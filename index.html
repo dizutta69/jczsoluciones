@@ -1,48 +1,114 @@
 <!doctype html>
-<html>
+<html lang="es">
 <head>
   <meta charset="utf-8"/>
-  <title>Cotizador Solar Rápido</title>
-  <style>body{font-family:system-ui;margin:2rem}</style>
+  <title>Cotizador Solar – Colombia</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <!-- CSS  -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    body{font-family:system-ui;margin:0;padding:1rem;background:#f7f7f7}
+    #map{height:50vh;border-radius:8px;margin-bottom:1rem}
+    label,input,button{font-size:1rem;padding:.4rem .6rem;margin:.2rem 0}
+    #searchBox{width:70%}
+    button{cursor:pointer;background:#00704a;color:#fff;border:none;border-radius:4px}
+    pre{background:#fff;padding:1rem;border-radius:4px;overflow:auto}
+  </style>
 </head>
+
 <body>
   <h1>Cotizador Solar Rápido</h1>
-  <label>Dirección: <input id="addr" placeholder="Av. Apoquindo 4800, Las Condes"></label><br>
-  <label>Factura mensual (CLP): <input id="bill" type="number"></label><br>
-  <button onclick="quote()">Cotizar</button>
-  <pre id="out"></pre>
 
+  <!-- Buscador -->
+  <label>
+    Dirección:
+    <input id="searchBox" type="text" placeholder="Cra 15 # 120-30, Bogotá"/>
+    <button onclick="buscar()">Buscar</button>
+  </label>
+  <br/>
+
+  <!-- Mapa -->
+  <div id="map"></div>
+
+  <!-- Factura -->
+  <label>Factura mensual (COP):
+    <input id="bill" type="number" placeholder="200000"/>
+  </label>
+  <br/>
+
+  <!-- Coordenadas visibles (solo lectura) -->
+  <label>Lat: <input id="latTxt" readonly/></label>
+  <label>Lon: <input id="lonTxt" readonly/></label>
+  <br/>
+
+  <button onclick="cotizar()">Cotizar</button>
+
+  <pre id="out">Resultado aparecerá aquí…</pre>
+
+  <!-- JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-  async function quote(){
-    const addr = document.getElementById("addr").value;
-    const bill = document.getElementById("bill").value;
-    // Geocodificar gratis con Nominatim
-    const geo = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr)}`).then(r=>r.json());
-    if(!geo.length){ alert("No encontré la dirección"); return; }
-    const {lat,lon} = geo[0];
+    /* ---------- MAPA ---------- */
+    const map = L.map('map').setView([4.71, -74.07], 12); // Bogotá por defecto
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
 
-    // Disparar GitHub Action
-    const res = await fetch("https://api.github.com/repos/TU_USUARIO/TU_REPO/dispatches",{
-      method:"POST",
-      headers:{
-        "Accept":"application/vnd.github+json",
-        "Authorization":"token TU_GITHUB_TOKEN_CLASSIC", // scope: repo
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        event_type:"quote",
-        client_payload:{lat,lon,bill,currency:"CLP"}
-      })
-    });
-    if(!res.ok){ alert("Error llamando backend"); return; }
+    let marker = L.marker([4.71, -74.07], {draggable:true}).addTo(map);
+    marker.on('dragend', ev => actualizaCoords(ev.target.getLatLng()));
 
-    // Esperar ~30 s y leer el artefacto (simplificado: lo escribimos en una Issue)
-    document.getElementById("out").textContent = "Calculando…";
-    await new Promise(r=>setTimeout(r,35000));
-    const issue = await fetch("https://api.github.com/repos/TU_USUARIO/TU_REPO/issues?sort=created&direction=desc&per_page=1")
-                   .then(r=>r.json()).then(j=>j[0]);
-    document.getElementById("out").textContent = issue.body;
-  }
+    function actualizaCoords(latlng){
+      const {lat, lng} = latlng;
+      document.getElementById('latTxt').value = lat.toFixed(5);
+      document.getElementById('lonTxt').value = lng.toFixed(5);
+    }
+
+    /* ---------- BUSCADOR ---------- */
+    async function buscar(){
+      const q = document.getElementById('searchBox').value;
+      if(!q){ alert('Escribe una dirección'); return; }
+      const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(q)}&countrycodes=co`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if(!data.length){ alert('Dirección no encontrada'); return; }
+      const {lat, lon, display_name} = data[0];
+      const latlng = [parseFloat(lat), parseFloat(lon)];
+      map.setView(latlng, 16);
+      marker.setLatLng(latlng);
+      actualizaCoords({lat:lat, lng:lon});
+    }
+
+    /* ---------- COTIZAR ---------- */
+    async function cotizar(){
+      const lat = parseFloat(document.getElementById('latTxt').value);
+      const lon = parseFloat(document.getElementById('lonTxt').value);
+      const bill = parseFloat(document.getElementById('bill').value);
+      if(!lat || !lon || !bill){ alert('Define ubicación y factura'); return; }
+
+      document.getElementById('out').textContent = 'Calculando…';
+
+      // Dispara GitHub Action igual que antes
+      const resp = await fetch("https://api.github.com/repos/TU_USUARIO/TU_REPO/dispatches",{
+        method:"POST",
+        headers:{
+          "Accept":"application/vnd.github+json",
+          "Authorization":"token TU_GITHUB_TOKEN_CLASSIC",
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          event_type:"quote",
+          client_payload:{lat, lon, bill, currency:"COP"}
+        })
+      });
+      if(!resp.ok){ alert("Error llamando backend"); return; }
+
+      // Esperamos 30 s y leemos la última Issue
+      await new Promise(r=>setTimeout(r,32000));
+      const issue = await fetch("https://api.github.com/repos/TU_USUARIO/TU_REPO/issues?sort=created&direction=desc&per_page=1")
+                     .then(r=>r.json()).then(j=>j[0]);
+      document.getElementById('out').textContent = issue.body;
+    }
   </script>
 </body>
 </html>
