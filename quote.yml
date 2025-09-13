@@ -1,0 +1,20 @@
+name: SolarQuote
+on:
+  repository_dispatch:
+    types: [quote]
+
+jobs:
+  calc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with: {python-version: '3.11'}
+      - run: pip install -r requirements.txt
+      - run: python quote.py
+        env:
+          INPUT_LAT: ${{ github.event.client_payload.lat }}
+          INPUT_LON: ${{ github.event.client_payload.lon }}
+          INPUT_BILL: ${{ github.event.client_payload.bill }}
+          INPUT_CURRENCY: ${{ github.event.client_payload.currency }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
