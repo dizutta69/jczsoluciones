@@ -4,7 +4,6 @@
   <meta charset="utf-8"/>
   <title>Cotizador Solar – Colombia (Google Maps)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <style>
     body{font-family:system-ui;margin:0;padding:1rem;background:#f7f7f7}
     #map{height:55vh;border-radius:8px;margin:.5rem 0}
@@ -18,7 +17,6 @@
 <body>
   <h1>Cotizador Solar Rápido</h1>
 
-  <!-- ===== BÚSQUEDA ===== -->
   <label>
     Dirección:
     <input id="searchBox" type="text" placeholder="Cra 15 # 120-30, Bogotá"/>
@@ -26,16 +24,13 @@
   </label>
   <br/>
 
-  <!-- ===== MAPA ===== -->
   <div id="map"></div>
 
-  <!-- ===== FACTURA ===== -->
   <label>Factura mensual (COP):
     <input id="bill" type="number" placeholder="200000"/>
   </label>
   <br/>
 
-  <!-- ===== COORDENADAS ===== -->
   <label>Lat: <input id="latTxt" readonly/></label>
   <label>Lon: <input id="lonTxt" readonly/></label>
   <br/>
@@ -44,9 +39,9 @@
 
   <pre id="out">Resultado aparecerá aquí…</pre>
 
-  <!-- ===== GOOGLE MAPS ===== -->
+  <!-- Google Maps -->
   <script>
-    let map, marker, autocomplete, searchBox;
+    let map, marker, autocomplete;
 
     function initMap(){
       const bogota = {lat:4.711, lng:-74.072};
@@ -65,22 +60,18 @@
         title: 'Arrastra para ajustar'
       });
 
-      // Cuadro de autocompletado
-      searchBox = document.getElementById('searchBox');
-      autocomplete = new google.maps.places.Autocomplete(searchBox, {
+      const input = document.getElementById('searchBox');
+      autocomplete = new google.maps.places.Autocomplete(input, {
         fields: ['geometry', 'formatted_address'],
         types: ['address']
       });
       autocomplete.bindTo('bounds', map);
-
-      // Evento cuando el usuario ELIGE del desplegable
       autocomplete.addListener('place_changed', ()=>{
         const place = autocomplete.getPlace();
         if(!place.geometry){ return; }
         muestraLugar(place.geometry.location);
       });
 
-      // Arrastrar marcador
       marker.addListener('dragend', ()=>{
         const pos = marker.getPosition();
         actualizaCoords(pos.lat(), pos.lng());
@@ -89,17 +80,14 @@
       actualizaCoords(bogota.lat, bogota.lng);
     }
 
-    // FUNCIÓN que llama el BOTÓN «Buscar»
     function buscaConBoton(){
-      // Si el autocompletado ya tiene un lugar seleccionado, lo usamos
-      const place = autocomplete.getPlace();
+      const place = autocomplete.getPlace && autocomplete.getPlace();
       if(place && place.geometry){
         muestraLugar(place.geometry.location);
         return;
       }
-      // Si no, hacemos una búsqueda programada con PlacesService
       const service = new google.maps.places.PlacesService(map);
-      service.textSearch({query: searchBox.value}, (results, status)=>{
+      service.textSearch({query: document.getElementById('searchBox').value}, (results, status)=>{
         if(status === google.maps.places.PlacesServiceStatus.OK && results[0]){
           muestraLugar(results[0].geometry.location);
         }else{
@@ -114,9 +102,9 @@
       actualizaCoords(latLng.lat(), latLng.lng());
     }
 
-    function actualizaCoords(lat, lon){
+    function actualizaCoords(lat, lng){
       document.getElementById('latTxt').value = lat.toFixed(5);
-      document.getElementById('lonTxt').value = lon.toFixed(5);
+      document.getElementById('lonTxt').value = lng.toFixed(5);
     }
 
     /* ---------- COTIZAR ---------- */
@@ -128,19 +116,28 @@
 
       document.getElementById('out').textContent = 'Calculando…';
 
-      const resp = await fetch("https://api.github.com/repos/dizutta69/energialt/dispatches",{
+      const url   = "https://api.github.com/repos/dizutta69/energialt/dispatches";
+      const token = "{{ secrets.GH_TOKEN }}";   // ← placeholder
+      const body  = JSON.stringify({
+                      event_type:"quote",
+                      client_payload:{lat, lon, bill, currency:"COP"}
+                    });
+
+      const resp = await fetch(url,{
         method:"POST",
         headers:{
           "Accept":"application/vnd.github+json",
-          "Authorization":"token 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",
+          "Authorization":"token "+token,
           "Content-Type":"application/json"
         },
-        body:JSON.stringify({
-          event_type:"quote",
-          client_payload:{lat, lon, bill, currency:"COP"}
-        })
+        body
       });
-      if(!resp.ok){ alert("Error llamando backend"); return; }
+
+      if(!resp.ok){
+        console.error("Status:", resp.status, resp.statusText);
+        alert("Error llamando backend – revisa consola (F12)");
+        return;
+      }
 
       await new Promise(r=>setTimeout(r,32000));
       const issue = await fetch("https://api.github.com/repos/dizutta69/energialt/issues?sort=created&direction=desc&per_page=1")
@@ -149,10 +146,9 @@
     }
   </script>
 
-  <!-- Carga de Google Maps con tu clave -->
+  <!-- Carga de Google Maps con tu clave real (sin secretos) -->
   <script async
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAxfYXhmjShvgyGH-3AVUQAyKNFxINjfqk&libraries=places&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=GOOGLE_API_KEY_AQUI&libraries=places&callback=initMap">
   </script>
 </body>
 </html>
-
