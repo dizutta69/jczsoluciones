@@ -4,40 +4,45 @@
   <meta charset="utf-8"/>
   <title>Cotizador Solar – Colombia</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-
-  <!-- CSS  -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <style>
     body{font-family:system-ui;margin:0;padding:1rem;background:#f7f7f7}
-    #map{height:50vh;border-radius:8px;margin-bottom:1rem}
+    #map{height:50vh;border-radius:8px;margin:.5rem 0}
     label,input,button{font-size:1rem;padding:.4rem .6rem;margin:.2rem 0}
-    #searchBox{width:70%}
+    #searchBox{width:65%}
     button{cursor:pointer;background:#00704a;color:#fff;border:none;border-radius:4px}
     pre{background:#fff;padding:1rem;border-radius:4px;overflow:auto}
+    #pickLabel{display:none;margin-top:.5rem}
   </style>
 </head>
 
 <body>
   <h1>Cotizador Solar Rápido</h1>
 
-  <!-- Buscador -->
-  <label>
-    Dirección:
-    <input id="searchBox" type="text" placeholder="Cra 15 # 120-30, Bogotá"/>
+  <!-- ===== BÚSQUEDA ===== -->
+  <label>Dirección:
+    <input id="searchBox" type="text" placeholder="Calle 93 # 7-65, Chapinero, Bogotá"/>
     <button onclick="buscar()">Buscar</button>
   </label>
   <br/>
+  <label>O pega lat,lon: <input id="manualLatLon" placeholder="6.244,-75.574"/></label>
+  <button onclick="usaManual()">Usar</button>
 
-  <!-- Mapa -->
+  <!-- Selector múltiple (oculto al principio) -->
+  <label id="pickLabel">Elige resultado:
+    <select id="pickList" onchange="usaEste()"></select>
+  </label>
+
+  <!-- ===== MAPA ===== -->
   <div id="map"></div>
 
-  <!-- Factura -->
+  <!-- ===== FACTURA ===== -->
   <label>Factura mensual (COP):
     <input id="bill" type="number" placeholder="200000"/>
   </label>
   <br/>
 
-  <!-- Coordenadas visibles (solo lectura) -->
+  <!-- ===== COORDENADAS ===== -->
   <label>Lat: <input id="latTxt" readonly/></label>
   <label>Lon: <input id="lonTxt" readonly/></label>
   <br/>
@@ -46,16 +51,16 @@
 
   <pre id="out">Resultado aparecerá aquí…</pre>
 
-  <!-- JS -->
+  <!-- ===== JS ===== -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     /* ---------- MAPA ---------- */
-    const map = L.map('map').setView([4.71, -74.07], 12); // Bogotá por defecto
+    const map = L.map('map').setView([4.711, -74.072], 12); // Bogotá
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
+      attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    let marker = L.marker([4.71, -74.07], {draggable:true}).addTo(map);
+    let marker = L.marker([4.711, -74.072], {draggable:true}).addTo(map);
     marker.on('dragend', ev => actualizaCoords(ev.target.getLatLng()));
 
     function actualizaCoords(latlng){
@@ -64,19 +69,64 @@
       document.getElementById('lonTxt').value = lng.toFixed(5);
     }
 
-    /* ---------- BUSCADOR ---------- */
+    /* ---------- BÚSQUEDA ---------- */
     async function buscar(){
-      const q = document.getElementById('searchBox').value;
+      const q = document.getElementById('searchBox').value.trim();
       if(!q){ alert('Escribe una dirección'); return; }
-      const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(q)}&countrycodes=co`;
-      const res = await fetch(url);
-      const data = await res.json();
-      if(!data.length){ alert('Dirección no encontrada'); return; }
-      const {lat, lon, display_name} = data[0];
-      const latlng = [parseFloat(lat), parseFloat(lon)];
+
+      // 1) Intentar solo Colombia
+      let url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(q)}&limit=5&countrycodes=co`;
+      let data = await fetch(url).then(r=>r.json());
+
+      // 2) Si no hay nada, buscar global
+      if(!data.length){
+        url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(q)}&limit=5`;
+        data = await fetch(url).then(r=>r.json());
+      }
+
+      console.log('Nominatim resp:', data);
+      if(!data.length){ alert('Dirección no encontrada. Prueba otra forma o pega lat,lon'); return; }
+
+      // 3) Mostrar selector si hay varios
+      if(data.length > 1){
+        const pick = document.getElementById('pickList');
+        pick.innerHTML = '';
+        data.forEach((r,i)=>{
+          const opt = document.createElement('option');
+          opt.value = i;
+          opt.textContent = r.display_name;
+          pick.appendChild(opt);
+        });
+        document.getElementById('pickLabel').style.display = 'inline-block';
+        window.nominatimData = data;
+        usaEste(); // carga el primero
+      }else{
+        muestraResultado(data[0]);
+      }
+    }
+
+    function usaEste(){
+      const idx = document.getElementById('pickList').value;
+      muestraResultado(window.nominatimData[idx]);
+    }
+
+    function muestraResultado(r){
+      const latlng = [parseFloat(r.lat), parseFloat(r.lon)];
       map.setView(latlng, 16);
       marker.setLatLng(latlng);
-      actualizaCoords({lat:lat, lng:lon});
+      actualizaCoords({lat:r.lat, lng:r.lon});
+    }
+
+    /* ---------- ENTRADA MANUAL LAT,LON ---------- */
+    function usaManual(){
+      const txt = document.getElementById('manualLatLon').value.trim();
+      const m = txt.match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);
+      if(!m){ alert('Formato debe ser: lat,lon  ej: 6.244,-75.574'); return; }
+      const lat = parseFloat(m[1]), lon = parseFloat(m[2]);
+      const latlng = [lat, lon];
+      map.setView(latlng, 16);
+      marker.setLatLng(latlng);
+      actualizaCoords({lat, lng:lon});
     }
 
     /* ---------- COTIZAR ---------- */
@@ -88,7 +138,7 @@
 
       document.getElementById('out').textContent = 'Calculando…';
 
-      // Dispara GitHub Action igual que antes
+      // Dispara GitHub Action
       const resp = await fetch("https://api.github.com/repos/TU_USUARIO/TU_REPO/dispatches",{
         method:"POST",
         headers:{
@@ -103,7 +153,7 @@
       });
       if(!resp.ok){ alert("Error llamando backend"); return; }
 
-      // Esperamos 30 s y leemos la última Issue
+      // Esperar 30 s y leer última Issue
       await new Promise(r=>setTimeout(r,32000));
       const issue = await fetch("https://api.github.com/repos/TU_USUARIO/TU_REPO/issues?sort=created&direction=desc&per_page=1")
                      .then(r=>r.json()).then(j=>j[0]);
