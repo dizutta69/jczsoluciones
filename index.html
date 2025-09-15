@@ -2,47 +2,38 @@
 <html lang="es">
 <head>
   <meta charset="utf-8"/>
-  <title>Cotizador Solar – Colombia</title>
+  <title>Cotizador Solar – Colombia (Google Maps)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <style>
     body{font-family:system-ui;margin:0;padding:1rem;background:#f7f7f7}
-    #map{height:50vh;border-radius:8px;margin:.5rem 0}
+    #map{height:60vh;border-radius:8px;margin:.5rem 0}
     label,input,button{font-size:1rem;padding:.4rem .6rem;margin:.2rem 0}
     #searchBox{width:65%}
     button{cursor:pointer;background:#00704a;color:#fff;border:none;border-radius:4px}
     pre{background:#fff;padding:1rem;border-radius:4px;overflow:auto}
-    #pickLabel{display:none;margin-top:.5rem}
   </style>
 </head>
 
 <body>
   <h1>Cotizador Solar Rápido</h1>
 
-  <!-- ===== BÚSQUEDA ===== -->
-  <label>Dirección:
-    <input id="searchBox" type="text" placeholder="Calle 93 # 7-65, Chapinero, Bogotá"/>
-    <button onclick="buscar()">Buscar</button>
+  <!-- Búsqueda con autocompletado de Google -->
+  <label>
+    Dirección:
+    <input id="searchBox" type="text" placeholder="Cra 15 # 120-30, Bogotá"/>
   </label>
   <br/>
-  <label>O pega lat,lon: <input id="manualLatLon" placeholder="6.244,-75.574"/></label>
-  <button onclick="usaManual()">Usar</button>
 
-  <!-- Selector múltiple (oculto al principio) -->
-  <label id="pickLabel">Elige resultado:
-    <select id="pickList" onchange="usaEste()"></select>
-  </label>
-
-  <!-- ===== MAPA ===== -->
+  <!-- Mapa -->
   <div id="map"></div>
 
-  <!-- ===== FACTURA ===== -->
+  <!-- Factura -->
   <label>Factura mensual (COP):
     <input id="bill" type="number" placeholder="200000"/>
   </label>
   <br/>
 
-  <!-- ===== COORDENADAS ===== -->
+  <!-- Coordenadas -->
   <label>Lat: <input id="latTxt" readonly/></label>
   <label>Lon: <input id="lonTxt" readonly/></label>
   <br/>
@@ -51,82 +42,61 @@
 
   <pre id="out">Resultado aparecerá aquí…</pre>
 
-  <!-- ===== JS ===== -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Google Maps + Places -->
   <script>
-    /* ---------- MAPA ---------- */
-    const map = L.map('map').setView([4.711, -74.072], 12); // Bogotá
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+    let map, marker, autocomplete;
 
-    let marker = L.marker([4.711, -74.072], {draggable:true}).addTo(map);
-    marker.on('dragend', ev => actualizaCoords(ev.target.getLatLng()));
+    function initMap(){
+      // Centro inicial: Bogotá
+      const bogota = {lat:4.711, lng:-74.072};
+      map = new google.maps.Map(document.getElementById('map'),{
+        zoom: 12,
+        center: bogota,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false
+      });
 
-    function actualizaCoords(latlng){
-      const {lat, lng} = latlng;
+      // Marcador arrastrable
+      marker = new google.maps.Marker({
+        position: bogota,
+        map: map,
+        draggable: true,
+        title: 'Arrastra para ajustar'
+      });
+
+      // Autocompletado
+      const input = document.getElementById('searchBox');
+      autocomplete = new google.maps.places.Autocomplete(input, {
+        fields: ['geometry', 'formatted_address'],
+        types: ['address']
+      });
+      autocomplete.bindTo('bounds', map);
+
+      // Eventos
+      autocomplete.addListener('place_changed', ()=>{
+        const place = autocomplete.getPlace();
+        if(!place.geometry){ return; }
+        muestraLugar(place.geometry.location);
+      });
+
+      marker.addListener('dragend', ()=>{
+        const pos = marker.getPosition();
+        actualizaCoords(pos.lat(), pos.lng());
+      });
+
+      actualizaCoords(bogota.lat, bogota.lng);
+    }
+
+    function muestraLugar(latLng){
+      map.setCenter(latLng);
+      marker.setPosition(latLng);
+      actualizaCoords(latLng.lat(), latLng.lng());
+    }
+
+    function actualizaCoords(lat, lon){
       document.getElementById('latTxt').value = lat.toFixed(5);
-      document.getElementById('lonTxt').value = lng.toFixed(5);
-    }
-
-    /* ---------- BÚSQUEDA ---------- */
-    async function buscar(){
-      const q = document.getElementById('searchBox').value.trim();
-      if(!q){ alert('Escribe una dirección'); return; }
-
-      // 1) Intentar solo Colombia
-      let url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(q)}&limit=5&countrycodes=co`;
-      let data = await fetch(url).then(r=>r.json());
-
-      // 2) Si no hay nada, buscar global
-      if(!data.length){
-        url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(q)}&limit=5`;
-        data = await fetch(url).then(r=>r.json());
-      }
-
-      console.log('Nominatim resp:', data);
-      if(!data.length){ alert('Dirección no encontrada. Prueba otra forma o pega lat,lon'); return; }
-
-      // 3) Mostrar selector si hay varios
-      if(data.length > 1){
-        const pick = document.getElementById('pickList');
-        pick.innerHTML = '';
-        data.forEach((r,i)=>{
-          const opt = document.createElement('option');
-          opt.value = i;
-          opt.textContent = r.display_name;
-          pick.appendChild(opt);
-        });
-        document.getElementById('pickLabel').style.display = 'inline-block';
-        window.nominatimData = data;
-        usaEste(); // carga el primero
-      }else{
-        muestraResultado(data[0]);
-      }
-    }
-
-    function usaEste(){
-      const idx = document.getElementById('pickList').value;
-      muestraResultado(window.nominatimData[idx]);
-    }
-
-    function muestraResultado(r){
-      const latlng = [parseFloat(r.lat), parseFloat(r.lon)];
-      map.setView(latlng, 16);
-      marker.setLatLng(latlng);
-      actualizaCoords({lat:r.lat, lng:r.lon});
-    }
-
-    /* ---------- ENTRADA MANUAL LAT,LON ---------- */
-    function usaManual(){
-      const txt = document.getElementById('manualLatLon').value.trim();
-      const m = txt.match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);
-      if(!m){ alert('Formato debe ser: lat,lon  ej: 6.244,-75.574'); return; }
-      const lat = parseFloat(m[1]), lon = parseFloat(m[2]);
-      const latlng = [lat, lon];
-      map.setView(latlng, 16);
-      marker.setLatLng(latlng);
-      actualizaCoords({lat, lng:lon});
+      document.getElementById('lonTxt').value = lon.toFixed(5);
     }
 
     /* ---------- COTIZAR ---------- */
@@ -138,7 +108,7 @@
 
       document.getElementById('out').textContent = 'Calculando…';
 
-      // Dispara GitHub Action
+      // Dispara GitHub Action (mismo endpoint que antes)
       const resp = await fetch("https://api.github.com/repos/dizutta69/energialt/dispatches",{
         method:"POST",
         headers:{
@@ -160,8 +130,10 @@
       document.getElementById('out').textContent = issue.body;
     }
   </script>
+
+  <!-- Carga de Google Maps con tu clave -->
+  <script async
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCydM17t7bn_u-HM_WrkN4HdnhiLwK2erk&libraries=places&callback=initMap">
+  </script>
 </body>
 </html>
-
-
-
