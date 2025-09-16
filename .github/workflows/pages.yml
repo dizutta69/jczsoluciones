@@ -1,7 +1,12 @@
-name: Publish to GitHub Pages
+name: Publish to GitHub Pages   # debe llamarse ESTO para que GitHub lo reconozca
 on:
   push:
     branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   build:
@@ -9,14 +14,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Insert secrets
+      - name: Sustituir placeholders
         run: |
           sed -i "s|{{ secrets.GH_TOKEN }}|${{ secrets.GH_TOKEN }}|g" index.html
           sed -i "s|GOOGLE_API_KEY_AQUI|${{ secrets.GOOGLE_API_KEY }}|g" index.html
 
-      - name: Deploy to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Subir artefacto
+        uses: actions/upload-pages-artifact@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .          # sube todo el directorio
-          publish_branch: gh-pages # ← importante
+          path: .          # todo el repo
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v3
