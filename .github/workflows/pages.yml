@@ -1,7 +1,9 @@
-name: Publish to GitHub Pages   # debe llamarse ESTO para que GitHub lo reconozca
+name: Publish to GitHub Pages
 on:
   push:
     branches: [main]
+  repository_dispatch:   # ← ¡falta!
+    types: [quote]
 
 permissions:
   contents: read
