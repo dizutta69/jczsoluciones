@@ -1,20 +1,45 @@
-name: SolarQuote
+name: Quote (repository_dispatch)
 on:
   repository_dispatch:
     types: [quote]
 
 jobs:
-  calc:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with: {python-version: '3.11'}
-      - run: pip install -r requirements.txt
-      - run: python quote.py
-        env:
-          INPUT_LAT: ${{ github.event.client_payload.lat }}
-          INPUT_LON: ${{ github.event.client_payload.lon }}
-          INPUT_BILL: ${{ github.event.client_payload.bill }}
-          INPUT_CURRENCY: ${{ github.event.client_payload.currency }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sustituir placeholders
+        run: |
+          sed -i "s|{{ secrets.GH_TOKEN }}|${{ secrets.GH_TOKEN }}|g" index.html
+          sed -i "s|GOOGLE_API_KEY_AQUI|${{ secrets.GOOGLE_API_KEY }}|g" index.html
+
+      - name: Subir artefacto
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+
+  create-issue:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Crear Issue con la cotización
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const payload = context.payload.client_payload;
+            const body = JSON.stringify(payload, null, 2);
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Cotización solar ${payload.lat},${payload.lon}`,
+              body: `\`\`\`json\n${body}\n\`\`\``
+            });
