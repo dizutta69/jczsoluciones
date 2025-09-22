@@ -8,12 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Sustituir placeholders
         run: |
           sed -i "s|{{ secrets.GH_TOKEN }}|${{ secrets.GH_TOKEN }}|g" index.html
           sed -i "s|GOOGLE_API_KEY_AQUI|${{ secrets.GOOGLE_API_KEY }}|g" index.html
-
       - name: Subir artefacto
         uses: actions/upload-pages-artifact@v3
         with:
@@ -26,7 +24,7 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
 
-  create-issue:
+  create-issue:          # ← debe estar al mismo nivel que «build» y «deploy»
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -36,10 +34,10 @@ jobs:
         with:
           script: |
             const payload = context.payload.client_payload;
-            const body = JSON.stringify(payload, null, 2);
+            const body    = JSON.stringify(payload, null, 2);
             await github.rest.issues.create({
               owner: context.repo.owner,
-              repo: context.repo.repo,
+              repo:  context.repo.repo,
               title: `Cotización solar ${payload.lat},${payload.lon}`,
-              body: `\`\`\`json\n${body}\n\`\`\``
+              body:  `\`\`\`json\n${body}\n\`\`\``
             });
