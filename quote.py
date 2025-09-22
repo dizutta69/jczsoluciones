@@ -1,38 +1,34 @@
 #!/usr/bin/env python3
 """
-Backend serverless – Cotizador solar rápido
-Adaptado para Colombia (COP)
+Server-less solar quick-quote
+Adapted for Colombia (COP)
 """
-import os
-import json
-import math
-import requests
-import datetime as dt
+import os, json, math, requests, datetime as dt
 from pvlib import irradiance, location
 
-# ---------- PARÁMETROS COLOMBIA ----------
-CUR       = "COP"          # moneda local
-PRICE_KWH = 890            # COP/kWh promedio residencial (CREG 2024)
-USD_COP   = 4_000          # tasa de cambio hoy (ajustar si fluctúa)
-USD_W     = 0.9            # USD/W instalado (referencia)
-LOSS      = 0.8            # pérdidas totales DC/AC
-TARGET    = 0.7            # 70 % de ahorro deseado
-# -----------------------------------------
+# ---------- Colombia constants ----------
+CUR       = "COP"
+PRICE_KWH = 890            # COP / kWh (CREG 2024)
+USD_COP   = 4_000          # today´s rate
+USD_W     = 0.9            # USD / Wp installed
+LOSS      = 0.8            # DC/AC losses
+TARGET    = 0.7            # 70 % bill reduction
 
+# ---------- Inputs ----------
 LAT   = float(os.getenv("INPUT_LAT"))
 LON   = float(os.getenv("INPUT_LON"))
 BILL  = float(os.getenv("INPUT_BILL"))
 
-# 1) kWh mensuales que paga el usuario
+# 1) Monthly kWh from bill
 kwh_month = BILL / PRICE_KWH
 kwh_70    = kwh_month * TARGET
 
-# 2) Producción específica anual (kWh/kWp) con PVWatts
+# 2) Specific yield (kWh/kWp/year) via PVWatts
 try:
     resp = requests.get(
         "https://developer.nrel.gov/api/pvwatts/v8.json",
         params={
-            "api_key": "DEMO_KEY",  # pide tu propia key en 30 s
+            "api_key": "DEMO_KEY",   # get yours in 30 s
             "lat": LAT,
             "lon": LON,
             "system_capacity": 1,
@@ -45,31 +41,25 @@ try:
         },
         timeout=10
     ).json()
-    specific = sum(resp["outputs"]["ac_monthly"]) / 1.0  # kWh/kWp/año
+    specific = sum(resp["outputs"]["ac_monthly"]) / 1.0   # kWh/kWp/year
 except Exception:
-    # Fallback Open-Meteo
-    meteo = requests.get(
-        f"https://archive-api.open-meteo.com/v1/era5?"
-        f"latitude={LAT}&longitude={LON}&start_date=2022-01-01&end_date=2022-12-31"
-        f"&daily=shortwave_radiation_sum&timezone=auto"
-    ).json()
-    ghi_day = sum(meteo["daily"]["shortwave_radiation_sum"]) / 365  # Wh/m²/day
-    specific = ghi_day * 0.365 * LOSS * 0.2  # 0.2 rendimiento panel
+    # fallback Bogotá
+    specific = 1350
 
-# 3) kWp necesarios
+# 3) kWp required
 kwp = (kwh_70 * 12) / specific
-panels = math.ceil(kwp / 0.45)  # 450 Wp por panel
+panels = math.ceil(kwp / 0.45)          # 450 Wp panels
 kwp_real = panels * 0.45
 
-# 4) Precio
-price_usd   = kwp_real * 1000 * USD_W
-price_cop   = price_usd * USD_COP
+# 4) Price
+price_usd = kwp_real * 1000 * USD_W
+price_cop = price_usd * USD_COP
 
-# 5) Payback simple
-ahorro_anual_usd = (BILL * 12 * TARGET) / USD_COP
-payback = price_usd / ahorro_anual_usd if ahorro_anual_usd else 99
+# 5) Simple pay-back
+ahorro_anual_cop = (BILL * 12 * TARGET)
+payback = price_cop / ahorro_anual_cop if ahorro_anual_cop else 99
 
-# 6) Salida
+# 6) Output
 result = {
     "kwh_month_total": round(kwh_month, 0),
     "kwh_month_target": round(kwh_70, 0),
@@ -84,7 +74,7 @@ result = {
 with open("quote.json", "w", encoding="utf-8") as f:
     json.dump(result, f, ensure_ascii=False)
 
-# (Opcional) crear Issue con la cotización
+# Optional: create GitHub issue (kept for compatibility)
 import github
 g = github.Github(os.getenv("GITHUB_TOKEN"))
 repo = g.get_repo(os.getenv("GITHUB_REPOSITORY"))
