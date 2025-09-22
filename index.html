@@ -107,7 +107,7 @@
       document.getElementById('lonTxt').value = lng.toFixed(5);
     }
 
-    /* ---------- COTIZAR ---------- */
+    /* ---------- CÁLCULO INSTANTÁNEO ---------- */
     async function cotizar(){
       const lat = parseFloat(document.getElementById('latTxt').value);
       const lon = parseFloat(document.getElementById('lonTxt').value);
@@ -116,41 +116,68 @@
 
       document.getElementById('out').textContent = 'Calculando…';
 
-      const url   = "https://api.github.com/repos/dizutta69/energialt/dispatches";
-      const token = "{{ secrets.GH_TOKEN }}";   // ← placeholder
-      const body  = JSON.stringify({
-                      event_type:"quote",
-                      client_payload:{lat, lon, bill, currency:"COP"}
-                    });
+      /* ====== CONSTANTS ====== */
+      const PRICE_KWH       = 890;           // COP / kWh
+      const USD_COP         = 4000;          // today
+      const USD_W_INSTALLED = 0.9;           // USD / Wp
+      const PANEL_W         = 450;           // Wp per panel
+      const LOSS            = 0.8;           // DC/AC losses
+      const TARGET          = 0.7;           // 70 % savings
 
-      const resp = await fetch(url,{
+      /* 1) Monthly kWh from bill */
+      const kwhMonth = bill / PRICE_KWH;
+      const kwh70    = kwhMonth * TARGET;
+
+      /* 2) Specific yield (kWh/kWp/year) via PVWatts client-side */
+      let specific;
+      try{
+        const pvw = await fetch(
+          `https://developer.nrel.gov/api/pvwatts/v8.json?api_key=DEMO_KEY&lat=${lat}&lon=${lon}&system_capacity=1&azimuth=180&tilt=${Math.abs(lat)}&array_type=1&losses=14&timeframe=monthly`
+        ).then(r => r.json());
+        specific = pvw.outputs.ac_monthly.reduce((a,b)=>a+b,0) / 1.0; // kWh/kWp/year
+      }catch{
+        specific = 1350; // Bogotá fallback
+      }
+
+      /* 3) kWp required */
+      const kwp     = (kwh70 * 12) / specific;
+      const panels  = Math.ceil(kwp / (PANEL_W/1000));
+      const kwpReal = panels * (PANEL_W/1000);
+
+      /* 4) Price */
+      const priceUsd = kwpReal * 1000 * USD_W_INSTALLED;
+      const priceCop = priceUsd * USD_COP;
+
+      /* 5) Simple pay-back */
+      const ahorroAnualCop = bill * 12 * TARGET;
+      const payback = priceCop / ahorroAnualCop;
+
+      /* 6) Build pretty output */
+      const out =
+        `💡 Consumo mensual: ${kwhMonth.toLocaleString()} kWh\n` +
+        `☀️  Objetivo solar (70 %): ${kwh70.toLocaleString()} kWh\n` +
+        `🔧 Potencia de paneles: ${kwpReal.toFixed(2)} kWp  (${panels} paneles de ${PANEL_W} W)\n` +
+        `💰 Precio aproximado: COP ${priceCop.toLocaleString()}\n` +
+        `⏱️  Pay-back simple: ${payback.toFixed(1)} años`;
+
+      document.getElementById('out').textContent = out;
+
+      /* 7) (Optional) keep creating the Issue for record */
+      fetch("https://api.github.com/repos/dizutta69/energialt/dispatches",{
         method:"POST",
         headers:{
           "Accept":"application/vnd.github+json",
-          "Authorization":"token "+token,
+          "Authorization":"token {{ secrets.GH_TOKEN }}",
           "Content-Type":"application/json"
         },
-        body
+        body:JSON.stringify({event_type:"quote",client_payload:{lat,lon,bill,currency:"COP"}})
       });
-
-      if(!resp.ok){
-        console.error("Status:", resp.status, resp.statusText);
-        alert("Error llamando backend – revisa consola (F12)");
-        return;
-      }
-
-      await new Promise(r=>setTimeout(r,32000));
-      const issue = await fetch("https://api.github.com/repos/dizutta69/energialt/issues?sort=created&direction=desc&per_page=1")
-                     .then(r=>r.json()).then(j=>j[0]);
-      document.getElementById('out').textContent = issue.body;
     }
   </script>
 
   <!-- Carga de Google Maps con tu clave real (sin secretos) -->
   <script async
-    src="https://maps.googleapis.com/maps/api/js?
-    key=GOOGLE_API_KEY_AQUI&libraries=places&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=GOOGLE_API_KEY_AQUI&libraries=places&callback=initMap">
   </script>
 </body>
 </html>
-
