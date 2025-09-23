@@ -18,6 +18,7 @@
       padding: 1rem;
       font-family: system-ui, sans-serif;
       text-align: center;
+      margin-top: 1rem;
     }
     /* ---- Overlay texts on the image ---- */
     .energy-overlay {
@@ -28,6 +29,7 @@
     .energy-overlay img {
       max-width: 100%;
       height: auto;
+      display: block;
     }
     .overlay-text {
       position: absolute;
@@ -75,6 +77,13 @@
       padding: 1rem;
       border-radius: 4px;
       margin-top: 1rem;
+      border: 1px solid #ddd;
+    }
+    .calculando {
+      text-align: center;
+      padding: 2rem;
+      font-size: 1.2rem;
+      color: #666;
     }
   </style>
 </head>
@@ -102,34 +111,37 @@
 
   <button onclick="cotizar()">Cotizar</button>
 
-<!-- Diagrama con imagen + textos overlay -->
-<div class="energy-diagram">
-  <div class="energy-overlay">
-    <img src="solar.png" alt="Energy Diagram">
-    <span id="txtSolar" class="overlay-text">0 kWh/mes</span>
-    <span id="txtGrid"  class="overlay-text">0 kWh/mes</span>
-    <span id="txtHome"  class="overlay-text">0 kWh/mes</span>
-  </div>
+<!-- Aquí se mostrará el texto de resultados -->
+<div id="textOutput"></div>
 
+<!-- Diagrama con imagen + textos overlay - SIEMPRE VISIBLE -->
+<div id="diagramContainer" class="energy-diagram">
+  <div class="calculando" id="calculandoText" style="display: none;">Calculando...</div>
   
+  <div id="diagramContent">
+    <div class="energy-overlay">
+      <img src="solar.png" alt="Energy Diagram">
+      <span id="txtSolar" class="overlay-text">0 kWh/mes</span>
+      <span id="txtGrid"  class="overlay-text">0 kWh/mes</span>
+      <span id="txtHome"  class="overlay-text">0 kWh/mes</span>
+    </div>
+
     <!-- optional: keep the bars if you like them -->
     <div class="bar-wrap">
-      <div class="bar solar" id="barSolar"></div>
+      <div class="bar solar" id="barSolar" style="width: 0%"></div>
       <span class="label" id="labSolar">0 kWh/día</span>
     </div>
     <div class="bar-wrap">
-      <div class="bar grid" id="barGrid"></div>
+      <div class="bar grid" id="barGrid" style="width: 0%"></div>
       <span class="label" id="labGrid">0 kWh/día</span>
     </div>
     <div class="bar-wrap">
-      <div class="bar home" id="barHome"></div>
+      <div class="bar home" id="barHome" style="width: 0%"></div>
       <span class="label" id="labHome">0 kWh/día</span>
     </div>
     <p class="legend">💡 Solar · 🔴 Red · 🟠 Hogar</p>
   </div>
-
-  <!-- Aquí se mostrará el texto de resultados -->
-  <div id="textOutput"></div>
+</div>
 
   <!-- Google Maps -->
   <script>
@@ -206,7 +218,10 @@
       const bill = parseFloat(document.getElementById('bill').value);
       if(!lat || !lon || !bill){ alert('Define ubicación y factura'); return; }
 
-      document.getElementById('textOutput').textContent = 'Calculando…';
+      // Mostrar "Calculando..." en el área de texto, NO en el diagrama
+      document.getElementById('textOutput').textContent = 'Calculando...';
+      document.getElementById('calculandoText').style.display = 'block';
+      document.getElementById('diagramContent').style.display = 'none';
 
       /* ====== CONSTANTS ====== */
       const PRICE_KWH       = 890;           // COP / kWh
@@ -254,7 +269,11 @@
 
       document.getElementById('textOutput').textContent = out;
 
-      /* 7) CORRECCIÓN: Cálculos correctos para los textos overlay */
+      /* 7) CORRECCIÓN: Mostrar el diagrama con los resultados */
+      document.getElementById('calculandoText').style.display = 'none';
+      document.getElementById('diagramContent').style.display = 'block';
+
+      /* 8) Cálculos correctos para los textos overlay */
       // kWh/mes producidos por los paneles
       const monthlySolar = kwh70;
       // kWh/mes comprados de la red
@@ -266,7 +285,7 @@
       document.getElementById('txtGrid').textContent  = monthlyGrid.toLocaleString()  + ' kWh/mes';
       document.getElementById('txtHome').textContent  = monthlyHome.toLocaleString()  + ' kWh/mes';
       
-      /* 8) Actualizar barras con valores diarios */
+      /* 9) Actualizar barras con valores diarios */
       const dailySolar = monthlySolar / 30.4; // promedio mensual a diario
       const dailyGrid = monthlyGrid / 30.4;
       const dailyHome = monthlyHome / 30.4;
@@ -279,7 +298,7 @@
       document.getElementById('barHome').style.width  = `${(dailyHome  / maxBar * 70).toFixed(0)}%`;
       document.getElementById('labHome').textContent  = `${dailyHome.toFixed(2)}  kWh/día`;
 
-      /* 9) (Optional) keep creating the Issue for record */
+      /* 10) (Optional) keep creating the Issue for record */
       // Comentado temporalmente para evitar errores
       /*
       fetch("https://api.github.com/repos/dizutta69/energialt/dispatches",{
@@ -293,6 +312,13 @@
       });
       */
     }
+
+    // Inicializar barras a 0
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('barSolar').style.width = '0%';
+      document.getElementById('barGrid').style.width = '0%';
+      document.getElementById('barHome').style.width = '0%';
+    });
   </script>
 
   <!-- Carga de Google Maps con tu clave real (sin secretos) -->
