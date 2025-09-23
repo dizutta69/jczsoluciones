@@ -139,7 +139,7 @@
       color: #666;
     }
 
-    /* NUEVOS ESTILOS PARA LA GRÁFICA DE FLUJO DE CAJA */
+    /* NUEVOS ESTILOS PARA LA GRÁFICA DE LÍNEA */
     .cashflow-chart {
       background: #fff;
       border: 1px solid #ddd;
@@ -153,34 +153,14 @@
       height: 300px;
       margin: 1rem 0;
     }
-    .chart-bar {
-      position: absolute;
-      bottom: 0;
-      width: 30px;
-      transition: all 0.5s ease;
-      border-radius: 4px 4px 0 0;
-      text-align: center;
-      font-size: 0.8rem;
-      font-weight: bold;
-      color: #333;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding-top: 5px;
-    }
-    .positive-bar {
-      background: #2ecc71;
-    }
-    .negative-bar {
-      background: #e74c3c;
-    }
-    .break-even-bar {
-      background: #f39c12;
+    .chart-canvas {
+      width: 100%;
+      height: 100%;
     }
     .chart-labels {
       display: flex;
-      justify-content: space-around;
-      margin-top: 2rem;
+      justify-content: space-between;
+      margin-top: 1rem;
       font-size: 0.8rem;
       color: #666;
     }
@@ -198,8 +178,17 @@
     }
     .legend-color {
       width: 15px;
-      height: 15px;
+      height: 3px;
       border-radius: 3px;
+    }
+    .break-even-point {
+      position: absolute;
+      background: #f39c12;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 0 3px rgba(0,0,0,0.5);
     }
   </style>
 </head>
@@ -267,26 +256,31 @@
   </div>
 </div>
 
-<!-- NUEVA GRÁFICA DE FLUJO DE CAJA -->
+<!-- NUEVA GRÁFICA DE LÍNEA DE FLUJO DE CAJA -->
 <div id="cashflowChart" class="cashflow-chart" style="display: none;">
-  <h3>Flujo de Caja a 10 Años</h3>
-  <div class="chart-container" id="chartContainer"></div>
-  <div class="chart-labels" id="chartLabels"></div>
+  <h3>Flujo de Caja Acumulado (10 Años)</h3>
+  <div class="chart-container">
+    <canvas id="lineChart" class="chart-canvas"></canvas>
+  </div>
+  <div class="chart-labels">
+    <span>Inversión</span>
+    <span>Año 2</span>
+    <span>Año 4</span>
+    <span>Año 6</span>
+    <span>Año 8</span>
+    <span>Año 10</span>
+  </div>
   <div class="chart-legend">
     <div class="legend-item">
-      <div class="legend-color" style="background: #e74c3c;"></div>
-      <span>Inversión</span>
+      <div class="legend-color" style="background: #00704a;"></div>
+      <span>Flujo de Caja</span>
     </div>
     <div class="legend-item">
       <div class="legend-color" style="background: #f39c12;"></div>
       <span>Punto de Equilibrio</span>
     </div>
-    <div class="legend-item">
-      <div class="legend-color" style="background: #2ecc71;"></div>
-      <span>Ganancia Acumulada</span>
-    </div>
   </div>
-  <div id="chartSummary" style="margin-top: 1rem; text-align: center; font-weight: bold;"></div>
+  <div id="chartSummary" style="margin-top: 1rem; text-align: center; font-size: 0.9rem;"></div>
 </div>
 
   <!-- Google Maps -->
@@ -357,15 +351,15 @@
       document.getElementById('lonTxt').value = lng.toFixed(5);
     }
 
-    /* FUNCIÓN PARA CREAR LA GRÁFICA DE FLUJO DE CAJA */
-    function crearGraficaFlujoCaja(inversion, ahorroMensual, payback) {
-      const chartContainer = document.getElementById('chartContainer');
-      const chartLabels = document.getElementById('chartLabels');
+    /* FUNCIÓN PARA CREAR LA GRÁFICA DE LÍNEA */
+    function crearGraficaLinea(inversion, ahorroMensual, payback) {
+      const canvas = document.getElementById('lineChart');
+      const ctx = canvas.getContext('2d');
       const chartSummary = document.getElementById('chartSummary');
       
-      // Limpiar contenido anterior
-      chartContainer.innerHTML = '';
-      chartLabels.innerHTML = '';
+      // Configurar tamaño del canvas
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
       
       const años = 10;
       const ahorroAnual = ahorroMensual * 12;
@@ -384,66 +378,113 @@
         }
       }
       
-      // Encontrar máximo y mínimo para escalar la gráfica
-      const maxVal = Math.max(...flujoCaja.filter(val => val > 0));
+      // Configurar dimensiones de la gráfica
+      const padding = 40;
+      const width = canvas.width - padding * 2;
+      const height = canvas.height - padding * 2;
+      
+      // Encontrar máximo y mínimo para escalar
+      const maxVal = Math.max(...flujoCaja);
       const minVal = Math.min(...flujoCaja);
       const range = maxVal - minVal;
-      const scale = 280 / range; // 280px de altura útil
       
-      // Crear barras
-      const barWidth = (chartContainer.offsetWidth - 60) / (años + 1);
+      // Función para mapear valores a coordenadas
+      const x = (año) => padding + (año / años) * width;
+      const y = (valor) => {
+        const normalized = (valor - minVal) / range;
+        return padding + height - (normalized * height);
+      };
+      
+      // Limpiar canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Dibujar ejes
+      ctx.strokeStyle = '#ccc';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      // Eje X
+      ctx.moveTo(padding, padding + height);
+      ctx.lineTo(padding + width, padding + height);
+      // Eje Y
+      ctx.moveTo(padding, padding);
+      ctx.lineTo(padding, padding + height);
+      ctx.stroke();
+      
+      // Dibujar línea de cero
+      ctx.strokeStyle = '#999';
+      ctx.setLineDash([5, 3]);
+      ctx.beginPath();
+      const zeroY = y(0);
+      ctx.moveTo(padding, zeroY);
+      ctx.lineTo(padding + width, zeroY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      
+      // Dibujar línea de flujo de caja
+      ctx.strokeStyle = '#00704a';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
       
       for (let año = 0; año <= años; año++) {
-        const valor = flujoCaja[año];
-        const height = Math.abs(valor) * scale;
-        const left = año * barWidth + 20;
-        
-        const bar = document.createElement('div');
-        bar.className = 'chart-bar';
-        bar.style.left = left + 'px';
-        bar.style.width = (barWidth - 10) + 'px';
-        bar.style.height = height + 'px';
-        
-        // Determinar color de la barra
         if (año === 0) {
-          bar.className += ' negative-bar';
-          bar.textContent = `-$${(inversion/1000000).toFixed(0)}M`;
-        } else if (año === breakEvenYear && valor >= 0) {
-          bar.className += ' break-even-bar';
-          bar.textContent = `$${(valor/1000000).toFixed(0)}M`;
-        } else if (valor >= 0) {
-          bar.className += ' positive-bar';
-          bar.textContent = `$${(valor/1000000).toFixed(0)}M`;
+          ctx.moveTo(x(año), y(flujoCaja[año]));
         } else {
-          bar.className += ' negative-bar';
-          bar.textContent = `-$${(Math.abs(valor)/1000000).toFixed(0)}M`;
+          ctx.lineTo(x(año), y(flujoCaja[año]));
         }
-        
-        // Posicionar texto arriba o abajo según sea positivo o negativo
-        if (valor >= 0) {
-          bar.style.alignItems = 'flex-start';
-        } else {
-          bar.style.alignItems = 'flex-end';
-          bar.style.bottom = (280 - height) + 'px';
-        }
-        
-        chartContainer.appendChild(bar);
-        
-        // Crear etiquetas del eje X
-        const label = document.createElement('div');
-        label.textContent = año === 0 ? 'Inversión' : `Año ${año}`;
-        label.style.textAlign = 'center';
-        label.style.width = (barWidth - 10) + 'px';
-        label.style.marginLeft = left + 'px';
-        chartLabels.appendChild(label);
       }
+      ctx.stroke();
+      
+      // Dibujar puntos en cada año
+      for (let año = 0; año <= años; año++) {
+        const pointX = x(año);
+        const pointY = y(flujoCaja[año]);
+        
+        // Punto de equilibrio especial
+        if (año === breakEvenYear && flujoCaja[año] >= 0) {
+          ctx.fillStyle = '#f39c12';
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(pointX, pointY, 6, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = año === 0 ? '#e74c3c' : '#00704a';
+          ctx.beginPath();
+          ctx.arc(pointX, pointY, 4, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+        
+        // Etiquetas de valores
+        ctx.fillStyle = '#333';
+        ctx.font = '10px system-ui';
+        ctx.textAlign = 'center';
+        
+        // Solo mostrar algunos valores para no saturar
+        if (año === 0 || año === breakEvenYear || año === años || año % 2 === 0) {
+          const labelY = pointY - 15;
+          ctx.fillText(`$${(flujoCaja[año]/1000000).toFixed(1)}M`, pointX, labelY);
+        }
+      }
+      
+      // Etiquetas de ejes
+      ctx.fillStyle = '#666';
+      ctx.font = '12px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText('Años', canvas.width / 2, canvas.height - 10);
+      
+      ctx.save();
+      ctx.translate(10, canvas.height / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('Flujo de Caja Acumulado (COP)', 0, 0);
+      ctx.restore();
       
       // Resumen
       const gananciaTotal = flujoCaja[años];
       chartSummary.innerHTML = `
-        <div>Punto de equilibrio: Año ${breakEvenYear}</div>
-        <div>Ganancia acumulada a 10 años: $${gananciaTotal.toLocaleString()} COP</div>
-        <div>Retorno total: ${((gananciaTotal / inversion) * 100).toFixed(0)}%</div>
+        <div><strong>Punto de equilibrio:</strong> Año ${breakEvenYear} ($${flujoCaja[breakEvenYear]?.toLocaleString() || '0'} COP)</div>
+        <div><strong>Ganancia acumulada a 10 años:</strong> $${gananciaTotal.toLocaleString()} COP</div>
+        <div><strong>Retorno total:</strong> ${((gananciaTotal / inversion) * 100).toFixed(0)}%</div>
       `;
       
       // Mostrar la gráfica
@@ -548,8 +589,8 @@
       document.getElementById('barHome').style.width  = `${(dailyHome  / maxBar * 70).toFixed(0)}%`;
       document.getElementById('labHome').textContent  = `${dailyHome.toFixed(2)}  kWh/día`;
 
-      /* 12) CREAR GRÁFICA DE FLUJO DE CAJA */
-      crearGraficaFlujoCaja(priceCop, ahorroMensual, payback);
+      /* 12) CREAR GRÁFICA DE LÍNEA */
+      crearGraficaLinea(priceCop, ahorroMensual, payback);
 
       /* 13) (Optional) keep creating the Issue for record */
       // Comentado temporalmente para evitar errores
