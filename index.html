@@ -69,6 +69,13 @@
       font-size: .8rem;
       color: #666;
     }
+    #textOutput {
+      white-space: pre-line;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-top: 1rem;
+    }
   </style>
 </head>
 
@@ -96,7 +103,7 @@
   <button onclick="cotizar()">Cotizar</button>
 
 <!-- Diagrama con imagen + textos overlay -->
-<div id="out" class="energy-diagram">
+<div class="energy-diagram">
   <div class="energy-overlay">
     <img src="solar.png" alt="Energy Diagram">
     <span id="txtSolar" class="overlay-text">0 kWh/mes</span>
@@ -120,6 +127,9 @@
     </div>
     <p class="legend">💡 Solar · 🔴 Red · 🟠 Hogar</p>
   </div>
+
+  <!-- Aquí se mostrará el texto de resultados -->
+  <div id="textOutput"></div>
 
   <!-- Google Maps -->
   <script>
@@ -196,7 +206,7 @@
       const bill = parseFloat(document.getElementById('bill').value);
       if(!lat || !lon || !bill){ alert('Define ubicación y factura'); return; }
 
-      document.getElementById('out').textContent = 'Calculando…';
+      document.getElementById('textOutput').textContent = 'Calculando…';
 
       /* ====== CONSTANTS ====== */
       const PRICE_KWH       = 890;           // COP / kWh
@@ -242,23 +252,25 @@
         `💰 Precio aproximado: COP ${priceCop.toLocaleString()}\n` +
         `⏱️  Pay-back simple: ${payback.toFixed(1)} años`;
 
-      document.getElementById('out').textContent = out;
+      document.getElementById('textOutput').textContent = out;
 
-      /* 7) Update image text */
-      /* 7) Escribir valores ENCIMA de la imagen */
-      const monthlySolar = (kwh70 * 12) / specific;   // kWh/mes producidos
-      const monthlyGrid  = kwhMonth - kwh70;          // kWh/mes comprados
-      const monthlyHome  = kwhMonth;                  // kWh/mes consumidos
+      /* 7) CORRECCIÓN: Cálculos correctos para los textos overlay */
+      // kWh/mes producidos por los paneles
+      const monthlySolar = kwh70;
+      // kWh/mes comprados de la red
+      const monthlyGrid = kwhMonth - kwh70;
+      // kWh/mes consumidos por el hogar
+      const monthlyHome = kwhMonth;
 
       document.getElementById('txtSolar').textContent = monthlySolar.toLocaleString() + ' kWh/mes';
       document.getElementById('txtGrid').textContent  = monthlyGrid.toLocaleString()  + ' kWh/mes';
       document.getElementById('txtHome').textContent  = monthlyHome.toLocaleString()  + ' kWh/mes';
       
-      
-      const dailySolar = (kwh70 * 12) / specific / 365;
-      const dailyGrid  = (kwhMonth * 12) / 365 - dailySolar;
-      const dailyHome  = (kwhMonth * 12) / 365;
-      const maxBar     = Math.max(dailySolar, dailyGrid, dailyHome, 1);
+      /* 8) Actualizar barras con valores diarios */
+      const dailySolar = monthlySolar / 30.4; // promedio mensual a diario
+      const dailyGrid = monthlyGrid / 30.4;
+      const dailyHome = monthlyHome / 30.4;
+      const maxBar = Math.max(dailySolar, dailyGrid, dailyHome, 1);
 
       document.getElementById('barSolar').style.width = `${(dailySolar / maxBar * 70).toFixed(0)}%`;
       document.getElementById('labSolar').textContent = `${dailySolar.toFixed(2)} kWh/día`;
@@ -267,8 +279,9 @@
       document.getElementById('barHome').style.width  = `${(dailyHome  / maxBar * 70).toFixed(0)}%`;
       document.getElementById('labHome').textContent  = `${dailyHome.toFixed(2)}  kWh/día`;
 
-      
-      /* 8) (Optional) keep creating the Issue for record */
+      /* 9) (Optional) keep creating the Issue for record */
+      // Comentado temporalmente para evitar errores
+      /*
       fetch("https://api.github.com/repos/dizutta69/energialt/dispatches",{
         method:"POST",
         headers:{
@@ -278,6 +291,7 @@
         },
         body:JSON.stringify({event_type:"quote",client_payload:{lat,lon,bill,currency:"COP"}})
       });
+      */
     }
   </script>
 
@@ -287,9 +301,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
