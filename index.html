@@ -252,13 +252,20 @@
       document.getElementById('out').textContent = out;
 
       /* 7) Update image text */
+      /* 7) Escribir valores ENCIMA de la imagen */
+      const monthlySolar = (kwh70 * 12) / specific;   // kWh/mes producidos
+      const monthlyGrid  = kwhMonth - kwh70;          // kWh/mes comprados
+      const monthlyHome  = kwhMonth;                  // kWh/mes consumidos
+
+      document.getElementById('txtSolar').textContent = monthlySolar.toLocaleString() + ' kWh/mes';
+      document.getElementById('txtGrid').textContent  = monthlyGrid.toLocaleString()  + ' kWh/mes';
+      document.getElementById('txtHome').textContent  = monthlyHome.toLocaleString()  + ' kWh/mes';
+      
+      
       const dailySolar = (kwh70 * 12) / specific / 365;
       const dailyGrid  = (kwhMonth * 12) / 365 - dailySolar;
       const dailyHome  = (kwhMonth * 12) / 365;
       const maxBar     = Math.max(dailySolar, dailyGrid, dailyHome, 1);
-      const monthlySolar = (kwh70 * 12) / specific;   // kWh/month produced
-      const monthlyGrid  = kwhMonth - kwh70;          // kWh/month bought
-      const monthlyHome  = kwhMonth;                  // kWh/month consumed
 
       document.getElementById('barSolar').style.width = `${(dailySolar / maxBar * 70).toFixed(0)}%`;
       document.getElementById('labSolar').textContent = `${dailySolar.toFixed(2)} kWh/día`;
@@ -266,9 +273,6 @@
       document.getElementById('labGrid').textContent  = `${dailyGrid.toFixed(2)}  kWh/día`;
       document.getElementById('barHome').style.width  = `${(dailyHome  / maxBar * 70).toFixed(0)}%`;
       document.getElementById('labHome').textContent  = `${dailyHome.toFixed(2)}  kWh/día`;
-      document.getElementById('txtSolar').textContent = monthlySolar.toLocaleString() + ' kWh/mes';
-      document.getElementById('txtGrid').textContent  = monthlyGrid.toLocaleString()  + ' kWh/mes';
-      document.getElementById('txtHome').textContent  = monthlyHome.toLocaleString()  + ' kWh/mes';
 
       
       /* 8) (Optional) keep creating the Issue for record */
@@ -290,4 +294,5 @@
   </script>
 </body>
 </html>
+
 
