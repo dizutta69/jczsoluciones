@@ -34,18 +34,32 @@
     .overlay-text {
       position: absolute;
       font-weight: 700;
-      font-size: 1.3rem;   /* un poco más grande */
+      font-size: 1.1rem;   /* Más pequeño que antes */
       color: #fff;
       text-shadow: 0 0 5px #000;
       padding: 3px 8px;
       border-radius: 4px;
       background: rgba(0,0,0,.45);
+      text-align: center;
+      min-width: 120px; /* Para que todos tengan el mismo ancho */
     }
 
-      /* Ajuste fino – tunea hasta que caigan justo encima */
-      #txtSolar { top: 18%;  left: 12%; }
-      #txtGrid  { top: 18%;  right: 12%; }
-      #txtHome  { bottom: 12%; left: 50%; transform: translateX(-50%);}
+    /* NUEVAS POSICIONES */
+    #txtSolar { 
+      bottom: 10%;    /* Inferior izquierda - Paneles */
+      left: 5%; 
+      transform: translateX(0);
+    }
+    #txtGrid  { 
+      bottom: 10%;    /* Inferior derecha - Red */
+      right: 5%; 
+      transform: translateX(0);
+    }
+    #txtHome  { 
+      top: 15%;       /* Superior centrada - Hogar */
+      left: 50%; 
+      transform: translateX(-50%);
+    }
    
     .bar-wrap {
       display: flex;
