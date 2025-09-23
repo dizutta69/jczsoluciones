@@ -95,23 +95,16 @@
 
   <button onclick="cotizar()">Cotizar</button>
 
-  <img id="energyDiagram" src="solar.png" alt="Energy Diagram" style="max-width:100%; height:auto; margin:1rem auto; display:block;">
+<!-- Diagrama con imagen + textos overlay -->
+<div id="out" class="energy-diagram">
+  <div class="energy-overlay">
+    <img src="solar.png" alt="Energy Diagram">
+    <span id="txtSolar" class="overlay-text">0 kWh/mes</span>
+    <span id="txtGrid"  class="overlay-text">0 kWh/mes</span>
+    <span id="txtHome"  class="overlay-text">0 kWh/mes</span>
+  </div>
 
-  <!-- Diagrama de barras -->
-
-  <!-- OLD -->
-  <!-- <div id="out" class="energy-diagram"> … </div> -->
-
-  <!-- NEW -->
-  <div id="out" class="energy-diagram">
-    <div class="energy-overlay">
-      <img src="solar.png" alt="Energy Diagram">
-      <!-- texts will be written here -->
-      <span id="txtSolar" class="overlay-text">0 kWh/mes</span>
-      <span id="txtGrid"  class="overlay-text">0 kWh/mes</span>
-      <span id="txtHome"  class="overlay-text">0 kWh/mes</span>
-    </div>
-
+  
     <!-- optional: keep the bars if you like them -->
     <div class="bar-wrap">
       <div class="bar solar" id="barSolar"></div>
@@ -294,6 +287,7 @@
   </script>
 </body>
 </html>
+
 
 
 
