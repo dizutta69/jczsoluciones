@@ -32,7 +32,7 @@
     }
     .solar { background: #2ecc71; }
     .grid  { background: #e74c3c; }
-    .home { background: #f39c12; }
+    .home  { background: #f39c12; }
     .label {
       font-weight: 600;
       font-size: .95rem;
@@ -69,27 +69,25 @@
 
   <button onclick="cotizar()">Cotizar</button>
 
+  <!-- Imagen de diagrama de energía -->
+  <img id="energyDiagram" src="solar.png" alt="Energy Diagram" style="max-width:100%; height:auto; margin:1rem auto; display:block;">
+
+  <!-- Diagrama de barras -->
   <div id="out" class="energy-diagram">
     <div class="bar-wrap">
       <div class="bar solar" id="barSolar"></div>
       <span class="label" id="labSolar">0 kWh/día</span>
     </div>
-
     <div class="bar-wrap">
       <div class="bar grid" id="barGrid"></div>
       <span class="label" id="labGrid">0 kWh/día</span>
     </div>
-
     <div class="bar-wrap">
       <div class="bar home" id="barHome"></div>
       <span class="label" id="labHome">0 kWh/día</span>
     </div>
-
-    <p class="legend">
-      💡 Solar · 🔴 Red · 🟠 Hogar
-    </p>
+    <p class="legend">💡 Solar · 🔴 Red · 🟠 Hogar</p>
   </div>
-</div>
 
   <!-- Google Maps -->
   <script>
@@ -213,26 +211,33 @@
         `⏱️  Pay-back simple: ${payback.toFixed(1)} años`;
 
       document.getElementById('out').textContent = out;
-        /* 7) Update image text */
-      document.getElementById('barSolar').style.width = `${(kwpReal * 100 / maxBar).toFixed(0)}%`;
-      document.getElementById('labSolar').textContent = `${kwpReal.toFixed(2)} kWh/día`;
-      document.getElementById('barGrid').style.width = `${((kwhMonth * 12 / 365 - dailySolar) * 100 / maxBar).toFixed(0)}%`;
-      document.getElementById('labGrid').textContent  = `${(kwhMonth * 12 / 365 - dailySolar).toFixed(2)} kWh/día`;
-      document.getElementById('barHome').style.width = `${(dailyHome * 100 / maxBar).toFixed(0)}%`;
-      document.getElementById('labHome').textContent  = `${dailyHome.toFixed(2)} kWh/día`;
 
-        /* 8) (Optional) keep creating the Issue for record */
-  fetch("https://api.github.com/repos/dizutta69/energialt/dispatches",{
-    method:"POST",
-    headers:{
-      "Accept":"application/vnd.github+json",
-      "Authorization":"token {{ secrets.GH_TOKEN }}",
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify({event_type:"quote",client_payload:{lat,lon,bill,currency:"COP"}})
-  });
-}
-      </script>
+      /* 7) Update image text */
+      const dailySolar = (kwh70 * 12) / specific / 365;
+      const dailyGrid  = (kwhMonth * 12) / 365 - dailySolar;
+      const dailyHome  = (kwhMonth * 12) / 365;
+      const maxBar     = Math.max(dailySolar, dailyGrid, dailyHome, 1);
+
+      document.getElementById('barSolar').style.width = `${(dailySolar / maxBar * 70).toFixed(0)}%`;
+      document.getElementById('labSolar').textContent = `${dailySolar.toFixed(2)} kWh/día`;
+      document.getElementById('barGrid').style.width  = `${(dailyGrid  / maxBar * 70).toFixed(0)}%`;
+      document.getElementById('labGrid').textContent  = `${dailyGrid.toFixed(2)}  kWh/día`;
+      document.getElementById('barHome').style.width  = `${(dailyHome  / maxBar * 70).toFixed(0)}%`;
+      document.getElementById('labHome').textContent  = `${dailyHome.toFixed(2)}  kWh/día`;
+
+      /* 8) (Optional) keep creating the Issue for record */
+      fetch("https://api.github.com/repos/dizutta69/energialt/dispatches",{
+        method:"POST",
+        headers:{
+          "Accept":"application/vnd.github+json",
+          "Authorization":"token {{ secrets.GH_TOKEN }}",
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({event_type:"quote",client_payload:{lat,lon,bill,currency:"COP"}})
+      });
+    }
+  </script>
+
   <!-- Carga de Google Maps con tu clave real (sin secretos) -->
   <script async
     src="https://maps.googleapis.com/maps/api/js?key=GOOGLE_API_KEY_AQUI&libraries=places&callback=initMap">
