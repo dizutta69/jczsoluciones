@@ -32,18 +32,19 @@
     .overlay-text {
       position: absolute;
       font-weight: 700;
-      font-size: 1.1rem;
+      font-size: 1.3rem;   /* un poco más grande */
       color: #fff;
-      text-shadow: 0 0 4px #000;
-      padding: 2px 6px;
+      text-shadow: 0 0 5px #000;
+      padding: 3px 8px;
       border-radius: 4px;
-      background: rgba(0,0,0,.35);
+      background: rgba(0,0,0,.45);
     }
-    /* quick tuning knobs */
-    #txtSolar { top: 15%;  left: 10%; }
-    #txtGrid  { top: 15%;  right: 10%; }
-    #txtHome  { bottom: 8%; left: 50%; transform: translateX(-50%);}
-    
+
+      /* Ajuste fino – tunea hasta que caigan justo encima */
+      #txtSolar { top: 18%;  left: 12%; }
+      #txtGrid  { top: 18%;  right: 12%; }
+      #txtHome  { bottom: 12%; left: 50%; transform: translateX(-50%);}
+   
     .bar-wrap {
       display: flex;
       align-items: center;
@@ -94,7 +95,7 @@
 
   <button onclick="cotizar()">Cotizar</button>
 
-  <!-- Imagen de diagrama de energía <img id="energyDiagram" src="solar.png" alt="Energy Diagram" style="max-width:100%; height:auto; margin:1rem auto; display:block;"> -->
+  <img id="energyDiagram" src="solar.png" alt="Energy Diagram" style="max-width:100%; height:auto; margin:1rem auto; display:block;">
 
   <!-- Diagrama de barras -->
 
@@ -293,6 +294,7 @@
   </script>
 </body>
 </html>
+
 
 
 
