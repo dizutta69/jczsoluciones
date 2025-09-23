@@ -87,16 +87,16 @@
     /* Valor anterior - Rojo - Izquierda 30% - Abajo 30% */
     #txtFacturaAntigua {
       color: #ff6b6b; /* Rojo */
-      bottom: 13%;
-      left: 25%;
+      bottom: 30%;
+      left: 30%;
       transform: translateX(-50%);
     }
     
     /* Valor nuevo - Verde - Derecha 30% - Arriba 50% */
     #txtFacturaNueva {
       color: #51cf66; /* Verde */
-      top: 57%;
-      right: 25%;
+      top: 50%;
+      right: 30%;
       transform: translateX(50%);
     }
    
@@ -137,6 +137,69 @@
       padding: 2rem;
       font-size: 1.2rem;
       color: #666;
+    }
+
+    /* NUEVOS ESTILOS PARA LA GRÁFICA DE FLUJO DE CAJA */
+    .cashflow-chart {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+      font-family: system-ui, sans-serif;
+    }
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin: 1rem 0;
+    }
+    .chart-bar {
+      position: absolute;
+      bottom: 0;
+      width: 30px;
+      transition: all 0.5s ease;
+      border-radius: 4px 4px 0 0;
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #333;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 5px;
+    }
+    .positive-bar {
+      background: #2ecc71;
+    }
+    .negative-bar {
+      background: #e74c3c;
+    }
+    .break-even-bar {
+      background: #f39c12;
+    }
+    .chart-labels {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: #666;
+    }
+    .chart-legend {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .legend-color {
+      width: 15px;
+      height: 15px;
+      border-radius: 3px;
     }
   </style>
 </head>
@@ -189,19 +252,41 @@
 
     <!-- optional: keep the bars if you like them -->
     <div class="bar-wrap">
-      <div class="bar solar" id="barSolar" style="width: 0%"></div>
+      <div class="bar solar" id="barSolar"></div>
       <span class="label" id="labSolar">0 kWh/día</span>
     </div>
     <div class="bar-wrap">
-      <div class="bar grid" id="barGrid" style="width: 0%"></div>
+      <div class="bar grid" id="barGrid"></div>
       <span class="label" id="labGrid">0 kWh/día</span>
     </div>
     <div class="bar-wrap">
-      <div class="bar home" id="barHome" style="width: 0%"></div>
+      <div class="bar home" id="barHome"></div>
       <span class="label" id="labHome">0 kWh/día</span>
     </div>
     <p class="legend">💡 Solar · 🔴 Red · 🟠 Hogar</p>
   </div>
+</div>
+
+<!-- NUEVA GRÁFICA DE FLUJO DE CAJA -->
+<div id="cashflowChart" class="cashflow-chart" style="display: none;">
+  <h3>Flujo de Caja a 10 Años</h3>
+  <div class="chart-container" id="chartContainer"></div>
+  <div class="chart-labels" id="chartLabels"></div>
+  <div class="chart-legend">
+    <div class="legend-item">
+      <div class="legend-color" style="background: #e74c3c;"></div>
+      <span>Inversión</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #f39c12;"></div>
+      <span>Punto de Equilibrio</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #2ecc71;"></div>
+      <span>Ganancia Acumulada</span>
+    </div>
+  </div>
+  <div id="chartSummary" style="margin-top: 1rem; text-align: center; font-weight: bold;"></div>
 </div>
 
   <!-- Google Maps -->
@@ -272,6 +357,99 @@
       document.getElementById('lonTxt').value = lng.toFixed(5);
     }
 
+    /* FUNCIÓN PARA CREAR LA GRÁFICA DE FLUJO DE CAJA */
+    function crearGraficaFlujoCaja(inversion, ahorroMensual, payback) {
+      const chartContainer = document.getElementById('chartContainer');
+      const chartLabels = document.getElementById('chartLabels');
+      const chartSummary = document.getElementById('chartSummary');
+      
+      // Limpiar contenido anterior
+      chartContainer.innerHTML = '';
+      chartLabels.innerHTML = '';
+      
+      const años = 10;
+      const ahorroAnual = ahorroMensual * 12;
+      const breakEvenYear = Math.ceil(payback);
+      
+      // Calcular flujo de caja acumulado por año
+      const flujoCaja = [];
+      let acumulado = -inversion;
+      
+      for (let año = 0; año <= años; año++) {
+        if (año === 0) {
+          flujoCaja.push(acumulado);
+        } else {
+          acumulado += ahorroAnual;
+          flujoCaja.push(acumulado);
+        }
+      }
+      
+      // Encontrar máximo y mínimo para escalar la gráfica
+      const maxVal = Math.max(...flujoCaja.filter(val => val > 0));
+      const minVal = Math.min(...flujoCaja);
+      const range = maxVal - minVal;
+      const scale = 280 / range; // 280px de altura útil
+      
+      // Crear barras
+      const barWidth = (chartContainer.offsetWidth - 60) / (años + 1);
+      
+      for (let año = 0; año <= años; año++) {
+        const valor = flujoCaja[año];
+        const height = Math.abs(valor) * scale;
+        const left = año * barWidth + 20;
+        
+        const bar = document.createElement('div');
+        bar.className = 'chart-bar';
+        bar.style.left = left + 'px';
+        bar.style.width = (barWidth - 10) + 'px';
+        bar.style.height = height + 'px';
+        
+        // Determinar color de la barra
+        if (año === 0) {
+          bar.className += ' negative-bar';
+          bar.textContent = `-$${(inversion/1000000).toFixed(0)}M`;
+        } else if (año === breakEvenYear && valor >= 0) {
+          bar.className += ' break-even-bar';
+          bar.textContent = `$${(valor/1000000).toFixed(0)}M`;
+        } else if (valor >= 0) {
+          bar.className += ' positive-bar';
+          bar.textContent = `$${(valor/1000000).toFixed(0)}M`;
+        } else {
+          bar.className += ' negative-bar';
+          bar.textContent = `-$${(Math.abs(valor)/1000000).toFixed(0)}M`;
+        }
+        
+        // Posicionar texto arriba o abajo según sea positivo o negativo
+        if (valor >= 0) {
+          bar.style.alignItems = 'flex-start';
+        } else {
+          bar.style.alignItems = 'flex-end';
+          bar.style.bottom = (280 - height) + 'px';
+        }
+        
+        chartContainer.appendChild(bar);
+        
+        // Crear etiquetas del eje X
+        const label = document.createElement('div');
+        label.textContent = año === 0 ? 'Inversión' : `Año ${año}`;
+        label.style.textAlign = 'center';
+        label.style.width = (barWidth - 10) + 'px';
+        label.style.marginLeft = left + 'px';
+        chartLabels.appendChild(label);
+      }
+      
+      // Resumen
+      const gananciaTotal = flujoCaja[años];
+      chartSummary.innerHTML = `
+        <div>Punto de equilibrio: Año ${breakEvenYear}</div>
+        <div>Ganancia acumulada a 10 años: $${gananciaTotal.toLocaleString()} COP</div>
+        <div>Retorno total: ${((gananciaTotal / inversion) * 100).toFixed(0)}%</div>
+      `;
+      
+      // Mostrar la gráfica
+      document.getElementById('cashflowChart').style.display = 'block';
+    }
+
     /* ---------- CÁLCULO INSTANTÁNEO ---------- */
     async function cotizar(){
       const lat = parseFloat(document.getElementById('latTxt').value);
@@ -283,6 +461,7 @@
       document.getElementById('textOutput').textContent = 'Calculando...';
       document.getElementById('calculandoText').style.display = 'block';
       document.getElementById('diagramContent').style.display = 'none';
+      document.getElementById('cashflowChart').style.display = 'none';
 
       /* ====== CONSTANTS ====== */
       const PRICE_KWH       = 890;           // COP / kWh
@@ -290,7 +469,7 @@
       const USD_W_INSTALLED = 0.9;           // USD / Wp
       const PANEL_W         = 450;           // Wp per panel
       const LOSS            = 0.8;           // DC/AC losses
-      const TARGET          = 0.7354;           // 70 % savings
+      const TARGET          = 0.7;           // 70 % savings
 
       /* 1) Monthly kWh from bill */
       const kwhMonth = bill / PRICE_KWH;
@@ -323,6 +502,7 @@
       /* 6) CÁLCULO NUEVA FACTURA */
       const monthlyGrid = kwhMonth - kwh70;  // kWh/mes comprados de la red
       const nuevaFactura = monthlyGrid * PRICE_KWH;  // Nueva factura = energía de red * precio kWh
+      const ahorroMensual = bill - nuevaFactura;
 
       /* 7) Build pretty output */
       const out =
@@ -333,7 +513,7 @@
         `⏱️  Pay-back simple: ${payback.toFixed(1)} años\n` +
         `💵 Factura actual: $${bill.toLocaleString()} COP\n` +
         `💚 Nueva factura: $${nuevaFactura.toLocaleString()} COP\n` +
-        `💰 Ahorro mensual: $${(bill - nuevaFactura).toLocaleString()} COP`;
+        `💰 Ahorro mensual: $${ahorroMensual.toLocaleString()} COP`;
 
       document.getElementById('textOutput').textContent = out;
 
@@ -368,7 +548,10 @@
       document.getElementById('barHome').style.width  = `${(dailyHome  / maxBar * 70).toFixed(0)}%`;
       document.getElementById('labHome').textContent  = `${dailyHome.toFixed(2)}  kWh/día`;
 
-      /* 12) (Optional) keep creating the Issue for record */
+      /* 12) CREAR GRÁFICA DE FLUJO DE CAJA */
+      crearGraficaFlujoCaja(priceCop, ahorroMensual, payback);
+
+      /* 13) (Optional) keep creating the Issue for record */
       // Comentado temporalmente para evitar errores
       /*
       fetch("https://api.github.com/repos/dizutta69/energialt/dispatches",{
@@ -397,8 +580,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
