@@ -44,21 +44,60 @@
       min-width: 120px; /* Para que todos tengan el mismo ancho */
     }
 
-    /* NUEVAS POSICIONES */
+    /* NUEVAS POSICIONES para solar.png */
     #txtSolar { 
-      bottom: 5%;    /* Inferior izquierda - Paneles */
+      bottom: 10%;    /* Inferior izquierda - Paneles */
       left: 5%; 
       transform: translateX(0);
     }
     #txtGrid  { 
-      bottom: 5%;    /* Inferior derecha - Red */
+      bottom: 10%;    /* Inferior derecha - Red */
       right: 5%; 
       transform: translateX(0);
     }
     #txtHome  { 
-      top: 0%;       /* Superior centrada - Hogar */
+      top: 15%;       /* Superior centrada - Hogar */
       left: 50%; 
       transform: translateX(-50%);
+    }
+
+    /* ESTILOS PARA LA NUEVA IMAGEN FACTURA */
+    .factura-overlay {
+      position: relative;
+      display: inline-block;
+      margin: 1rem auto;
+    }
+    .factura-overlay img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    .factura-text {
+      position: absolute;
+      font-weight: 700;
+      font-size: 1.2rem;
+      text-shadow: 0 0 5px #000;
+      padding: 5px 10px;
+      border-radius: 4px;
+      background: rgba(0,0,0,.45);
+      text-align: center;
+      min-width: 140px;
+    }
+    
+    /* Valor anterior - Rojo - Izquierda 30% - Abajo 30% */
+    #txtFacturaAntigua {
+      color: #ff6b6b; /* Rojo */
+      bottom: 30%;
+      left: 30%;
+      transform: translateX(-50%);
+    }
+    
+    /* Valor nuevo - Verde - Derecha 30% - Arriba 50% */
+    #txtFacturaNueva {
+      color: #51cf66; /* Verde */
+      top: 50%;
+      right: 30%;
+      transform: translateX(50%);
     }
    
     .bar-wrap {
@@ -133,11 +172,19 @@
   <div class="calculando" id="calculandoText" style="display: none;">Calculando...</div>
   
   <div id="diagramContent">
+    <!-- Primera imagen: solar.png -->
     <div class="energy-overlay">
       <img src="solar.png" alt="Energy Diagram">
       <span id="txtSolar" class="overlay-text">0 kWh/mes</span>
       <span id="txtGrid"  class="overlay-text">0 kWh/mes</span>
       <span id="txtHome"  class="overlay-text">0 kWh/mes</span>
+    </div>
+
+    <!-- Segunda imagen: factura.png -->
+    <div class="factura-overlay">
+      <img src="factura.png" alt="Factura Comparación">
+      <span id="txtFacturaAntigua" class="factura-text">$0 COP</span>
+      <span id="txtFacturaNueva" class="factura-text">$0 COP</span>
     </div>
 
     <!-- optional: keep the bars if you like them -->
@@ -273,25 +320,30 @@
       const ahorroAnualCop = bill * 12 * TARGET;
       const payback = priceCop / ahorroAnualCop;
 
-      /* 6) Build pretty output */
+      /* 6) CÁLCULO NUEVA FACTURA */
+      const monthlyGrid = kwhMonth - kwh70;  // kWh/mes comprados de la red
+      const nuevaFactura = monthlyGrid * PRICE_KWH;  // Nueva factura = energía de red * precio kWh
+
+      /* 7) Build pretty output */
       const out =
         `💡 Consumo mensual: ${kwhMonth.toLocaleString()} kWh\n` +
         `☀️  Objetivo solar (70 %): ${kwh70.toLocaleString()} kWh\n` +
         `🔧 Potencia de paneles: ${kwpReal.toFixed(2)} kWp  (${panels} paneles de ${PANEL_W} W)\n` +
         `💰 Precio aproximado: COP ${priceCop.toLocaleString()}\n` +
-        `⏱️  Pay-back simple: ${payback.toFixed(1)} años`;
+        `⏱️  Pay-back simple: ${payback.toFixed(1)} años\n` +
+        `💵 Factura actual: $${bill.toLocaleString()} COP\n` +
+        `💚 Nueva factura: $${nuevaFactura.toLocaleString()} COP\n` +
+        `💰 Ahorro mensual: $${(bill - nuevaFactura).toLocaleString()} COP`;
 
       document.getElementById('textOutput').textContent = out;
 
-      /* 7) CORRECCIÓN: Mostrar el diagrama con los resultados */
+      /* 8) CORRECCIÓN: Mostrar el diagrama con los resultados */
       document.getElementById('calculandoText').style.display = 'none';
       document.getElementById('diagramContent').style.display = 'block';
 
-      /* 8) Cálculos correctos para los textos overlay */
+      /* 9) Cálculos correctos para los textos overlay de solar.png */
       // kWh/mes producidos por los paneles
       const monthlySolar = kwh70;
-      // kWh/mes comprados de la red
-      const monthlyGrid = kwhMonth - kwh70;
       // kWh/mes consumidos por el hogar
       const monthlyHome = kwhMonth;
 
@@ -299,7 +351,11 @@
       document.getElementById('txtGrid').textContent  = monthlyGrid.toLocaleString()  + ' kWh/mes';
       document.getElementById('txtHome').textContent  = monthlyHome.toLocaleString()  + ' kWh/mes';
       
-      /* 9) Actualizar barras con valores diarios */
+      /* 10) Actualizar valores de factura.png */
+      document.getElementById('txtFacturaAntigua').textContent = '$' + bill.toLocaleString() + ' COP';
+      document.getElementById('txtFacturaNueva').textContent = '$' + nuevaFactura.toLocaleString() + ' COP';
+      
+      /* 11) Actualizar barras con valores diarios */
       const dailySolar = monthlySolar / 30.4; // promedio mensual a diario
       const dailyGrid = monthlyGrid / 30.4;
       const dailyHome = monthlyHome / 30.4;
@@ -312,7 +368,7 @@
       document.getElementById('barHome').style.width  = `${(dailyHome  / maxBar * 70).toFixed(0)}%`;
       document.getElementById('labHome').textContent  = `${dailyHome.toFixed(2)}  kWh/día`;
 
-      /* 10) (Optional) keep creating the Issue for record */
+      /* 12) (Optional) keep creating the Issue for record */
       // Comentado temporalmente para evitar errores
       /*
       fetch("https://api.github.com/repos/dizutta69/energialt/dispatches",{
@@ -341,5 +397,3 @@
   </script>
 </body>
 </html>
-
-
