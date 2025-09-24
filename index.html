@@ -351,19 +351,32 @@
       document.getElementById('lonTxt').value = lng.toFixed(5);
     }
 
-    /* FUNCIÓN PARA CREAR LA GRÁFICA DE LÍNEA */
+/* FUNCIÓN PARA CREAR LA GRÁFICA DE LÍNEA */
     function crearGraficaLinea(inversion, ahorroMensual, payback) {
       const canvas = document.getElementById('lineChart');
       const ctx = canvas.getContext('2d');
       const chartSummary = document.getElementById('chartSummary');
-      
-      // Configurar tamaño del canvas
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-      
+  
+    // CONFIGURACIÓN RESPONSIVE - ESTO ES LO QUE DEBES CAMBIAR
+      const container = canvas.parentElement;
+      const dpr = window.devicePixelRatio || 1;
+      const rect = container.getBoundingClientRect();
+  
+      // Usar las dimensiones reales del contenedor
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+      ctx.scale(dpr, dpr);
+  
+      // Limpiar canvas primero
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
       const años = 10;
       const ahorroAnual = ahorroMensual * 12;
       const breakEvenYear = Math.ceil(payback);
+  
+  // ... el resto del código se mantiene igual ...
       
       // Calcular flujo de caja acumulado por año
       const flujoCaja = [];
@@ -621,3 +634,4 @@
   </script>
 </body>
 </html>
+
