@@ -531,13 +531,14 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
       const kwh70    = kwhMonth * TARGET;
 
       /* 2) Specific yield (kWh/kWp/year) via PVWatts client-side */
+
       let specific;
       try{
         const pvw = await fetch(
-          `https://developer.nrel.gov/api/pvwatts/v8.json?api_key=DEMO_KEY&lat=${lat}&lon=${lon}&system_capacity=1&azimuth=180&tilt=${Math.abs(lat)}&array_type=1&losses=14&timeframe=monthly`
+  `        https://developer.nrel.gov/api/pvwatts/v8.json?api_key=ECmQDDWbYsWgQ4pFg2zFUZdlbTirJhA1pnfQRRC4&lat=${lat}&lon=${lon}&system_capacity=1&azimuth=180&tilt=${Math.abs(lat)}&array_type=1&losses=14&timeframe=annual`
         ).then(r => r.json());
-        specific = pvw.outputs.ac_monthly.reduce((a,b)=>a+b,0) / 1.0; // kWh/kWp/year
-      }catch{
+        specific = pvw.outputs.ac_annual; // kWh/kWp/year
+              }catch{
         specific = 1350; // Bogotá fallback
       }
 
@@ -635,5 +636,6 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
   </script>
 </body>
 </html>
+
 
 
