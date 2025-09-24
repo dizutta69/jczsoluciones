@@ -343,31 +343,25 @@
       document.getElementById('lonTxt').value = lng.toFixed(5);
     }
 /* FUNCIÓN PARA CREAR LA GRÁFICA DE LÍNEA */
+
+/* FUNCIÓN PARA CREAR LA GRÁFICA DE LÍNEA */
 function crearGraficaLinea(inversion, ahorroMensual, payback) {
   const canvas = document.getElementById('lineChart');
   const ctx = canvas.getContext('2d');
   const chartSummary = document.getElementById('chartSummary');
 
-  // FORZAR dimensiones fijas para debugging
+  // Dimensiones fijas para consistencia
   canvas.width = 800;
   canvas.height = 400;
   canvas.style.width = '800px';
   canvas.style.height = '400px';
   
-  console.log('Canvas dimensions:', canvas.width, canvas.height);
-  console.log('Inversion:', inversion, 'Ahorro mensual:', ahorroMensual, 'Payback:', payback);
-
-  // Limpiar canvas completamente
+  // LIMPIAR COMPLETAMENTE el canvas antes de dibujar
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-  // Dibujar fondo para verificar que el canvas funciona
-  ctx.fillStyle = '#f0f8ff';
+  // Fondo blanco
+  ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
-  // Dibujar borde rojo para ver el área del canvas
-  ctx.strokeStyle = 'red';
-  ctx.lineWidth = 2;
-  ctx.strokeRect(0, 0, canvas.width, canvas.height);
 
   const años = 10;
   const ahorroAnual = ahorroMensual * 12;
@@ -375,7 +369,7 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
   
   // Calcular flujo de caja acumulado por año (en millones)
   const flujoCaja = [];
-  let acumulado = -inversion / 1000000; // Convertir a millones
+  let acumulado = -inversion / 1000000;
   
   for (let año = 0; año <= años; año++) {
     if (año === 0) {
@@ -385,8 +379,6 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
       flujoCaja.push(acumulado);
     }
   }
-  
-  console.log('Flujo de caja (millones):', flujoCaja);
 
   // Configurar área de dibujo
   const margin = 80;
@@ -396,9 +388,7 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
   // Encontrar máximo y mínimo
   const maxVal = Math.max(...flujoCaja);
   const minVal = Math.min(...flujoCaja);
-  const range = Math.max(maxVal - minVal, 1); // Mínimo rango de 1
-  
-  console.log('Max:', maxVal, 'Min:', minVal, 'Range:', range);
+  const range = Math.max(maxVal - minVal, 1);
 
   // Función para mapear coordenadas
   const x = (año) => margin + (año / años) * graphWidth;
@@ -407,9 +397,90 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
     return margin + graphHeight - (normalized * graphHeight);
   };
 
+  // DIBUJAR LÍNEA DE CERO (línea punteada gruesa)
+  const zeroY = y(0);
+  ctx.strokeStyle = '#666';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([5, 5]);
+  ctx.beginPath();
+  ctx.moveTo(margin, zeroY);
+  ctx.lineTo(margin + graphWidth, zeroY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  
+  // Etiqueta de línea cero
+  ctx.fillStyle = '#666';
+  ctx.font = '12px Arial';
+  ctx.textAlign = 'right';
+  ctx.fillText('$0', margin - 5, zeroY + 4);
+
+  // DIBUJAR LÍNEA PRINCIPAL
+  ctx.strokeStyle = '#00704a';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  
+  for (let año = 0; año <= años; año++) {
+    const xPos = x(año);
+    const yPos = y(flujoCaja[año]);
+    
+    if (año === 0) {
+      ctx.moveTo(xPos, yPos);
+    } else {
+      ctx.lineTo(xPos, yPos);
+    }
+  }
+  ctx.stroke();
+
+  // DIBUJAR PUNTOS Y ETIQUETAS
+  for (let año = 0; año <= años; año++) {
+    const xPos = x(año);
+    const yPos = y(flujoCaja[año]);
+    const valor = flujoCaja[año];
+    
+    // Determinar color según si es negativo o positivo
+    let puntoColor, textoColor;
+    if (valor < 0) {
+      puntoColor = '#e67e22'; // Naranja para negativos
+      textoColor = '#c0392b';
+    } else if (año === breakEvenYear) {
+      puntoColor = '#f39c12'; // Naranja especial para punto de equilibrio
+      textoColor = '#d35400';
+    } else {
+      puntoColor = '#27ae60'; // Verde para positivos
+      textoColor = '#27ae60';
+    }
+    
+    // Dibujar punto
+    ctx.fillStyle = puntoColor;
+    ctx.beginPath();
+    ctx.arc(xPos, yPos, 6, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Borde blanco para mejor visibilidad
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    // Etiqueta de valor
+    ctx.fillStyle = textoColor;
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+    
+    // Posicionar etiqueta arriba o abajo según el valor
+    const labelY = valor >= 0 ? yPos - 20 : yPos + 20;
+    ctx.fillText(`$${valor.toFixed(1)}M`, xPos, labelY);
+    
+    // Etiqueta especial para punto de equilibrio
+    if (año === breakEvenYear && valor >= 0) {
+      ctx.fillStyle = '#d35400';
+      ctx.font = 'bold 13px Arial';
+      ctx.fillText('Punto de Equilibrio', xPos, labelY - 15);
+    }
+  }
+
   // DIBUJAR EJES PRINCIPALES
   ctx.strokeStyle = '#333';
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 2;
   
   // Eje X
   ctx.beginPath();
@@ -423,87 +494,78 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
   ctx.lineTo(margin, margin + graphHeight);
   ctx.stroke();
 
-  // DIBUJAR LÍNEA PRINCIPAL (más gruesa y visible)
-  ctx.strokeStyle = '#00704a';
-  ctx.lineWidth = 4;
-  ctx.beginPath();
-  
-  for (let año = 0; año <= años; año++) {
-    const xPos = x(año);
-    const yPos = y(flujoCaja[año]);
-    
-    if (año === 0) {
-      ctx.moveTo(xPos, yPos);
-    } else {
-      ctx.lineTo(xPos, yPos);
-    }
-    
-    // Dibujar puntos grandes e visibles
-    ctx.fillStyle = año === 0 ? '#e74c3c' : 
-                   año === breakEvenYear ? '#f39c12' : '#00704a';
-    ctx.beginPath();
-    ctx.arc(xPos, yPos, 6, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Etiquetas de valores grandes
-    ctx.fillStyle = '#000';
-    ctx.font = 'bold 14px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(`$${flujoCaja[año].toFixed(1)}M`, xPos, yPos - 15);
-  }
-  ctx.stroke();
-
-  // ETIQUETAS DEL EJE X (grandes y visibles)
+  // ETIQUETAS DEL EJE X
   ctx.fillStyle = '#333';
-  ctx.font = 'bold 12px Arial';
+  ctx.font = '12px Arial';
   ctx.textAlign = 'center';
   
   for (let año = 0; año <= años; año++) {
     const xPos = x(año);
     const label = año === 0 ? 'Inversión' : `Año ${año}`;
-    ctx.fillText(label, xPos, margin + graphHeight + 30);
+    
+    // Mostrar solo algunas etiquetas para evitar saturación
+    if (año === 0 || año === breakEvenYear || año === años || año % 2 === 0) {
+      ctx.fillText(label, xPos, margin + graphHeight + 25);
+    }
   }
 
-  // ETIQUETAS DEL EJE Y (grandes y visibles)
+  // ETIQUETAS DEL EJE Y
   ctx.textAlign = 'right';
   ctx.fillStyle = '#333';
   
-  for (let i = 0; i <= 5; i++) {
-    const value = minVal + (i / 5) * range;
+  // Calcular valores para las marcas del eje Y
+  const yStep = range / 4;
+  for (let i = 0; i <= 4; i++) {
+    const value = minVal + (i * yStep);
     const yPos = y(value);
-    ctx.fillText(`$${value.toFixed(1)}M`, margin - 10, yPos + 5);
+    
+    // Línea de guía
+    ctx.strokeStyle = '#f0f0f0';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(margin, yPos);
+    ctx.lineTo(margin + graphWidth, yPos);
+    ctx.stroke();
+    
+    // Etiqueta del valor
+    ctx.fillStyle = '#333';
+    ctx.fillText(`$${value.toFixed(1)}M`, margin - 10, yPos + 4);
   }
 
   // TÍTULOS DE EJES
   ctx.fillStyle = '#000';
-  ctx.font = 'bold 16px Arial';
+  ctx.font = 'bold 14px Arial';
   ctx.textAlign = 'center';
   ctx.fillText('Años', canvas.width / 2, canvas.height - 10);
   
   ctx.save();
-  ctx.translate(20, canvas.height / 2);
+  ctx.translate(25, canvas.height / 2);
   ctx.rotate(-Math.PI / 2);
-  ctx.fillText('Flujo de Caja (Millones COP)', 0, 0);
+  ctx.fillText('Flujo de Caja Acumulado (Millones COP)', 0, 0);
   ctx.restore();
 
+  // CALCULAR MES EXACTO DEL PUNTO DE EQUILIBRIO
+  const mesesPayback = (payback - Math.floor(payback)) * 12;
+  const mesEquilibrio = Math.round(mesesPayback);
+  
   // RESULTADOS FINALES
   const gananciaTotal = flujoCaja[años] * 1000000;
   const retornoTotal = inversion > 0 ? ((gananciaTotal / inversion) * 100) : 0;
   
   chartSummary.innerHTML = `
-    <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #00704a;">
-      <div style="font-size: 16px; font-weight: bold; margin-bottom: 10px;">📊 Resumen Financiero</div>
-      <div><strong>Punto de equilibrio:</strong> Año ${breakEvenYear}</div>
+    <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #27ae60;">
+      <div style="font-size: 16px; font-weight: bold; margin-bottom: 10px; color: #27ae60;">📊 Resumen Financiero</div>
+      <div><strong>Punto de equilibrio:</strong> Año ${breakEvenYear}, Mes ${mesEquilibrio}</div>
       <div><strong>Ganancia a 10 años:</strong> $${gananciaTotal.toLocaleString()} COP</div>
       <div><strong>Retorno total:</strong> ${retornoTotal.toFixed(0)}%</div>
+      <div><strong>Tiempo de retorno:</strong> ${payback.toFixed(1)} años</div>
     </div>
   `;
   
   // Mostrar la gráfica
   document.getElementById('cashflowChart').style.display = 'block';
-  console.log('Gráfica dibujada correctamente');
 }
-
+    
     /* ---------- CÁLCULO INSTANTÁNEO ---------- */
     async function cotizar(){
       const lat = parseFloat(document.getElementById('latTxt').value);
@@ -639,6 +701,7 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
   </script>
 </body>
 </html>
+
 
 
 
