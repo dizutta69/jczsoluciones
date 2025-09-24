@@ -158,30 +158,7 @@
       height: 100%;
       display: block;
     }
-    .chart-labels {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 1rem;
-      font-size: 0.8rem;
-      color: #666;
-    }
-    .chart-legend {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 1rem;
-      font-size: 0.8rem;
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .legend-color {
-      width: 15px;
-      height: 3px;
-      border-radius: 3px;
-    }
+    /* ELIMINADOS: .chart-labels y .chart-legend duplicados */
   </style>
 </head>
 
@@ -254,24 +231,7 @@
   <div class="chart-container">
     <canvas id="lineChart" class="chart-canvas"></canvas>
   </div>
-  <div class="chart-labels">
-    <span>Inversión</span>
-    <span>Año 2</span>
-    <span>Año 4</span>
-    <span>Año 6</span>
-    <span>Año 8</span>
-    <span>Año 10</span>
-  </div>
-  <div class="chart-legend">
-    <div class="legend-item">
-      <div class="legend-color" style="background: #00704a;"></div>
-      <span>Flujo de Caja</span>
-    </div>
-    <div class="legend-item">
-      <div class="legend-color" style="background: #f39c12;"></div>
-      <span>Punto de Equilibrio</span>
-    </div>
-  </div>
+  <!-- ELIMINADOS: chart-labels y chart-legend duplicados -->
   <div id="chartSummary" style="margin-top: 1rem; text-align: center; font-size: 0.9rem;"></div>
 </div>
 
@@ -364,7 +324,6 @@
 
       const años = 10;
       const ahorroAnual = ahorroMensual * 12;
-      const breakEvenYear = Math.ceil(payback);
       
       // Calcular flujo de caja acumulado por año (en millones)
       const flujoCaja = [];
@@ -378,6 +337,33 @@
           flujoCaja.push(acumulado);
         }
       }
+
+      // CALCULAR PUNTO DE EQUILIBRIO EXACTO (donde flujo de caja = 0)
+      let breakEvenYear = 0;
+      let breakEvenMonth = 0;
+      
+      // Buscar el año donde cambia de negativo a positivo
+      for (let año = 1; año <= años; año++) {
+        if (flujoCaja[año - 1] <= 0 && flujoCaja[año] >= 0) {
+          // Interpolación lineal para encontrar el mes exacto
+          const valorAnterior = flujoCaja[año - 1];
+          const valorActual = flujoCaja[año];
+          const fraccionDelAño = -valorAnterior / (valorActual - valorAnterior);
+          
+          breakEvenYear = año - 1 + fraccionDelAño;
+          breakEvenMonth = Math.round(fraccionDelAño * 12);
+          break;
+        }
+      }
+      
+      // Si no se encontró punto de equilibrio, usar el payback calculado
+      if (breakEvenYear === 0) {
+        breakEvenYear = payback;
+        breakEvenMonth = Math.round((payback - Math.floor(payback)) * 12);
+      }
+      
+      const añoEquilibrio = Math.floor(breakEvenYear);
+      const mesEquilibrio = breakEvenMonth;
 
       // Configurar área de dibujo
       const margin = 80;
@@ -441,9 +427,6 @@
         if (valor < 0) {
           puntoColor = '#e67e22'; // Naranja para negativos
           textoColor = '#c0392b';
-        } else if (año === breakEvenYear) {
-          puntoColor = '#f39c12'; // Naranja especial para punto de equilibrio
-          textoColor = '#d35400';
         } else {
           puntoColor = '#27ae60'; // Verde para positivos
           textoColor = '#27ae60';
@@ -468,13 +451,27 @@
         // Posicionar etiqueta arriba o abajo según el valor
         const labelY = valor >= 0 ? yPos - 20 : yPos + 20;
         ctx.fillText(`$${valor.toFixed(1)}M`, xPos, labelY);
+      }
+
+      // DIBUJAR PUNTO DE EQUILIBRIO ESPECIAL (en la línea de cero)
+      if (breakEvenYear > 0 && breakEvenYear <= años) {
+        const eqX = x(breakEvenYear);
+        const eqY = y(0);
         
-        // Etiqueta especial para punto de equilibrio
-        if (año === breakEvenYear && valor >= 0) {
-          ctx.fillStyle = '#d35400';
-          ctx.font = 'bold 13px Arial';
-          ctx.fillText('Punto de Equilibrio', xPos, labelY - 15);
-        }
+        // Punto grande naranja
+        ctx.fillStyle = '#f39c12';
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(eqX, eqY, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Etiqueta del punto de equilibrio
+        ctx.fillStyle = '#d35400';
+        ctx.font = 'bold 13px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Punto de Equilibrio', eqX, eqY - 25);
       }
 
       // DIBUJAR EJES PRINCIPALES
@@ -503,7 +500,7 @@
         const label = año === 0 ? 'Inversión' : `Año ${año}`;
         
         // Mostrar solo algunas etiquetas para evitar saturación
-        if (año === 0 || año === breakEvenYear || año === años || año % 2 === 0) {
+        if (año === 0 || año === Math.floor(breakEvenYear) || año === años || año % 2 === 0) {
           ctx.fillText(label, xPos, margin + graphHeight + 25);
         }
       }
@@ -543,10 +540,6 @@
       ctx.fillText('Flujo de Caja Acumulado (Millones COP)', 0, 0);
       ctx.restore();
 
-      // CALCULAR MES EXACTO DEL PUNTO DE EQUILIBRIO
-      const mesesPayback = (payback - Math.floor(payback)) * 12;
-      const mesEquilibrio = Math.round(mesesPayback);
-      
       // RESULTADOS FINALES
       const gananciaTotal = flujoCaja[años] * 1000000;
       const retornoTotal = inversion > 0 ? ((gananciaTotal / inversion) * 100) : 0;
@@ -554,10 +547,10 @@
       chartSummary.innerHTML = `
         <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #27ae60;">
           <div style="font-size: 16px; font-weight: bold; margin-bottom: 10px; color: #27ae60;">📊 Resumen Financiero</div>
-          <div><strong>Punto de equilibrio:</strong> Año ${breakEvenYear}, Mes ${mesEquilibrio}</div>
+          <div><strong>Punto de equilibrio:</strong> Año ${añoEquilibrio}, Mes ${mesEquilibrio}</div>
           <div><strong>Ganancia a 10 años:</strong> $${gananciaTotal.toLocaleString()} COP</div>
           <div><strong>Retorno total:</strong> ${retornoTotal.toFixed(0)}%</div>
-          <div><strong>Tiempo de retorno:</strong> ${payback.toFixed(1)} años</div>
+          <div><strong>Tiempo de retorno:</strong> ${breakEvenYear.toFixed(1)} años</div>
         </div>
       `;
       
