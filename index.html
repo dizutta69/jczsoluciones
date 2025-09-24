@@ -44,6 +44,14 @@
       min-width: 120px; /* Para que todos tengan el mismo ancho */
     }
 
+      .chart-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        background: #fafafa; /* Fondo temporal para ver si se dibuja */
+        border: 1px solid #ddd; /* Borde temporal para ver el área */
+      }
+
     /* NUEVAS POSICIONES para solar.png */
     #txtSolar { 
       bottom: 10%;    /* Inferior izquierda - Paneles */
@@ -352,158 +360,151 @@
     }
 
 /* FUNCIÓN PARA CREAR LA GRÁFICA DE LÍNEA */
-    function crearGraficaLinea(inversion, ahorroMensual, payback) {
-      const canvas = document.getElementById('lineChart');
-      const ctx = canvas.getContext('2d');
-      const chartSummary = document.getElementById('chartSummary');
-  
-    // CONFIGURACIÓN RESPONSIVE - ESTO ES LO QUE DEBES CAMBIAR
-      const container = canvas.parentElement;
-      const dpr = window.devicePixelRatio || 1;
-      const rect = container.getBoundingClientRect();
-  
-      // Usar las dimensiones reales del contenedor
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      canvas.style.width = rect.width + 'px';
-      canvas.style.height = rect.height + 'px';
-      ctx.scale(dpr, dpr);
-  
-      // Limpiar canvas primero
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-      const años = 10;
-      const ahorroAnual = ahorroMensual * 12;
-      const breakEvenYear = Math.ceil(payback);
-  
-  // ... el resto del código se mantiene igual ...
-      
-      // Calcular flujo de caja acumulado por año
-      const flujoCaja = [];
-      let acumulado = -inversion;
-      
-      for (let año = 0; año <= años; año++) {
-        if (año === 0) {
-          flujoCaja.push(acumulado);
-        } else {
-          acumulado += ahorroAnual;
-          flujoCaja.push(acumulado);
-        }
-      }
-      
-      // Configurar dimensiones de la gráfica
-      const padding = 40;
-      const width = canvas.width - padding * 2;
-      const height = canvas.height - padding * 2;
-      
-      // Encontrar máximo y mínimo para escalar
-      const maxVal = Math.max(...flujoCaja);
-      const minVal = Math.min(...flujoCaja);
-      const range = maxVal - minVal;
-      
-      // Función para mapear valores a coordenadas
-      const x = (año) => padding + (año / años) * width;
-      const y = (valor) => {
-        const normalized = (valor - minVal) / range;
-        return padding + height - (normalized * height);
-      };
-      
-      // Limpiar canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Dibujar ejes
-      ctx.strokeStyle = '#ccc';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      // Eje X
-      ctx.moveTo(padding, padding + height);
-      ctx.lineTo(padding + width, padding + height);
-      // Eje Y
-      ctx.moveTo(padding, padding);
-      ctx.lineTo(padding, padding + height);
-      ctx.stroke();
-      
-      // Dibujar línea de cero
-      ctx.strokeStyle = '#999';
-      ctx.setLineDash([5, 3]);
-      ctx.beginPath();
-      const zeroY = y(0);
-      ctx.moveTo(padding, zeroY);
-      ctx.lineTo(padding + width, zeroY);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      
-      // Dibujar línea de flujo de caja
-      ctx.strokeStyle = '#00704a';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      
-      for (let año = 0; año <= años; año++) {
-        if (año === 0) {
-          ctx.moveTo(x(año), y(flujoCaja[año]));
-        } else {
-          ctx.lineTo(x(año), y(flujoCaja[año]));
-        }
-      }
-      ctx.stroke();
-      
-      // Dibujar puntos en cada año
-      for (let año = 0; año <= años; año++) {
-        const pointX = x(año);
-        const pointY = y(flujoCaja[año]);
-        
-        // Punto de equilibrio especial
-        if (año === breakEvenYear && flujoCaja[año] >= 0) {
-          ctx.fillStyle = '#f39c12';
-          ctx.strokeStyle = '#fff';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.arc(pointX, pointY, 6, 0, 2 * Math.PI);
-          ctx.fill();
-          ctx.stroke();
-        } else {
-          ctx.fillStyle = año === 0 ? '#e74c3c' : '#00704a';
-          ctx.beginPath();
-          ctx.arc(pointX, pointY, 4, 0, 2 * Math.PI);
-          ctx.fill();
-        }
-        
-        // Etiquetas de valores
-        ctx.fillStyle = '#333';
-        ctx.font = '10px system-ui';
-        ctx.textAlign = 'center';
-        
-        // Solo mostrar algunos valores para no saturar
-        if (año === 0 || año === breakEvenYear || año === años || año % 2 === 0) {
-          const labelY = pointY - 15;
-          ctx.fillText(`$${(flujoCaja[año]/1000000).toFixed(1)}M`, pointX, labelY);
-        }
-      }
-      
-      // Etiquetas de ejes
-      ctx.fillStyle = '#666';
-      ctx.font = '12px system-ui';
-      ctx.textAlign = 'center';
-      ctx.fillText('Años', canvas.width / 2, canvas.height - 10);
-      
-      ctx.save();
-      ctx.translate(10, canvas.height / 2);
-      ctx.rotate(-Math.PI / 2);
-      ctx.fillText('Flujo de Caja Acumulado (COP)', 0, 0);
-      ctx.restore();
-      
-      // Resumen
-      const gananciaTotal = flujoCaja[años];
-      chartSummary.innerHTML = `
-        <div><strong>Punto de equilibrio:</strong> Año ${breakEvenYear} ($${flujoCaja[breakEvenYear]?.toLocaleString() || '0'} COP)</div>
-        <div><strong>Ganancia acumulada a 10 años:</strong> $${gananciaTotal.toLocaleString()} COP</div>
-        <div><strong>Retorno total:</strong> ${((gananciaTotal / inversion) * 100).toFixed(0)}%</div>
-      `;
-      
-      // Mostrar la gráfica
-      document.getElementById('cashflowChart').style.display = 'block';
-    }
 
+function crearGraficaLinea(inversion, ahorroMensual, payback) {
+  const canvas = document.getElementById('lineChart');
+  const ctx = canvas.getContext('2d');
+  const chartSummary = document.getElementById('chartSummary');
+
+  // CONFIGURACIÓN RESPONSIVE SIMPLIFICADA
+  const container = canvas.parentElement;
+  const rect = container.getBoundingClientRect();
+  
+  // Usar dimensiones CSS para el canvas
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  
+  // Limpiar canvas primero
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const años = 10;
+  const ahorroAnual = ahorroMensual * 12;
+  const breakEvenYear = Math.ceil(payback);
+  
+  // Calcular flujo de caja acumulado por año
+  const flujoCaja = [];
+  let acumulado = -inversion;
+  
+  for (let año = 0; año <= años; año++) {
+    if (año === 0) {
+      flujoCaja.push(acumulado);
+    } else {
+      acumulado += ahorroAnual;
+      flujoCaja.push(acumulado);
+    }
+  }
+  
+  // Configurar dimensiones de la gráfica
+  const padding = 40;
+  const width = canvas.width - padding * 2;
+  const height = canvas.height - padding * 2;
+  
+  // Encontrar máximo y mínimo para escalar
+  const maxVal = Math.max(...flujoCaja);
+  const minVal = Math.min(...flujoCaja);
+  const range = maxVal - minVal;
+  
+  // Función para mapear valores a coordenadas
+  const x = (año) => padding + (año / años) * width;
+  const y = (valor) => {
+    if (range === 0) return padding + height / 2; // Evitar división por cero
+    const normalized = (valor - minVal) / range;
+    return padding + height - (normalized * height);
+  };
+  
+  // Dibujar ejes
+  ctx.strokeStyle = '#ccc';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  // Eje X
+  ctx.moveTo(padding, padding + height);
+  ctx.lineTo(padding + width, padding + height);
+  // Eje Y
+  ctx.moveTo(padding, padding);
+  ctx.lineTo(padding, padding + height);
+  ctx.stroke();
+  
+  // Dibujar línea de cero
+  ctx.strokeStyle = '#999';
+  ctx.setLineDash([5, 3]);
+  ctx.beginPath();
+  const zeroY = y(0);
+  ctx.moveTo(padding, zeroY);
+  ctx.lineTo(padding + width, zeroY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  
+  // Dibujar línea de flujo de caja
+  ctx.strokeStyle = '#00704a';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  
+  for (let año = 0; año <= años; año++) {
+    if (año === 0) {
+      ctx.moveTo(x(año), y(flujoCaja[año]));
+    } else {
+      ctx.lineTo(x(año), y(flujoCaja[año]));
+    }
+  }
+  ctx.stroke();
+  
+  // Dibujar puntos en cada año
+  for (let año = 0; año <= años; año++) {
+    const pointX = x(año);
+    const pointY = y(flujoCaja[año]);
+    
+    // Punto de equilibrio especial
+    if (año === breakEvenYear && flujoCaja[año] >= 0) {
+      ctx.fillStyle = '#f39c12';
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(pointX, pointY, 6, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.stroke();
+    } else {
+      ctx.fillStyle = año === 0 ? '#e74c3c' : '#00704a';
+      ctx.beginPath();
+      ctx.arc(pointX, pointY, 4, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+    
+    // Etiquetas de valores
+    ctx.fillStyle = '#333';
+    ctx.font = '10px system-ui';
+    ctx.textAlign = 'center';
+    
+    // Solo mostrar algunos valores para no saturar
+    if (año === 0 || año === breakEvenYear || año === años || año % 2 === 0) {
+      const labelY = pointY - 15;
+      ctx.fillText(`$${(flujoCaja[año]/1000000).toFixed(1)}M`, pointX, labelY);
+    }
+  }
+  
+  // Etiquetas de ejes
+  ctx.fillStyle = '#666';
+  ctx.font = '12px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText('Años', canvas.width / 2, canvas.height - 10);
+  
+  ctx.save();
+  ctx.translate(10, canvas.height / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText('Flujo de Caja Acumulado (COP)', 0, 0);
+  ctx.restore();
+  
+  // Resumen
+  const gananciaTotal = flujoCaja[años];
+  chartSummary.innerHTML = `
+    <div><strong>Punto de equilibrio:</strong> Año ${breakEvenYear} ($${flujoCaja[breakEvenYear]?.toLocaleString() || '0'} COP)</div>
+    <div><strong>Ganancia acumulada a 10 años:</strong> $${gananciaTotal.toLocaleString()} COP</div>
+    <div><strong>Retorno total:</strong> ${((gananciaTotal / inversion) * 100).toFixed(0)}%</div>
+  `;
+  
+  // Mostrar la gráfica
+  document.getElementById('cashflowChart').style.display = 'block';
+}
+    
     /* ---------- CÁLCULO INSTANTÁNEO ---------- */
     async function cotizar(){
       const lat = parseFloat(document.getElementById('latTxt').value);
@@ -634,4 +635,5 @@
   </script>
 </body>
 </html>
+
 
