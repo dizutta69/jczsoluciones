@@ -44,14 +44,6 @@
       min-width: 120px; /* Para que todos tengan el mismo ancho */
     }
 
-      .chart-canvas {
-        width: 100%;
-        height: 100%;
-        display: block;
-        background: #fafafa; /* Fondo temporal para ver si se dibuja */
-        border: 1px solid #ddd; /* Borde temporal para ver el área */
-      }
-
     /* NUEVAS POSICIONES para solar.png */
     #txtSolar { 
       bottom: 10%;    /* Inferior izquierda - Paneles */
@@ -164,6 +156,7 @@
     .chart-canvas {
       width: 100%;
       height: 100%;
+      display: block;
     }
     .chart-labels {
       display: flex;
@@ -188,15 +181,6 @@
       width: 15px;
       height: 3px;
       border-radius: 3px;
-    }
-    .break-even-point {
-      position: absolute;
-      background: #f39c12;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      border: 2px solid #fff;
-      box-shadow: 0 0 3px rgba(0,0,0,0.5);
     }
   </style>
 </head>
@@ -359,267 +343,272 @@
       document.getElementById('lonTxt').value = lng.toFixed(5);
     }
 
-/* FUNCIÓN PARA CREAR LA GRÁFICA DE LÍNEA */
+    /* FUNCIÓN PARA CREAR LA GRÁFICA DE LÍNEA */
+    function crearGraficaLinea(inversion, ahorroMensual, payback) {
+      const canvas = document.getElementById('lineChart');
+      const ctx = canvas.getContext('2d');
+      const chartSummary = document.getElementById('chartSummary');
 
-function crearGraficaLinea(inversion, ahorroMensual, payback) {
-  const canvas = document.getElementById('lineChart');
-  const ctx = canvas.getContext('2d');
-  const chartSummary = document.getElementById('chartSummary');
+      // CONFIGURACIÓN RESPONSIVE
+      const container = canvas.parentElement;
+      const rect = container.getBoundingClientRect();
+      
+      // Usar dimensiones CSS para el canvas
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      
+      // Limpiar canvas primero
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // CONFIGURACIÓN RESPONSIVE SIMPLIFICADA
-  const container = canvas.parentElement;
-  const rect = container.getBoundingClientRect();
-  
-  // Usar dimensiones CSS para el canvas
-  canvas.width = rect.width;
-  canvas.height = rect.height;
-  
-  // Limpiar canvas primero
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  const años = 10;
-  const ahorroAnual = ahorroMensual * 12;
-  const breakEvenYear = Math.ceil(payback);
-  
-  // Calcular flujo de caja acumulado por año
-  const flujoCaja = [];
-  let acumulado = -inversion;
-  
-  for (let año = 0; año <= años; año++) {
-    if (año === 0) {
-      flujoCaja.push(acumulado);
-    } else {
-      acumulado += ahorroAnual;
-      flujoCaja.push(acumulado);
-    }
-  }
-  
-  // Configurar dimensiones de la gráfica
-  const padding = 40;
-  const width = canvas.width - padding * 2;
-  const height = canvas.height - padding * 2;
-  
-  // Encontrar máximo y mínimo para escalar
-  const maxVal = Math.max(...flujoCaja);
-  const minVal = Math.min(...flujoCaja);
-  const range = maxVal - minVal;
-  
-  // Función para mapear valores a coordenadas
-  const x = (año) => padding + (año / años) * width;
-  const y = (valor) => {
-    if (range === 0) return padding + height / 2; // Evitar división por cero
-    const normalized = (valor - minVal) / range;
-    return padding + height - (normalized * height);
-  };
-  
-  // Dibujar ejes
-  ctx.strokeStyle = '#ccc';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  // Eje X
-  ctx.moveTo(padding, padding + height);
-  ctx.lineTo(padding + width, padding + height);
-  // Eje Y
-  ctx.moveTo(padding, padding);
-  ctx.lineTo(padding, padding + height);
-  ctx.stroke();
-  
-  // Dibujar línea de cero
-  ctx.strokeStyle = '#999';
-  ctx.setLineDash([5, 3]);
-  ctx.beginPath();
-  const zeroY = y(0);
-  ctx.moveTo(padding, zeroY);
-  ctx.lineTo(padding + width, zeroY);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  
-  // Dibujar línea de flujo de caja
-  ctx.strokeStyle = '#00704a';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  
-  for (let año = 0; año <= años; año++) {
-    if (año === 0) {
-      ctx.moveTo(x(año), y(flujoCaja[año]));
-    } else {
-      ctx.lineTo(x(año), y(flujoCaja[año]));
-    }
-  }
-  ctx.stroke();
-  
-  // Dibujar puntos en cada año
-  for (let año = 0; año <= años; año++) {
-    const pointX = x(año);
-    const pointY = y(flujoCaja[año]);
-    
-    // Punto de equilibrio especial
-    if (año === breakEvenYear && flujoCaja[año] >= 0) {
-      ctx.fillStyle = '#f39c12';
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 2;
+      const años = 10;
+      const ahorroAnual = ahorroMensual * 12;
+      const breakEvenYear = Math.ceil(payback);
+      
+      // Calcular flujo de caja acumulado por año
+      const flujoCaja = [];
+      let acumulado = -inversion;
+      
+      for (let año = 0; año <= años; año++) {
+        if (año === 0) {
+          flujoCaja.push(acumulado);
+        } else {
+          acumulado += ahorroAnual;
+          flujoCaja.push(acumulado);
+        }
+      }
+      
+      // Configurar dimensiones de la gráfica
+      const padding = 40;
+      const width = canvas.width - padding * 2;
+      const height = canvas.height - padding * 2;
+      
+      // Encontrar máximo y mínimo para escalar
+      const maxVal = Math.max(...flujoCaja);
+      const minVal = Math.min(...flujoCaja);
+      const range = maxVal - minVal;
+      
+      // Función para mapear valores a coordenadas
+      const x = (año) => padding + (año / años) * width;
+      const y = (valor) => {
+        if (range === 0) return padding + height / 2;
+        const normalized = (valor - minVal) / range;
+        return padding + height - (normalized * height);
+      };
+      
+      // Dibujar ejes
+      ctx.strokeStyle = '#ccc';
+      ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.arc(pointX, pointY, 6, 0, 2 * Math.PI);
-      ctx.fill();
+      // Eje X
+      ctx.moveTo(padding, padding + height);
+      ctx.lineTo(padding + width, padding + height);
+      // Eje Y
+      ctx.moveTo(padding, padding);
+      ctx.lineTo(padding, padding + height);
       ctx.stroke();
-    } else {
-      ctx.fillStyle = año === 0 ? '#e74c3c' : '#00704a';
+      
+      // Dibujar línea de cero
+      ctx.strokeStyle = '#999';
+      ctx.setLineDash([5, 3]);
       ctx.beginPath();
-      ctx.arc(pointX, pointY, 4, 0, 2 * Math.PI);
-      ctx.fill();
+      const zeroY = y(0);
+      ctx.moveTo(padding, zeroY);
+      ctx.lineTo(padding + width, zeroY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      
+      // Dibujar línea de flujo de caja
+      ctx.strokeStyle = '#00704a';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      
+      for (let año = 0; año <= años; año++) {
+        if (año === 0) {
+          ctx.moveTo(x(año), y(flujoCaja[año]));
+        } else {
+          ctx.lineTo(x(año), y(flujoCaja[año]));
+        }
+      }
+      ctx.stroke();
+      
+      // Dibujar puntos en cada año
+      for (let año = 0; año <= años; año++) {
+        const pointX = x(año);
+        const pointY = y(flujoCaja[año]);
+        
+        // Punto de equilibrio especial
+        if (año === breakEvenYear && flujoCaja[año] >= 0) {
+          ctx.fillStyle = '#f39c12';
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(pointX, pointY, 6, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = año === 0 ? '#e74c3c' : '#00704a';
+          ctx.beginPath();
+          ctx.arc(pointX, pointY, 4, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+        
+        // Etiquetas de valores
+        ctx.fillStyle = '#333';
+        ctx.font = '10px system-ui';
+        ctx.textAlign = 'center';
+        
+        // Solo mostrar algunos valores para no saturar
+        if (año === 0 || año === breakEvenYear || año === años || año % 2 === 0) {
+          const labelY = pointY - 15;
+          ctx.fillText(`$${(flujoCaja[año]/1000000).toFixed(1)}M`, pointX, labelY);
+        }
+      }
+      
+      // Etiquetas de ejes
+      ctx.fillStyle = '#666';
+      ctx.font = '12px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText('Años', canvas.width / 2, canvas.height - 10);
+      
+      ctx.save();
+      ctx.translate(10, canvas.height / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('Flujo de Caja (COP)', 0, 0);
+      ctx.restore();
+      
+      // Resumen con validación
+      const gananciaTotal = flujoCaja[años];
+      const retornoTotal = inversion > 0 ? ((gananciaTotal / inversion) * 100) : 0;
+      
+      chartSummary.innerHTML = `
+        <div><strong>Punto de equilibrio:</strong> Año ${breakEvenYear} ($${(flujoCaja[breakEvenYear] || 0).toLocaleString()} COP)</div>
+        <div><strong>Ganancia acumulada a 10 años:</strong> $${gananciaTotal.toLocaleString()} COP</div>
+        <div><strong>Retorno total:</strong> ${retornoTotal.toFixed(0)}%</div>
+      `;
+      
+      // Mostrar la gráfica
+      document.getElementById('cashflowChart').style.display = 'block';
     }
-    
-    // Etiquetas de valores
-    ctx.fillStyle = '#333';
-    ctx.font = '10px system-ui';
-    ctx.textAlign = 'center';
-    
-    // Solo mostrar algunos valores para no saturar
-    if (año === 0 || año === breakEvenYear || año === años || año % 2 === 0) {
-      const labelY = pointY - 15;
-      ctx.fillText(`$${(flujoCaja[año]/1000000).toFixed(1)}M`, pointX, labelY);
-    }
-  }
-  
-  // Etiquetas de ejes
-  ctx.fillStyle = '#666';
-  ctx.font = '12px system-ui';
-  ctx.textAlign = 'center';
-  ctx.fillText('Años', canvas.width / 2, canvas.height - 10);
-  
-  ctx.save();
-  ctx.translate(10, canvas.height / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.fillText('Flujo de Caja Acumulado (COP)', 0, 0);
-  ctx.restore();
-  
-  // Resumen
-  const gananciaTotal = flujoCaja[años];
-  chartSummary.innerHTML = `
-    <div><strong>Punto de equilibrio:</strong> Año ${breakEvenYear} ($${flujoCaja[breakEvenYear]?.toLocaleString() || '0'} COP)</div>
-    <div><strong>Ganancia acumulada a 10 años:</strong> $${gananciaTotal.toLocaleString()} COP</div>
-    <div><strong>Retorno total:</strong> ${((gananciaTotal / inversion) * 100).toFixed(0)}%</div>
-  `;
-  
-  // Mostrar la gráfica
-  document.getElementById('cashflowChart').style.display = 'block';
-}
-    
+
     /* ---------- CÁLCULO INSTANTÁNEO ---------- */
     async function cotizar(){
       const lat = parseFloat(document.getElementById('latTxt').value);
       const lon = parseFloat(document.getElementById('lonTxt').value);
       const bill = parseFloat(document.getElementById('bill').value);
-      if(!lat || !lon || !bill){ alert('Define ubicación y factura'); return; }
+      
+      // Validación más estricta
+      if(isNaN(lat) || isNaN(lon) || isNaN(bill) || bill <= 0){ 
+        alert('Define una ubicación válida y factura mayor a 0'); 
+        return; 
+      }
 
-      // Mostrar "Calculando..." en el área de texto, NO en el diagrama
+      // Mostrar "Calculando..."
       document.getElementById('textOutput').textContent = 'Calculando...';
       document.getElementById('calculandoText').style.display = 'block';
       document.getElementById('diagramContent').style.display = 'none';
       document.getElementById('cashflowChart').style.display = 'none';
 
       /* ====== CONSTANTS ====== */
-      const PRICE_KWH       = 890;           // COP / kWh
-      const USD_COP         = 4000;          // today
-      const USD_W_INSTALLED = 0.9;           // USD / Wp
-      const PANEL_W         = 450;           // Wp per panel
-      const LOSS            = 0.8;           // DC/AC losses
-      const TARGET          = 0.7;           // 70 % savings
+      const PRICE_KWH       = 890;
+      const USD_COP         = 4000;
+      const USD_W_INSTALLED = 0.9;
+      const PANEL_W         = 450;
+      const TARGET          = 0.7;
 
-      /* 1) Monthly kWh from bill */
-      const kwhMonth = bill / PRICE_KWH;
-      const kwh70    = kwhMonth * TARGET;
+      try {
+        /* 1) Monthly kWh from bill */
+        const kwhMonth = bill / PRICE_KWH;
+        const kwh70    = kwhMonth * TARGET;
 
-      /* 2) Specific yield (kWh/kWp/year) via PVWatts client-side */
+        /* 2) Specific yield (kWh/kWp/year) */
+        let specific = 1350; // Valor por defecto
+        
+        try {
+          const response = await fetch(
+            `https://developer.nrel.gov/api/pvwatts/v8.json?api_key=DEMO_KEY&lat=${lat}&lon=${lon}&system_capacity=1&azimuth=180&tilt=${Math.abs(lat)}&array_type=1&losses=14&timeframe=monthly`
+          );
+          
+          if (response.ok) {
+            const pvw = await response.json();
+            if(pvw && pvw.outputs && pvw.outputs.ac_annual) {
+              specific = pvw.outputs.ac_annual;
+            }
+          }
+        } catch(error) {
+          console.warn('Error PVWatts, usando valor por defecto:', error);
+        }
 
-      let specific;
-      try{
-        const pvw = await fetch(
-  `        https://developer.nrel.gov/api/pvwatts/v8.json?api_key=ECmQDDWbYsWgQ4pFg2zFUZdlbTirJhA1pnfQRRC4&lat=${lat}&lon=${lon}&system_capacity=1&azimuth=180&tilt=${Math.abs(lat)}&array_type=1&losses=14&timeframe=annual`
-        ).then(r => r.json());
-        specific = pvw.outputs.ac_annual; // kWh/kWp/year
-              }catch{
-        specific = 1350; // Bogotá fallback
+        /* 3) kWp required */
+        const kwp     = (kwh70 * 12) / specific;
+        const panels  = Math.ceil(kwp / (PANEL_W/1000));
+        const kwpReal = panels * (PANEL_W/1000);
+
+        /* 4) Price */
+        const priceUsd = kwpReal * 1000 * USD_W_INSTALLED;
+        const priceCop = priceUsd * USD_COP;
+
+        /* 5) Simple pay-back con validación */
+        const ahorroAnualCop = bill * 12 * TARGET;
+        const payback = ahorroAnualCop > 0 ? priceCop / ahorroAnualCop : 0;
+
+        /* 6) CÁLCULO NUEVA FACTURA */
+        const monthlyGrid = Math.max(0, kwhMonth - kwh70);
+        const nuevaFactura = monthlyGrid * PRICE_KWH;
+        const ahorroMensual = bill - nuevaFactura;
+
+        /* 7) Build pretty output */
+        const out =
+          `💡 Consumo mensual: ${kwhMonth.toLocaleString()} kWh\n` +
+          `☀️  Objetivo solar (70 %): ${kwh70.toLocaleString()} kWh\n` +
+          `🔧 Potencia de paneles: ${kwpReal.toFixed(2)} kWp  (${panels} paneles de ${PANEL_W} W)\n` +
+          `💰 Precio aproximado: COP ${priceCop.toLocaleString()}\n` +
+          `⏱️  Pay-back simple: ${payback.toFixed(1)} años\n` +
+          `💵 Factura actual: $${bill.toLocaleString()} COP\n` +
+          `💚 Nueva factura: $${nuevaFactura.toLocaleString()} COP\n` +
+          `💰 Ahorro mensual: $${ahorroMensual.toLocaleString()} COP`;
+
+        document.getElementById('textOutput').textContent = out;
+
+        /* 8) Mostrar diagramas */
+        document.getElementById('calculandoText').style.display = 'none';
+        document.getElementById('diagramContent').style.display = 'block';
+
+        /* 9) Actualizar textos overlay */
+        const monthlySolar = kwh70;
+        const monthlyHome = kwhMonth;
+
+        document.getElementById('txtSolar').textContent = monthlySolar.toLocaleString() + ' kWh/mes';
+        document.getElementById('txtGrid').textContent  = monthlyGrid.toLocaleString()  + ' kWh/mes';
+        document.getElementById('txtHome').textContent  = monthlyHome.toLocaleString()  + ' kWh/mes';
+        
+        /* 10) Actualizar valores de factura */
+        document.getElementById('txtFacturaAntigua').textContent = '$' + bill.toLocaleString() + ' COP';
+        document.getElementById('txtFacturaNueva').textContent = '$' + nuevaFactura.toLocaleString() + ' COP';
+        
+        /* 11) Actualizar barras */
+        const dailySolar = monthlySolar / 30.4;
+        const dailyGrid = monthlyGrid / 30.4;
+        const dailyHome = monthlyHome / 30.4;
+        const maxBar = Math.max(dailySolar, dailyGrid, dailyHome, 1);
+
+        document.getElementById('barSolar').style.width = `${(dailySolar / maxBar * 70).toFixed(0)}%`;
+        document.getElementById('labSolar').textContent = `${dailySolar.toFixed(2)} kWh/día`;
+        document.getElementById('barGrid').style.width  = `${(dailyGrid  / maxBar * 70).toFixed(0)}%`;
+        document.getElementById('labGrid').textContent  = `${dailyGrid.toFixed(2)}  kWh/día`;
+        document.getElementById('barHome').style.width  = `${(dailyHome  / maxBar * 70).toFixed(0)}%`;
+        document.getElementById('labHome').textContent  = `${dailyHome.toFixed(2)}  kWh/día`;
+
+        /* 12) CREAR GRÁFICA DE LÍNEA */
+        if(priceCop > 0 && ahorroMensual > 0 && !isNaN(payback)) {
+          crearGraficaLinea(priceCop, ahorroMensual, payback);
+        }
+
+      } catch (error) {
+        console.error('Error en cotización:', error);
+        document.getElementById('textOutput').textContent = 'Error en el cálculo. Verifica los datos.';
+        document.getElementById('calculandoText').style.display = 'none';
+        document.getElementById('diagramContent').style.display = 'block';
       }
-
-      /* 3) kWp required */
-      const kwp     = (kwh70 * 12) / specific;
-      const panels  = Math.ceil(kwp / (PANEL_W/1000));
-      const kwpReal = panels * (PANEL_W/1000);
-
-      /* 4) Price */
-      const priceUsd = kwpReal * 1000 * USD_W_INSTALLED;
-      const priceCop = priceUsd * USD_COP;
-
-      /* 5) Simple pay-back */
-      const ahorroAnualCop = bill * 12 * TARGET;
-      const payback = priceCop / ahorroAnualCop;
-
-      /* 6) CÁLCULO NUEVA FACTURA */
-      const monthlyGrid = kwhMonth - kwh70;  // kWh/mes comprados de la red
-      const nuevaFactura = monthlyGrid * PRICE_KWH;  // Nueva factura = energía de red * precio kWh
-      const ahorroMensual = bill - nuevaFactura;
-
-      /* 7) Build pretty output */
-      const out =
-        `💡 Consumo mensual: ${kwhMonth.toLocaleString()} kWh\n` +
-        `☀️  Objetivo solar (70 %): ${kwh70.toLocaleString()} kWh\n` +
-        `🔧 Potencia de paneles: ${kwpReal.toFixed(2)} kWp  (${panels} paneles de ${PANEL_W} W)\n` +
-        `💰 Precio aproximado: COP ${priceCop.toLocaleString()}\n` +
-        `⏱️  Pay-back simple: ${payback.toFixed(1)} años\n` +
-        `💵 Factura actual: $${bill.toLocaleString()} COP\n` +
-        `💚 Nueva factura: $${nuevaFactura.toLocaleString()} COP\n` +
-        `💰 Ahorro mensual: $${ahorroMensual.toLocaleString()} COP`;
-
-      document.getElementById('textOutput').textContent = out;
-
-      /* 8) CORRECCIÓN: Mostrar el diagrama con los resultados */
-      document.getElementById('calculandoText').style.display = 'none';
-      document.getElementById('diagramContent').style.display = 'block';
-
-      /* 9) Cálculos correctos para los textos overlay de solar.png */
-      // kWh/mes producidos por los paneles
-      const monthlySolar = kwh70;
-      // kWh/mes consumidos por el hogar
-      const monthlyHome = kwhMonth;
-
-      document.getElementById('txtSolar').textContent = monthlySolar.toLocaleString() + ' kWh/mes';
-      document.getElementById('txtGrid').textContent  = monthlyGrid.toLocaleString()  + ' kWh/mes';
-      document.getElementById('txtHome').textContent  = monthlyHome.toLocaleString()  + ' kWh/mes';
-      
-      /* 10) Actualizar valores de factura.png */
-      document.getElementById('txtFacturaAntigua').textContent = '$' + bill.toLocaleString() + ' COP';
-      document.getElementById('txtFacturaNueva').textContent = '$' + nuevaFactura.toLocaleString() + ' COP';
-      
-      /* 11) Actualizar barras con valores diarios */
-      const dailySolar = monthlySolar / 30.4; // promedio mensual a diario
-      const dailyGrid = monthlyGrid / 30.4;
-      const dailyHome = monthlyHome / 30.4;
-      const maxBar = Math.max(dailySolar, dailyGrid, dailyHome, 1);
-
-      document.getElementById('barSolar').style.width = `${(dailySolar / maxBar * 70).toFixed(0)}%`;
-      document.getElementById('labSolar').textContent = `${dailySolar.toFixed(2)} kWh/día`;
-      document.getElementById('barGrid').style.width  = `${(dailyGrid  / maxBar * 70).toFixed(0)}%`;
-      document.getElementById('labGrid').textContent  = `${dailyGrid.toFixed(2)}  kWh/día`;
-      document.getElementById('barHome').style.width  = `${(dailyHome  / maxBar * 70).toFixed(0)}%`;
-      document.getElementById('labHome').textContent  = `${dailyHome.toFixed(2)}  kWh/día`;
-
-      /* 12) CREAR GRÁFICA DE LÍNEA */
-      crearGraficaLinea(priceCop, ahorroMensual, payback);
-
-      /* 13) (Optional) keep creating the Issue for record */
-      // Comentado temporalmente para evitar errores
-      /*
-      fetch("https://api.github.com/repos/dizutta69/energialt/dispatches",{
-        method:"POST",
-        headers:{
-          "Accept":"application/vnd.github+json",
-          "Authorization":"token {{ secrets.GH_TOKEN }}",
-          "Content-Type":"application/json"
-        },
-        body:JSON.stringify({event_type:"quote",client_payload:{lat,lon,bill,currency:"COP"}})
-      });
-      */
     }
 
     // Inicializar barras a 0
@@ -630,12 +619,9 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
     });
   </script>
 
-  <!-- Carga de Google Maps con tu clave real (sin secretos) -->
+  <!-- Carga de Google Maps con tu clave real -->
   <script async
     src="https://maps.googleapis.com/maps/api/js?key=GOOGLE_API_KEY_AQUI&libraries=places&callback=initMap">
   </script>
 </body>
 </html>
-
-
-
