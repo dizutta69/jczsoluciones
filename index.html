@@ -470,8 +470,9 @@
         // Etiqueta del punto de equilibrio
         ctx.fillStyle = '#d35400';
         ctx.font = 'bold 13px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('Punto de Equilibrio', eqX, eqY - 25);
+        ctx.textAlign = 'left'; // Cambia 'right' por 'left'
+        ctx.fillText('Punto de Equilibrio', eqX + 10, eqY); 
+        
       }
 
       // DIBUJAR EJES PRINCIPALES
@@ -693,3 +694,4 @@
   </script>
 </body>
 </html>
+
