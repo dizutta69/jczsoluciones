@@ -673,9 +673,9 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
         const monthlySolar = kwh70;
         const monthlyHome = kwhMonth;
 
-        document.getElementById('txtSolar').textContent = monthlySolar.toLocaleString() + ' kWh/mes';
-        document.getElementById('txtGrid').textContent  = monthlyGrid.toLocaleString()  + ' kWh/mes';
-        document.getElementById('txtHome').textContent  = monthlyHome.toLocaleString()  + ' kWh/mes';
+        document.getElementById('txtSolar').textContent = Math.round(monthlySolar).toLocaleString() + ' kWh/mes';
+        document.getElementById('txtGrid').textContent  = Math.round(monthlyGrid).toLocaleString()  + ' kWh/mes';
+        document.getElementById('txtHome').textContent  = Math.round(monthlyHome).toLocaleString()  + ' kWh/mes';
         
         /* 10) Actualizar valores de factura */
         document.getElementById('txtFacturaAntigua').textContent = '$' + bill.toLocaleString() + ' COP';
@@ -721,6 +721,7 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
   </script>
 </body>
 </html>
+
 
 
 
