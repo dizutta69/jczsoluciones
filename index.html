@@ -769,15 +769,22 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
 
         /* 7) Build pretty output */
         const out =
-          `💡 Consumo mensual: ${kwhMonth.toLocaleString()} kWh\n` +
-          `☀️  Objetivo solar (70 %): ${kwh70.toLocaleString()} kWh\n` +
-          `🔧 Potencia de paneles: ${kwpReal.toFixed(2)} kWp  (${panels} paneles de ${PANEL_W} W)\n` +
-          `💰 Precio aproximado: COP ${priceCop.toLocaleString()}\n` +
-          `⏱️  Pay-back simple: ${payback.toFixed(1)} años\n` +
-          `💵 Factura actual: $${bill.toLocaleString()} COP\n` +
-          `💚 Nueva factura: $${nuevaFactura.toLocaleString()} COP\n` +
-          `💰 Ahorro mensual: $${ahorroMensual.toLocaleString()} COP`;
 
+          const produccionKwh25anios = kwh70 * 12 * 25;
+          const valorProduccionCOP = produccionKwh25anios * PRICE_KWH;
+        
+        const out =
+          `🏠 Tu consumo actual de energía es: ${kwhMonth.toLocaleString()} kWh\n` +
+          `☀️ Tu meta de generación solar es: ${kwh70.toLocaleString()} kWh\n` +
+          // Se eliminó la línea de potencia de paneles
+          `💵 Factura actual de Energía: $${bill.toLocaleString()} COP\n` +
+          `💚 Tu nueva Factura: $${nuevaFactura.toLocaleString()} COP\n` +
+          `💰 Tu sistema solar te ahorra cada mes: $${ahorroMensual.toLocaleString()} COP\n` +
+          `🏗️ Costo aproximado de tu inversión: COP ${priceCop.toLocaleString()}\n` +
+          `⏱️ Recupera tu inversión en: ${payback.toFixed(1)} años\n` +
+          `📈 Tu sistema Solar te produce: COP $${valorProduccionCOP.toLocaleString()}\n` +
+          `   durante su vida útil (25 años)`;
+        
         document.getElementById('textOutput').textContent = out;
 
         /* 8) Mostrar diagramas */
@@ -841,3 +848,4 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
   </script>
 </body>
 </html>
+
