@@ -421,7 +421,8 @@
     /* FUNCIÓN PARA CREAR LA GRÁFICA DE LÍNEA */
 
     /* FUNCIÓN PARA CREAR LA GRÁFICA DE LÍNEA */
-function crearGraficaLinea(inversion, ahorroMensual, payback) {
+
+  function crearGraficaLinea(inversion, ahorroMensual, payback) {
   const canvas = document.getElementById('lineChart');
   const ctx = canvas.getContext('2d');
   const chartSummary = document.getElementById('chartSummary');
@@ -439,7 +440,7 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const años = 10;
+  const años = 25; // CAMBIADO: De 10 a 25 años
   const ahorroAnual = ahorroMensual * 12;
   
   // Calcular flujo de caja acumulado por año (en millones)
@@ -516,11 +517,11 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
   ctx.textAlign = 'right';
   ctx.fillText('$0', margin - 5, zeroY + 4);
 
-  // DIBUJAR LÍNEAS VERTICALES PUNTEADAS PARA CADA AÑO
-  for (let año = 0; año <= años; año++) {
+  // DIBUJAR LÍNEAS VERTICALES PUNTEADAS PARA CADA AÑO (cada 5 años para mejor legibilidad)
+  for (let año = 0; año <= años; año += 5) {
     const xPos = x(año);
     
-    // Línea vertical punteada gris para cada año
+    // Línea vertical punteada gris para cada 5 años
     ctx.strokeStyle = '#e0e0e0';
     ctx.setLineDash([2, 2]);
     ctx.lineWidth = 1;
@@ -548,8 +549,8 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
   }
   ctx.stroke();
 
-  // DIBUJAR PUNTOS EN CADA AÑO
-  for (let año = 0; año <= años; año++) {
+  // DIBUJAR PUNTOS EN CADA 5 AÑOS (para mejor legibilidad)
+  for (let año = 0; año <= años; año += 5) {
     const xPos = x(año);
     const yPos = y(flujoCaja[año]);
     const valor = flujoCaja[año];
@@ -632,15 +633,15 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
   ctx.lineTo(margin, margin + graphHeight);
   ctx.stroke();
 
-  // ETIQUETAS DEL EJE X (números simples 1-10)
+  // ETIQUETAS DEL EJE X (cada 5 años)
   ctx.fillStyle = '#333';
   ctx.font = '12px Arial';
   ctx.textAlign = 'center';
   
-  for (let año = 0; año <= años; año++) {
+  for (let año = 0; año <= años; año += 5) {
     const xPos = x(año);
     
-    // Etiqueta numérica simple (1-10) en lugar de "Año X"
+    // Etiqueta numérica cada 5 años
     if (año > 0) {
       ctx.fillText(año.toString(), xPos, margin + graphHeight + 20);
     } else {
@@ -683,17 +684,22 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
   ctx.fillText('Flujo de Caja Acumulado (Millones COP)', 0, 0);
   ctx.restore();
 
-  // RESULTADOS FINALES
+  // RESULTADOS FINALES - PROYECCIÓN A 25 AÑOS
   const gananciaTotal = flujoCaja[años] * 1000000;
   const retornoTotal = inversion > 0 ? ((gananciaTotal / inversion) * 100) : 0;
+  const ahorroTotal25anios = ahorroMensual * 12 * 25;
   
   chartSummary.innerHTML = `
     <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #27ae60;">
-      <div style="font-size: 16px; font-weight: bold; margin-bottom: 10px; color: #27ae60;">📊 Resumen Financiero</div>
+      <div style="font-size: 16px; font-weight: bold; margin-bottom: 10px; color: #27ae60;">📊 Resumen Financiero (25 Años)</div>
       <div><strong>Punto de equilibrio:</strong> Año ${añoEquilibrio}, Mes ${mesEquilibrio}</div>
-      <div><strong>Ganancia a 10 años:</strong> $${gananciaTotal.toLocaleString()} COP</div>
-      <div><strong>Retorno total:</strong> ${retornoTotal.toFixed(0)}%</div>
+      <div><strong>Ganancia total a 25 años:</strong> $${gananciaTotal.toLocaleString()} COP</div>
+      <div><strong>Ahorro total en facturas:</strong> $${ahorroTotal25anios.toLocaleString()} COP</div>
+      <div><strong>Retorno total de inversión:</strong> ${retornoTotal.toFixed(0)}%</div>
       <div><strong>Tiempo de retorno:</strong> ${breakEvenYear.toFixed(1)} años</div>
+      <div style="margin-top: 8px; font-size: 0.85rem; color: #666;">
+        * Proyección considera vida útil típica de paneles solares (25 años)
+      </div>
     </div>
   `;
   
@@ -847,5 +853,6 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
   </script>
 </body>
 </html>
+
 
 
