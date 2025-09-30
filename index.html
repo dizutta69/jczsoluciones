@@ -768,23 +768,22 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
         const ahorroMensual = bill - nuevaFactura;
 
         /* 7) Build pretty output */
-        const out =
 
-          const produccionKwh25anios = kwh70 * 12 * 25;
-          const valorProduccionCOP = produccionKwh25anios * PRICE_KWH;
+        const produccionKwh25anios = kwh70 * 12 * 25;
+        const valorProduccionCOP = produccionKwh25anios * PRICE_KWH;
+        const ahorroImpuestoRenta = priceCop * 0.5; // 50% del valor de inversión
         
         const out =
           `🏠 Tu consumo actual de energía es: ${kwhMonth.toLocaleString()} kWh\n` +
           `☀️ Tu meta de generación solar es: ${kwh70.toLocaleString()} kWh\n` +
-          // Se eliminó la línea de potencia de paneles
           `💵 Factura actual de Energía: $${bill.toLocaleString()} COP\n` +
           `💚 Tu nueva Factura: $${nuevaFactura.toLocaleString()} COP\n` +
           `💰 Tu sistema solar te ahorra cada mes: $${ahorroMensual.toLocaleString()} COP\n` +
           `🏗️ Costo aproximado de tu inversión: COP ${priceCop.toLocaleString()}\n` +
           `⏱️ Recupera tu inversión en: ${payback.toFixed(1)} años\n` +
           `📈 Tu sistema Solar te produce: COP $${valorProduccionCOP.toLocaleString()}\n` +
-          `   durante su vida útil (25 años)`;
-        
+          `   durante su vida útil (25 años)\n` +
+          `💳 Incentivo Tributario DIAN: COP $${ahorroImpuestoRenta.toLocaleString()}`;        
         document.getElementById('textOutput').textContent = out;
 
         /* 8) Mostrar diagramas */
@@ -848,4 +847,5 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
   </script>
 </body>
 </html>
+
 
