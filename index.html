@@ -159,10 +159,125 @@
       display: block;
     }
     /* ELIMINADOS: .chart-labels y .chart-legend duplicados */
+
+    /* NUEVOS ESTILOS PARA EL SPLASH SCREEN */
+    .splash-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .splash-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    .splash-title {
+      color: #00704a;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+    }
+    .splash-instructions {
+      margin-bottom: 2rem;
+    }
+    .splash-step {
+      display: flex;
+      margin-bottom: 1rem;
+      align-items: flex-start;
+    }
+    .step-number {
+      background: #00704a;
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 1rem;
+      flex-shrink: 0;
+    }
+    .step-text {
+      flex: 1;
+    }
+    .splash-button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: #00704a;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .splash-button:hover {
+      background: #005a3c;
+    }
   </style>
 </head>
 
 <body>
+  <!-- SPLASH SCREEN CON INSTRUCCIONES -->
+  <div id="splashScreen" class="splash-overlay">
+    <div class="splash-content">
+      <h2 class="splash-title">Cotizador Solar Rápido</h2>
+      <div class="splash-instructions">
+        <p style="text-align: center; margin-bottom: 1.5rem;">Sigue estos pasos para obtener tu cotización de energía solar:</p>
+        
+        <div class="splash-step">
+          <div class="step-number">1</div>
+          <div class="step-text">
+            <strong>Ingresa tu dirección</strong> en el campo de búsqueda o arrastra el marcador en el mapa para ubicar tu propiedad.
+          </div>
+        </div>
+        
+        <div class="splash-step">
+          <div class="step-number">2</div>
+          <div class="step-text">
+            <strong>Ingresa el valor de tu factura mensual</strong> de energía en pesos colombianos (COP).
+          </div>
+        </div>
+        
+        <div class="splash-step">
+          <div class="step-number">3</div>
+          <div class="step-text">
+            <strong>Haz clic en "Cotizar"</strong> para calcular tu sistema solar personalizado.
+          </div>
+        </div>
+        
+        <div class="splash-step">
+          <div class="step-number">4</div>
+          <div class="step-text">
+            <strong>Revisa los resultados</strong> que incluyen:
+            <ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
+              <li>Potencia recomendada y número de paneles</li>
+              <li>Inversión estimada</li>
+              <li>Tiempo de recuperación (payback)</li>
+              <li>Nuevo valor de tu factura mensual</li>
+              <li>Gráfica de flujo de caja a 10 años</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <button id="closeSplash" class="splash-button">Comenzar a usar el cotizador</button>
+    </div>
+  </div>
+
   <h1>Cotizador Solar Rápido</h1>
 
   <label>
@@ -712,6 +827,11 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
       document.getElementById('barSolar').style.width = '0%';
       document.getElementById('barGrid').style.width = '0%';
       document.getElementById('barHome').style.width = '0%';
+      
+      // Agregar evento para cerrar el splash screen
+      document.getElementById('closeSplash').addEventListener('click', function() {
+        document.getElementById('splashScreen').style.display = 'none';
+      });
     });
   </script>
 
@@ -721,12 +841,3 @@ function crearGraficaLinea(inversion, ahorroMensual, payback) {
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
