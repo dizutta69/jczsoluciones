@@ -719,32 +719,71 @@
       cotizar();
     }
 
-    async function guardarEnBaseDeDatos(nombre, email, telefono) {
-      // Simulación de guardado en GitHub (en un escenario real usarías GitHub Pages + GitHub API)
-      const datos = {
-        nombre: nombre,
-        email: email,
-        telefono: telefono,
-        inversion: currentPriceCop,
-        paneles: currentPanels,
-        area: currentArea,
-        fecha: new Date().toISOString(),
-        lat: document.getElementById('latTxtSplash').value,
-        lon: document.getElementById('lonTxtSplash').value,
-        factura: document.getElementById('billSplash').value
-      };
+async function guardarEnBaseDeDatos(nombre, email, telefono) {
+  const datos = {
+    nombre: nombre,
+    email: email,
+    telefono: telefono,
+    inversion: currentPriceCop,
+    paneles: currentPanels,
+    area: currentArea,
+    fecha: new Date().toISOString(),
+    lat: document.getElementById('latTxtSplash').value,
+    lon: document.getElementById('lonTxtSplash').value,
+    factura: document.getElementById('billSplash').value
+  };
 
-      // En un caso real, aquí harías una petición a tu backend o GitHub API
-      console.log('Datos a guardar:', datos);
-      
-      // Simulación exitosa
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          console.log('Datos guardados exitosamente');
-          resolve();
-        }, 1000);
-      });
+  // Usar GitHub API para guardar los datos
+  const GITHUB_TOKEN = 'tu_token_aqui'; // Necesitas crear un token
+  const REPO_OWNER = 'tu_usuario';
+  const REPO_NAME = 'solar-leads';
+  
+  try {
+    // Primero, obtener el archivo actual
+    const response = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/leads.json`);
+    const fileData = await response.json();
+    
+    // Decodificar el contenido actual
+    const currentContent = JSON.parse(atob(fileData.content));
+    currentContent.leads.push(datos);
+    
+    // Actualizar el archivo
+    const updateResponse = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/leads.json`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${GITHUB_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: 'Nuevo lead solar',
+        content: btoa(JSON.stringify(currentContent, null, 2)),
+        sha: fileData.sha
+      })
+    });
+    
+    if (updateResponse.ok) {
+      console.log('Datos guardados en GitHub');
+      return true;
+    } else {
+      console.error('Error al guardar en GitHub');
+      return false;
     }
+    
+  } catch (error) {
+    console.error('Error:', error);
+    // Fallback: guardar en localStorage
+    guardarEnLocalStorage(datos);
+    return true;
+  }
+}
+
+// Función de respaldo en localStorage
+function guardarEnLocalStorage(datos) {
+  let leads = JSON.parse(localStorage.getItem('solarLeads') || '[]');
+  leads.push(datos);
+  localStorage.setItem('solarLeads', JSON.stringify(leads));
+  console.log('Datos guardados en localStorage como respaldo');
+}
 
     // FUNCIÓN ORIGINAL COTIZAR (modificada para incluir área)
     async function cotizar(){
@@ -886,3 +925,4 @@
   </script>
 </body>
 </html>
+
