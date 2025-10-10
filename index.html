@@ -786,35 +786,50 @@
       }
     }
 
-    async function guardarEnBaseDeDatos(nombre, email, telefono) {
-      const datos = {
-        nombre: nombre,
-        email: email,
-        telefono: telefono,
-        inversion: currentPriceCop,
-        paneles: currentPanels,
-        area: currentArea,
-        fecha: new Date().toISOString(),
-        lat: document.getElementById('latTxtSplash').value,
-        lon: document.getElementById('lonTxtSplash').value,
-        factura: document.getElementById('billSplash').value
-      };
+async function guardarEnBaseDeDatos(nombre, email, telefono) {
+  const datos = {
+    nombre: nombre,
+    email: email,
+    telefono: telefono,
+    inversion: currentPriceCop,
+    paneles: currentPanels,
+    area: currentArea,
+    fecha: new Date().toLocaleString('es-CO'),
+    lat: document.getElementById('latTxtSplash').value,
+    lon: document.getElementById('lonTxtSplash').value,
+    factura: document.getElementById('billSplash').value
+  };
 
-      try {
-        // Intentar guardar en GitHub
-        const exito = await guardarEnGitHub(datos);
-        if (exito) {
-          console.log('✅ Datos guardados en GitHub');
-          return true;
-        }
-      } catch (error) {
-        console.warn('⚠️ Error con GitHub:', error);
-      }
-
+  // URL de tu Google Apps Script - REEMPLAZA CON LA TUYA
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxV0otlkwNNruI_z2kK5-pBndXnrs2OuMUO8fCxLd4_odM-VXRL9QcPuTYmIDOvUBLMOQ/exec';
+  
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(datos)
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      console.log('✅ Datos guardados en Google Sheets');
+      return true;
+    } else {
+      console.error('Error del servidor:', result.error);
       // Fallback a localStorage
       guardarEnLocalStorage(datos);
       return true;
     }
+  } catch (error) {
+    console.error('Error conexión:', error);
+    // Fallback a localStorage
+    guardarEnLocalStorage(datos);
+    return true;
+  }
+}
 
     async function guardarEnGitHub(datos) {
       const token = obtenerToken();
@@ -1087,4 +1102,5 @@
   </script>
 </body>
 </html>
+
 
