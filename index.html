@@ -376,7 +376,7 @@
           <div class="step-text">
             <strong>Ingresa tu dirección</strong>
             <input id="searchBoxSplash" type="text" placeholder="Cra 15 # 120-30, Bogotá"/>
-            <button onclick="buscarDesdeSplash()">Buscar</button>
+            <button id="buscarSplashBtn">Buscar</button>
             <div class="splash-coords">
               <label>Lat: <input id="latTxtSplash" readonly/></label>
               <label>Lon: <input id="lonTxtSplash" readonly/></label>
@@ -472,7 +472,7 @@
     <label>
       Dirección:
       <input id="searchBox" type="text" placeholder="Cra 15 # 120-30, Bogotá"/>
-      <button onclick="buscaConBoton()">Buscar</button>
+      <button id="buscarBtn">Buscar</button>
     </label>
     <br/>
 
@@ -487,7 +487,7 @@
     <label>Lon: <input id="lonTxt" readonly/></label>
     <br/>
 
-    <button onclick="cotizar()">Cotizar</button>
+    <button id="cotizarBtn">Cotizar</button>
 
     <!-- Aquí se mostrará el texto de resultados -->
     <div id="textOutput"></div>
@@ -580,6 +580,13 @@
     // FUNCIONES PARA EL FLUJO MEJORADO
     function buscarDesdeSplash() {
       const input = document.getElementById('searchBoxSplash');
+      if (!input.value) {
+        alert('Por favor ingresa una dirección');
+        return;
+      }
+      
+      console.log('Buscando dirección:', input.value);
+      
       const service = new google.maps.places.PlacesService(map);
       
       service.textSearch({query: input.value}, (results, status) => {
@@ -587,6 +594,7 @@
           const latLng = results[0].geometry.location;
           document.getElementById('latTxtSplash').value = latLng.lat().toFixed(5);
           document.getElementById('lonTxtSplash').value = latLng.lng().toFixed(5);
+          console.log('Dirección encontrada:', latLng.lat(), latLng.lng());
         } else {
           alert('Dirección no encontrada. Prueba otra forma o pega lat,lon');
         }
@@ -687,6 +695,8 @@
         return; 
       }
 
+      console.log('Cotizando desde splash:', lat, lon, bill);
+
       // Mostrar pantalla de confirmación de ubicación
       document.getElementById('splashScreen').style.display = 'none';
       document.getElementById('confirmLocationScreen').style.display = 'flex';
@@ -700,6 +710,8 @@
       const lon = parseFloat(document.getElementById('lonTxtSplash').value);
       const bill = parseFloat(document.getElementById('billSplash').value);
       
+      console.log('Confirmando ubicación:', lat, lon, bill);
+      
       // Calcular cotización
       calcularCotizacion(lat, lon, bill).then(() => {
         // Mostrar pantalla de inversión
@@ -708,6 +720,7 @@
         
         // Mostrar valor de inversión
         document.getElementById('investmentAmount').textContent = formatoDineroCOP(currentPriceCop);
+        console.log('Inversión calculada:', currentPriceCop);
       });
     }
 
@@ -747,6 +760,10 @@
         currentPriceCop = priceUsd * USD_COP;
         currentArea = currentPanels * AREA_POR_PANEL;
 
+        console.log('Cotización calculada:', {
+          kwhMonth, kwh70, specific, kwp, currentPanels, kwpReal, priceUsd, currentPriceCop, currentArea
+        });
+
       } catch (error) {
         console.error('Error en cotización:', error);
         alert('Error en el cálculo. Verifica los datos.');
@@ -763,6 +780,8 @@
         return;
       }
 
+      console.log('Enviando informe:', { userName, userEmail, userPhone });
+
       // Mostrar loading y ocultar otros mensajes
       document.getElementById('loadingMessage').style.display = 'block';
       document.getElementById('errorMessage').style.display = 'none';
@@ -777,6 +796,8 @@
         // Mostrar mensaje de éxito
         document.getElementById('loadingMessage').style.display = 'none';
         document.getElementById('successMessage').style.display = 'block';
+        
+        console.log('Datos enviados correctamente');
         
         // Esperar 2 segundos y luego continuar
         setTimeout(() => {
@@ -799,6 +820,8 @@
         document.getElementById('errorMessage').style.display = 'block';
         document.getElementById('sendReportBtn').textContent = 'Enviar mi informe';
         document.getElementById('sendReportBtn').disabled = false;
+        
+        console.log('Error al enviar datos');
       }
     }
 
@@ -861,6 +884,8 @@
         alert('Define una ubicación válida y factura mayor a 0'); 
         return; 
       }
+
+      console.log('Cotizando desde main:', lat, lon, bill);
 
       document.getElementById('textOutput').textContent = 'Calculando...';
       document.getElementById('calculandoText').style.display = 'block';
@@ -934,7 +959,6 @@
         document.getElementById('diagramContent').style.display = 'block';
 
         const monthlySolar = kwh70;
-        const monthlyGrid = kwhMonth - kwh70;
         const monthlyHome = kwhMonth;
 
         document.getElementById('txtSolar').textContent = formatoNumeroEntero(monthlySolar) + ' kWh/mes';
@@ -970,18 +994,34 @@
 
     // EVENT LISTENERS
     document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM cargado, configurando event listeners');
+      
       document.getElementById('barSolar').style.width = '0%';
       document.getElementById('barGrid').style.width = '0%';
       document.getElementById('barHome').style.width = '0%';
       
+      // Botones del splash screen
+      document.getElementById('buscarSplashBtn').addEventListener('click', buscarDesdeSplash);
       document.getElementById('cotizarSplash').addEventListener('click', cotizarDesdeSplash);
+      
+      // Botones de confirmación
       document.getElementById('confirmLocationBtn').addEventListener('click', confirmarUbicacion);
+      
+      // Botón de enviar informe
       document.getElementById('sendReportBtn').addEventListener('click', enviarInforme);
+      
+      // Botones del contenido principal
+      document.getElementById('buscarBtn').addEventListener('click', buscaConBoton);
+      document.getElementById('cotizarBtn').addEventListener('click', cotizar);
+      
+      console.log('Event listeners configurados correctamente');
     });
 
-    // FUNCIÓN CREAR GRÁFICA DE LÍNEA (se mantiene igual)
+    // FUNCIÓN CREAR GRÁFICA DE LÍNEA (simplificada para evitar errores)
     function crearGraficaLinea(inversion, ahorroMensual, payback) {
-      // ... (todo el código de la gráfica que ya tenías)
+      console.log('Creando gráfica de línea');
+      document.getElementById('cashflowChart').style.display = 'block';
+      // Aquí iría el código completo de la gráfica
     }
   </script>
 
