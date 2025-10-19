@@ -315,6 +315,49 @@
     .benefits-list li {
       margin-bottom: 0.5rem;
     }
+    
+    /* ESTILOS PARA MENSAJES DE ERROR Y ÉXITO */
+    .error-message {
+      color: #d32f2f;
+      background-color: #ffebee;
+      padding: 10px;
+      border-radius: 4px;
+      margin-top: 10px;
+      text-align: center;
+      display: none;
+    }
+    
+    .success-message {
+      color: #2e7d32;
+      background-color: #e8f5e9;
+      padding: 10px;
+      border-radius: 4px;
+      margin-top: 10px;
+      text-align: center;
+      display: none;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 10px;
+      color: #00704a;
+      display: none;
+    }
+    
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #00704a;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 
@@ -403,6 +446,20 @@
           <input type="tel" id="userPhone" placeholder="Ingresa tu teléfono">
         </div>
         
+        <!-- Mensajes de estado -->
+        <div id="loadingMessage" class="loading">
+          <div class="spinner"></div>
+          <p>Enviando...</p>
+        </div>
+        
+        <div id="errorMessage" class="error-message">
+          Error al guardar los datos. Por favor intenta nuevamente.
+        </div>
+        
+        <div id="successMessage" class="success-message">
+          ¡Datos enviados correctamente! Redirigiendo...
+        </div>
+        
         <button id="sendReportBtn" class="splash-button">Enviar mi informe</button>
       </div>
     </div>
@@ -486,8 +543,8 @@
     let currentPanels = 0;
     let currentArea = 0;
 
-    // CONFIGURACIÓN GOOGLE APPS SCRIPT - ACTUALIZA CON TU URL
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyPGtDMnE8yviXlzBQpiB9hmAn1jxF_YvZhJuzqXHZ6TYZlraT6A2cI_SBGuwF2WuBW/exec'; // REEMPLAZA
+    // CONFIGURACIÓN GOOGLE APPS SCRIPT - REEMPLAZA CON TU URL REAL
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyPGtDMnE8yviXlzBQpiB9hmAn1jxF_YvZhJuzqXHZ6TYZlraT6A2cI_SBGuwF2WuBW/exec';
 
     // FUNCIONES DE FORMATEO
     function formatoDineroCOP(valor) {
@@ -706,7 +763,10 @@
         return;
       }
 
-      // Mostrar loading
+      // Mostrar loading y ocultar otros mensajes
+      document.getElementById('loadingMessage').style.display = 'block';
+      document.getElementById('errorMessage').style.display = 'none';
+      document.getElementById('successMessage').style.display = 'none';
       document.getElementById('sendReportBtn').textContent = 'Enviando...';
       document.getElementById('sendReportBtn').disabled = true;
 
@@ -714,20 +774,29 @@
       const exito = await guardarEnBaseDeDatos(userName, userEmail, userPhone);
 
       if (exito) {
-        // Transferir datos al contenido principal
-        document.getElementById('bill').value = document.getElementById('billSplash').value;
-        document.getElementById('latTxt').value = document.getElementById('latTxtSplash').value;
-        document.getElementById('lonTxt').value = document.getElementById('lonTxtSplash').value;
-        document.getElementById('searchBox').value = document.getElementById('searchBoxSplash').value;
+        // Mostrar mensaje de éxito
+        document.getElementById('loadingMessage').style.display = 'none';
+        document.getElementById('successMessage').style.display = 'block';
+        
+        // Esperar 2 segundos y luego continuar
+        setTimeout(() => {
+          // Transferir datos al contenido principal
+          document.getElementById('bill').value = document.getElementById('billSplash').value;
+          document.getElementById('latTxt').value = document.getElementById('latTxtSplash').value;
+          document.getElementById('lonTxt').value = document.getElementById('lonTxtSplash').value;
+          document.getElementById('searchBox').value = document.getElementById('searchBoxSplash').value;
 
-        // Ocultar splash y mostrar contenido principal
-        document.getElementById('investmentScreen').style.display = 'none';
-        document.getElementById('mainContent').style.display = 'block';
+          // Ocultar splash y mostrar contenido principal
+          document.getElementById('investmentScreen').style.display = 'none';
+          document.getElementById('mainContent').style.display = 'block';
 
-        // Ejecutar cotización automáticamente
-        cotizar();
+          // Ejecutar cotización automáticamente
+          cotizar();
+        }, 2000);
       } else {
-        alert('Error al guardar los datos. Por favor intenta nuevamente.');
+        // Mostrar mensaje de error
+        document.getElementById('loadingMessage').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'block';
         document.getElementById('sendReportBtn').textContent = 'Enviar mi informe';
         document.getElementById('sendReportBtn').disabled = false;
       }
@@ -751,22 +820,29 @@
       console.log('Enviando datos a Google Sheets:', datos);
 
       try {
+        // Usar FormData para evitar problemas CORS
+        const formData = new FormData();
+        formData.append('data', JSON.stringify(datos));
+        
         const response = await fetch(GOOGLE_SCRIPT_URL, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(datos)
+          body: formData
         });
         
-        const result = await response.json();
+        const result = await response.text();
         console.log('Respuesta del servidor:', result);
         
-        if (result.success) {
-          console.log('✅ Datos guardados en Google Sheets. Fila:', result.fila);
-          return true;
-        } else {
-          console.error('❌ Error del servidor:', result.error);
+        try {
+          const jsonResult = JSON.parse(result);
+          if (jsonResult.success) {
+            console.log('✅ Datos guardados en Google Sheets. Fila:', jsonResult.fila);
+            return true;
+          } else {
+            console.error('❌ Error del servidor:', jsonResult.error);
+            return false;
+          }
+        } catch (parseError) {
+          console.error('❌ Error parseando respuesta:', parseError);
           return false;
         }
       } catch (error) {
@@ -858,6 +934,7 @@
         document.getElementById('diagramContent').style.display = 'block';
 
         const monthlySolar = kwh70;
+        const monthlyGrid = kwhMonth - kwh70;
         const monthlyHome = kwhMonth;
 
         document.getElementById('txtSolar').textContent = formatoNumeroEntero(monthlySolar) + ' kWh/mes';
@@ -910,7 +987,7 @@
 
   <!-- Carga de Google Maps -->
   <script async
-    src="https://maps.googleapis.com/maps/api/js?key=GOOGLE_API_KEY_AQUI&libraries=places&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKNxSVeV-p40IVdXtU7Ghk7p-WdMnrZes&libraries=places&callback=initMap">
   </script>
 </body>
 </html>
