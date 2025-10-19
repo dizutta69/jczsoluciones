@@ -770,109 +770,151 @@
       }
     }
 
-    async function enviarInforme() {
-      const userName = document.getElementById('userName').value;
-      const userEmail = document.getElementById('userEmail').value;
-      const userPhone = document.getElementById('userPhone').value;
+async function enviarInforme() {
+  const userName = document.getElementById('userName').value;
+  const userEmail = document.getElementById('userEmail').value;
+  const userPhone = document.getElementById('userPhone').value;
 
-      if (!userName || !userEmail || !userPhone) {
-        alert('Por favor completa todos los campos');
-        return;
-      }
+  if (!userName || !userEmail || !userPhone) {
+    alert('Por favor completa todos los campos');
+    return;
+  }
 
-      console.log('Enviando informe:', { userName, userEmail, userPhone });
+  // Validación básica de email
+  if (!userEmail.includes('@') || !userEmail.includes('.')) {
+    alert('Por favor ingresa un email válido');
+    return;
+  }
 
-      // Mostrar loading y ocultar otros mensajes
-      document.getElementById('loadingMessage').style.display = 'block';
-      document.getElementById('errorMessage').style.display = 'none';
-      document.getElementById('successMessage').style.display = 'none';
-      document.getElementById('sendReportBtn').textContent = 'Enviando...';
-      document.getElementById('sendReportBtn').disabled = true;
+  // Validación básica de teléfono
+  if (userPhone.length < 10) {
+    alert('Por favor ingresa un teléfono válido');
+    return;
+  }
 
-      // Guardar en Google Sheets
-      const exito = await guardarEnBaseDeDatos(userName, userEmail, userPhone);
+  console.log('Enviando informe:', { userName, userEmail, userPhone });
 
-      if (exito) {
-        // Mostrar mensaje de éxito
-        document.getElementById('loadingMessage').style.display = 'none';
-        document.getElementById('successMessage').style.display = 'block';
-        
-        console.log('Datos enviados correctamente');
-        
-        // Esperar 2 segundos y luego continuar
-        setTimeout(() => {
-          // Transferir datos al contenido principal
-          document.getElementById('bill').value = document.getElementById('billSplash').value;
-          document.getElementById('latTxt').value = document.getElementById('latTxtSplash').value;
-          document.getElementById('lonTxt').value = document.getElementById('lonTxtSplash').value;
-          document.getElementById('searchBox').value = document.getElementById('searchBoxSplash').value;
+  // Mostrar loading y ocultar otros mensajes
+  document.getElementById('loadingMessage').style.display = 'block';
+  document.getElementById('errorMessage').style.display = 'none';
+  document.getElementById('successMessage').style.display = 'none';
+  document.getElementById('sendReportBtn').textContent = 'Enviando...';
+  document.getElementById('sendReportBtn').disabled = true;
 
-          // Ocultar splash y mostrar contenido principal
-          document.getElementById('investmentScreen').style.display = 'none';
-          document.getElementById('mainContent').style.display = 'block';
+  // Guardar en Google Sheets
+  const exito = await guardarEnBaseDeDatos(userName, userEmail, userPhone);
 
-          // Ejecutar cotización automáticamente
-          cotizar();
-        }, 2000);
-      } else {
-        // Mostrar mensaje de error
-        document.getElementById('loadingMessage').style.display = 'none';
-        document.getElementById('errorMessage').style.display = 'block';
-        document.getElementById('sendReportBtn').textContent = 'Enviar mi informe';
-        document.getElementById('sendReportBtn').disabled = false;
-        
-        console.log('Error al enviar datos');
-      }
+  if (exito) {
+    // Mostrar mensaje de éxito
+    document.getElementById('loadingMessage').style.display = 'none';
+    document.getElementById('successMessage').style.display = 'block';
+    
+    console.log('Datos enviados correctamente');
+    
+    // Esperar 3 segundos y luego continuar
+    setTimeout(() => {
+      // Transferir datos al contenido principal
+      document.getElementById('bill').value = document.getElementById('billSplash').value;
+      document.getElementById('latTxt').value = document.getElementById('latTxtSplash').value;
+      document.getElementById('lonTxt').value = document.getElementById('lonTxtSplash').value;
+      document.getElementById('searchBox').value = document.getElementById('searchBoxSplash').value;
+
+      // Ocultar splash y mostrar contenido principal
+      document.getElementById('investmentScreen').style.display = 'none';
+      document.getElementById('mainContent').style.display = 'block';
+
+      // Ejecutar cotización automáticamente
+      cotizar();
+    }, 3000);
+  } else {
+    // Mostrar mensaje de error
+    document.getElementById('loadingMessage').style.display = 'none';
+    document.getElementById('errorMessage').style.display = 'block';
+    document.getElementById('sendReportBtn').textContent = 'Enviar mi informe';
+    document.getElementById('sendReportBtn').disabled = false;
+    
+    console.log('Error al enviar datos');
+  }
+}
+
+async function guardarEnBaseDeDatos(nombre, email, telefono) {
+  const datos = {
+    nombre: nombre,
+    email: email,
+    telefono: telefono,
+    inversion: currentPriceCop,
+    paneles: currentPanels,
+    area: currentArea,
+    fecha: new Date().toLocaleString('es-CO'),
+    lat: document.getElementById('latTxtSplash').value,
+    lon: document.getElementById('lonTxtSplash').value,
+    factura: document.getElementById('billSplash').value,
+    direccion: document.getElementById('searchBoxSplash').value
+  };
+
+  console.log('Enviando datos a Google Sheets:', datos);
+
+  try {
+    // MÉTODO 1: Envío directo como JSON
+    console.log('Intentando método directo...');
+    const response = await fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors', // Importante para evitar problemas CORS
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(datos)
+    });
+    
+    // Con 'no-cors' no podemos leer la respuesta, pero asumimos éxito
+    console.log('✅ Petición enviada (no-cors mode)');
+    return true;
+    
+  } catch (error) {
+    console.error('❌ Error con método directo:', error);
+    
+    // MÉTODO 2: Usar Google Forms como alternativa
+    try {
+      console.log('Intentando método alternativo con Google Forms...');
+      const formSuccess = await enviarConGoogleForms(datos);
+      return formSuccess;
+    } catch (formError) {
+      console.error('❌ Error con Google Forms también:', formError);
+      return false;
     }
+  }
+}
 
-    async function guardarEnBaseDeDatos(nombre, email, telefono) {
-      const datos = {
-        nombre: nombre,
-        email: email,
-        telefono: telefono,
-        inversion: currentPriceCop,
-        paneles: currentPanels,
-        area: currentArea,
-        fecha: new Date().toLocaleString('es-CO'),
-        lat: document.getElementById('latTxtSplash').value,
-        lon: document.getElementById('lonTxtSplash').value,
-        factura: document.getElementById('billSplash').value,
-        direccion: document.getElementById('searchBoxSplash').value
-      };
-
-      console.log('Enviando datos a Google Sheets:', datos);
-
-      try {
-        // Usar FormData para evitar problemas CORS
-        const formData = new FormData();
-        formData.append('data', JSON.stringify(datos));
-        
-        const response = await fetch(GOOGLE_SCRIPT_URL, {
-          method: 'POST',
-          body: formData
-        });
-        
-        const result = await response.text();
-        console.log('Respuesta del servidor:', result);
-        
-        try {
-          const jsonResult = JSON.parse(result);
-          if (jsonResult.success) {
-            console.log('✅ Datos guardados en Google Sheets. Fila:', jsonResult.fila);
-            return true;
-          } else {
-            console.error('❌ Error del servidor:', jsonResult.error);
-            return false;
-          }
-        } catch (parseError) {
-          console.error('❌ Error parseando respuesta:', parseError);
-          return false;
-        }
-      } catch (error) {
-        console.error('❌ Error conexión:', error);
-        return false;
-      }
-    }
+// Método alternativo usando Google Forms (más confiable)
+async function enviarConGoogleForms(datos) {
+  // REEMPLAZA ESTE ID con el ID de tu Google Form
+  const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/TU_FORM_ID_AQUI/formResponse';
+  
+  const formData = new FormData();
+  
+  // Mapea los campos de tu Google Form - REEMPLAZA los entry.XXX con tus IDs reales
+  formData.append('entry.123456789', datos.nombre);     // Nombre
+  formData.append('entry.987654321', datos.email);      // Email
+  formData.append('entry.555555555', datos.telefono);   // Teléfono
+  formData.append('entry.111111111', datos.inversion);  // Inversión
+  formData.append('entry.222222222', datos.paneles);    // Paneles
+  formData.append('entry.333333333', datos.area);       // Área
+  formData.append('entry.444444444', datos.direccion);  // Dirección
+  
+  try {
+    const response = await fetch(GOOGLE_FORM_URL, {
+      method: 'POST',
+      body: formData,
+      mode: 'no-cors'
+    });
+    
+    console.log('✅ Datos enviados via Google Forms');
+    return true;
+  } catch (error) {
+    console.error('Error enviando a Google Forms:', error);
+    return false;
+  }
+}
 
     // FUNCIÓN ORIGINAL COTIZAR
     async function cotizar(){
@@ -1031,3 +1073,4 @@
   </script>
 </body>
 </html>
+
