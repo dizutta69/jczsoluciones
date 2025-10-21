@@ -932,47 +932,63 @@
       }
     }
 
-    async function guardarEnBaseDeDatos(nombre, email, telefono) {
-      const datos = {
-        nombre: nombre,
-        email: email,
-        telefono: telefono,
-        inversion: currentPriceCop,
-        paneles: currentPanels,
-        area: currentArea,
-        fecha: new Date().toLocaleString('es-CO'),
-        lat: document.getElementById('latTxtSplash').value,
-        lon: document.getElementById('lonTxtSplash').value,
-        factura: document.getElementById('billSplash').value,
-        direccion: document.getElementById('searchBoxSplash').value
-      };
+async function guardarEnBaseDeDatos(nombre, email, telefono) {
+  const datos = {
+    nombre: nombre,
+    email: email,
+    telefono: telefono,
+    inversion: currentPriceCop,
+    paneles: currentPanels,
+    area: currentArea,
+    lat: document.getElementById('latTxtSplash').value,
+    lon: document.getElementById('lonTxtSplash').value,
+    factura: document.getElementById('billSplash').value,
+    direccion: document.getElementById('searchBoxSplash').value
+  };
 
-      console.log('Enviando datos a Google Sheets:', datos);
+  console.log('Enviando datos a Google Sheets:', datos);
 
-      try {
-        const response = await fetch(GOOGLE_SCRIPT_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(datos)
-        });
-        
-        const result = await response.json();
-        console.log('Respuesta del servidor:', result);
-        
-        if (result.success) {
-          console.log('✅ Datos guardados en Google Sheets. Fila:', result.fila);
-          return true;
-        } else {
-          console.error('❌ Error del servidor:', result.error);
-          return false;
-        }
-      } catch (error) {
-        console.error('❌ Error conexión:', error);
-        return false;
+  // SOLUCIÓN: Usar JSONP para evitar CORS
+  return new Promise((resolve, reject) => {
+    const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+    
+    // Crear script para JSONP
+    const script = document.createElement('script');
+    const url = new URL(GOOGLE_SCRIPT_URL);
+    
+    // Agregar parámetros como query string
+    Object.keys(datos).forEach(key => {
+      url.searchParams.append(key, datos[key]);
+    });
+    url.searchParams.append('callback', callbackName);
+    
+    script.src = url.toString();
+    
+    // Definir callback global
+    window[callbackName] = function(response) {
+      delete window[callbackName];
+      document.body.removeChild(script);
+      
+      if (response.success) {
+        console.log('✅ Datos guardados en Google Sheets. Fila:', response.fila);
+        resolve(true);
+      } else {
+        console.error('❌ Error del servidor:', response.error);
+        resolve(false);
       }
-    }
+    };
+    
+    // Manejar error de carga del script
+    script.onerror = function() {
+      delete window[callbackName];
+      document.body.removeChild(script);
+      console.error('❌ Error de conexión JSONP');
+      resolve(false);
+    };
+    
+    document.body.appendChild(script);
+  });
+}
 
     // FUNCIÓN ORIGINAL COTIZAR
     async function cotizar(){
@@ -1113,5 +1129,6 @@
   </script>
 </body>
 </html>
+
 
 
