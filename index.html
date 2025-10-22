@@ -4,6 +4,9 @@
   <meta charset="utf-8"/>
   <title>Cotizador Solar – Colombia (Google Maps)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <!-- CDNs para captura de pantalla -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body{font-family:system-ui;margin:0;padding:1rem;background:#f7f7f7}
     #map, #confirmMap{height:55vh;border-radius:8px;margin:.5rem 0}
@@ -344,9 +347,6 @@
       flex: 1;
     }
   </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  
 </head>
 
 <body>
@@ -441,6 +441,7 @@
             <li>✅ Gráfica con el retorno de inversión</li>
             <li>✅ Ingresos que te producirá el sistema</li>
             <li>✅ Área requerida para la instalación</li>
+            <li>✅ 📄 PDF con captura completa de tu cotización</li>
           </ul>
         </div>
 
@@ -459,7 +460,7 @@
           <input type="tel" id="userPhone" placeholder="Ingresa tu teléfono">
         </div>
         
-        <button id="sendReportBtn" class="splash-button">Enviar mi informe</button>
+        <button id="sendReportBtn" class="splash-button">Enviar mi informe completo</button>
       </div>
     </div>
   </div>
@@ -543,7 +544,7 @@
     let currentArea = 0;
 
     // CONFIGURACIÓN GOOGLE APPS SCRIPT - ACTUALIZA CON TU URL
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxd_IQz8btM8nS6lxbVHdXJ54JzQTw3STwWcA8eSYTnf9JjnOXwue_hGG9Xg1t6VSRQRw/exec'; // REEMPLAZA
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxd_IQz8btM8nS6lxbVHdXJ54JzQTw3STwWcA8eSYTnf9JjnOXwue_hGG9Xg1t6VSRQRw/exec';
 
     // FUNCIONES DE FORMATEO
     function formatoDineroCOP(valor) {
@@ -898,7 +899,72 @@
       }
     }
 
-    async function enviarInforme() {
+    // FUNCIÓN PARA CAPTURAR CONTENIDO PARA PDF
+    function capturarContenidoParaPDF() {
+      return new Promise((resolve, reject) => {
+        // Ocultar elementos que no queremos en el PDF
+        const splashScreen = document.getElementById('splashScreen');
+        const confirmLocationScreen = document.getElementById('confirmLocationScreen');
+        const investmentScreen = document.getElementById('investmentScreen');
+        
+        const originalDisplaySplash = splashScreen.style.display;
+        const originalDisplayConfirm = confirmLocationScreen.style.display;
+        const originalDisplayInvestment = investmentScreen.style.display;
+        
+        splashScreen.style.display = 'none';
+        confirmLocationScreen.style.display = 'none';
+        investmentScreen.style.display = 'none';
+        
+        // Esperar un momento para que se oculte todo
+        setTimeout(() => {
+          // Capturar el contenido principal
+          html2canvas(document.getElementById('mainContent'), {
+            scale: 2, // Mayor calidad
+            useCORS: true,
+            allowTaint: true,
+            scrollY: -window.scrollY,
+            width: document.getElementById('mainContent').scrollWidth,
+            height: document.getElementById('mainContent').scrollHeight,
+            onclone: function(clonedDoc) {
+              // Asegurar que todo esté visible en el clone
+              const mainContent = clonedDoc.getElementById('mainContent');
+              if (mainContent) {
+                mainContent.style.display = 'block';
+                mainContent.style.width = '100%';
+              }
+              
+              // Asegurar que los canvas de gráficos se rendericen
+              const canvases = clonedDoc.querySelectorAll('canvas');
+              canvases.forEach(canvas => {
+                const context = canvas.getContext('2d');
+                if (context) {
+                  context.imageSmoothingEnabled = true;
+                  context.imageSmoothingQuality = 'high';
+                }
+              });
+            }
+          }).then(canvas => {
+            // Restaurar la visualización original
+            splashScreen.style.display = originalDisplaySplash;
+            confirmLocationScreen.style.display = originalDisplayConfirm;
+            investmentScreen.style.display = originalDisplayInvestment;
+            
+            // Convertir canvas a data URL
+            const imgData = canvas.toDataURL('image/png', 1.0);
+            resolve(imgData);
+          }).catch(error => {
+            // Restaurar en caso de error
+            splashScreen.style.display = originalDisplaySplash;
+            confirmLocationScreen.style.display = originalDisplayConfirm;
+            investmentScreen.style.display = originalDisplayInvestment;
+            reject(error);
+          });
+        }, 1000);
+      });
+    }
+
+    // FUNCIÓN MODIFICADA PARA ENVIAR EL PDF CON CAPTURA DE PANTALLA
+    async function enviarInformeConCaptura() {
       const userName = document.getElementById('userName').value;
       const userEmail = document.getElementById('userEmail').value;
       const userPhone = document.getElementById('userPhone').value;
@@ -909,98 +975,110 @@
       }
 
       // Mostrar loading
-      document.getElementById('sendReportBtn').textContent = 'Enviando...';
+      document.getElementById('sendReportBtn').textContent = 'Generando PDF...';
       document.getElementById('sendReportBtn').disabled = true;
 
-      // Guardar en Google Sheets
-      const exito = await guardarEnBaseDeDatos(userName, userEmail, userPhone);
+      try {
+        // Capturar la página completa
+        console.log('📸 Capturando contenido de la página...');
+        const imagenData = await capturarContenidoParaPDF();
+        console.log('✅ Captura completada');
+        
+        // Guardar en Google Sheets y enviar email con captura
+        const exito = await guardarEnBaseDeDatosConCaptura(userName, userEmail, userPhone, imagenData);
 
-      if (exito) {
-        // Transferir datos al contenido principal
-        document.getElementById('bill').value = document.getElementById('billSplash').value;
-        document.getElementById('latTxt').value = document.getElementById('latTxtSplash').value;
-        document.getElementById('lonTxt').value = document.getElementById('lonTxtSplash').value;
-        document.getElementById('searchBox').value = document.getElementById('searchBoxSplash').value;
+        if (exito) {
+          // Transferir datos al contenido principal
+          document.getElementById('bill').value = document.getElementById('billSplash').value;
+          document.getElementById('latTxt').value = document.getElementById('latTxtSplash').value;
+          document.getElementById('lonTxt').value = document.getElementById('lonTxtSplash').value;
+          document.getElementById('searchBox').value = document.getElementById('searchBoxSplash').value;
 
-        // Ocultar splash y mostrar contenido principal
-        document.getElementById('investmentScreen').style.display = 'none';
-        document.getElementById('mainContent').style.display = 'block';
+          // Ocultar splash y mostrar contenido principal
+          document.getElementById('investmentScreen').style.display = 'none';
+          document.getElementById('mainContent').style.display = 'block';
 
-        // Ejecutar cotización automáticamente
-        cotizar();
-      } else {
-        alert('Error al guardar los datos. Por favor intenta nuevamente.');
-        document.getElementById('sendReportBtn').textContent = 'Enviar mi informe';
+          // Ejecutar cotización automáticamente
+          cotizar();
+        } else {
+          alert('Error al guardar los datos. Por favor intenta nuevamente.');
+          document.getElementById('sendReportBtn').textContent = 'Enviar mi informe completo';
+          document.getElementById('sendReportBtn').disabled = false;
+        }
+      } catch (error) {
+        console.error('Error en captura:', error);
+        alert('Error generando el PDF. Por favor intenta nuevamente.');
+        document.getElementById('sendReportBtn').textContent = 'Enviar mi informe completo';
         document.getElementById('sendReportBtn').disabled = false;
       }
     }
 
-async function guardarEnBaseDeDatosConCaptura(nombre, email, telefono, imagenData) {
-  const datos = {
-    nombre: nombre,
-    email: email,
-    telefono: telefono,
-    inversion: currentPriceCop,
-    paneles: currentPanels,
-    area: currentArea,
-    lat: document.getElementById('latTxtSplash').value,
-    lon: document.getElementById('lonTxtSplash').value,
-    factura: document.getElementById('billSplash').value,
-    direccion: document.getElementById('searchBoxSplash').value,
-    captura: imagenData // Agregar la captura de pantalla
-  };
+    // FUNCIÓN ACTUALIZADA PARA GUARDAR CON CAPTURA
+    async function guardarEnBaseDeDatosConCaptura(nombre, email, telefono, imagenData) {
+      const datos = {
+        nombre: nombre,
+        email: email,
+        telefono: telefono,
+        inversion: currentPriceCop,
+        paneles: currentPanels,
+        area: currentArea,
+        lat: document.getElementById('latTxtSplash').value,
+        lon: document.getElementById('lonTxtSplash').value,
+        factura: document.getElementById('billSplash').value,
+        direccion: document.getElementById('searchBoxSplash').value,
+        captura: imagenData // Agregar la captura de pantalla
+      };
 
-  console.log('Enviando datos a Google Sheets con captura:', datos);
+      console.log('Enviando datos a Google Sheets con captura:', datos);
 
-  return new Promise((resolve, reject) => {
-    const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-    
-    // Crear script para JSONP
-    const script = document.createElement('script');
-    const url = new URL(GOOGLE_SCRIPT_URL);
-    
-    // Agregar parámetros como query string
-    Object.keys(datos).forEach(key => {
-      if (key === 'captura') {
-        // Para la imagen, enviar como string base64 (puede ser muy largo)
-        // En una implementación real, podrías necesitar chunking
-        url.searchParams.append(key, datos[key].substring(0, 100000)); // Limitar tamaño
-      } else {
-        url.searchParams.append(key, datos[key]);
-      }
-    });
-    url.searchParams.append('callback', callbackName);
-    
-    script.src = url.toString();
-    
-    // Definir callback global
-    window[callbackName] = function(response) {
-      delete window[callbackName];
-      document.body.removeChild(script);
-      
-      if (response.success) {
-        console.log('✅ Datos guardados en Google Sheets. Fila:', response.fila);
-        if (response.emailEnviado) {
-          console.log('✅ Email con PDF enviado correctamente');
-        }
-        resolve(true);
-      } else {
-        console.error('❌ Error del servidor:', response.error);
-        resolve(false);
-      }
-    };
-    
-    // Manejar error de carga del script
-    script.onerror = function() {
-      delete window[callbackName];
-      document.body.removeChild(script);
-      console.error('❌ Error de conexión JSONP');
-      resolve(false);
-    };
-    
-    document.body.appendChild(script);
-  });
-}
+      return new Promise((resolve, reject) => {
+        const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+        
+        // Crear script para JSONP
+        const script = document.createElement('script');
+        const url = new URL(GOOGLE_SCRIPT_URL);
+        
+        // Agregar parámetros como query string
+        Object.keys(datos).forEach(key => {
+          if (key === 'captura') {
+            // Para la imagen, enviar como string base64 (limitamos tamaño por URL)
+            url.searchParams.append(key, datos[key].substring(0, 50000)); // Limitar tamaño para URL
+          } else {
+            url.searchParams.append(key, datos[key]);
+          }
+        });
+        url.searchParams.append('callback', callbackName);
+        
+        script.src = url.toString();
+        
+        // Definir callback global
+        window[callbackName] = function(response) {
+          delete window[callbackName];
+          document.body.removeChild(script);
+          
+          if (response.success) {
+            console.log('✅ Datos guardados en Google Sheets. Fila:', response.fila);
+            if (response.emailEnviado) {
+              console.log('✅ Email con PDF enviado correctamente');
+            }
+            resolve(true);
+          } else {
+            console.error('❌ Error del servidor:', response.error);
+            resolve(false);
+          }
+        };
+        
+        // Manejar error de carga del script
+        script.onerror = function() {
+          delete window[callbackName];
+          document.body.removeChild(script);
+          console.error('❌ Error de conexión JSONP');
+          resolve(false);
+        };
+        
+        document.body.appendChild(script);
+      });
+    }
 
     // FUNCIÓN ORIGINAL COTIZAR
     async function cotizar(){
@@ -1126,435 +1204,301 @@ async function guardarEnBaseDeDatosConCaptura(nombre, email, telefono, imagenDat
       
       document.getElementById('cotizarSplash').addEventListener('click', cotizarDesdeSplash);
       document.getElementById('confirmLocationBtn').addEventListener('click', confirmarUbicacion);
-      document.getElementById('sendReportBtn').addEventListener('click', enviarInforme);
+      
+      // Reemplazar el event listener original por la nueva función con captura
+      document.getElementById('sendReportBtn').addEventListener('click', enviarInformeConCaptura);
     });
 
-
     /* FUNCIÓN PARA CREAR LA GRÁFICA DE LÍNEA */
+    function crearGraficaLinea(inversion, ahorroMensual, payback) {
+      const canvas = document.getElementById('lineChart');
+      const ctx = canvas.getContext('2d');
+      const chartSummary = document.getElementById('chartSummary');
 
-  function crearGraficaLinea(inversion, ahorroMensual, payback) {
-  const canvas = document.getElementById('lineChart');
-  const ctx = canvas.getContext('2d');
-  const chartSummary = document.getElementById('chartSummary');
-
-  // Dimensiones fijas para consistencia
-  canvas.width = 800;
-  canvas.height = 400;
-  canvas.style.width = '800px';
-  canvas.style.height = '400px';
-  
-  // LIMPIAR COMPLETAMENTE el canvas antes de dibujar
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  // Fondo blanco
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  const años = 25; // CAMBIADO: De 10 a 25 años
-  const ahorroAnual = ahorroMensual * 12;
-  
-  // Calcular flujo de caja acumulado por año (en millones)
-  const flujoCaja = [];
-  let acumulado = -inversion / 1000000;
-  
-  for (let año = 0; año <= años; año++) {
-    if (año === 0) {
-      flujoCaja.push(acumulado);
-    } else {
-      acumulado += ahorroAnual / 1000000;
-      flujoCaja.push(acumulado);
-    }
-  }
-
-  // CALCULAR PUNTO DE EQUILIBRIO EXACTO (donde flujo de caja = 0)
-  let breakEvenYear = 0;
-  let breakEvenMonth = 0;
-  
-  // Buscar el año donde cambia de negativo a positivo
-  for (let año = 1; año <= años; año++) {
-    if (flujoCaja[año - 1] <= 0 && flujoCaja[año] >= 0) {
-      // Interpolación lineal para encontrar el mes exacto
-      const valorAnterior = flujoCaja[año - 1];
-      const valorActual = flujoCaja[año];
-      const fraccionDelAño = -valorAnterior / (valorActual - valorAnterior);
+      // Dimensiones fijas para consistencia
+      canvas.width = 800;
+      canvas.height = 400;
+      canvas.style.width = '800px';
+      canvas.style.height = '400px';
       
-      breakEvenYear = año - 1 + fraccionDelAño;
-      breakEvenMonth = Math.round(fraccionDelAño * 12);
-      break;
+      // LIMPIAR COMPLETAMENTE el canvas antes de dibujar
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Fondo blanco
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const años = 25;
+      const ahorroAnual = ahorroMensual * 12;
+      
+      // Calcular flujo de caja acumulado por año (en millones)
+      const flujoCaja = [];
+      let acumulado = -inversion / 1000000;
+      
+      for (let año = 0; año <= años; año++) {
+        if (año === 0) {
+          flujoCaja.push(acumulado);
+        } else {
+          acumulado += ahorroAnual / 1000000;
+          flujoCaja.push(acumulado);
+        }
+      }
+
+      // CALCULAR PUNTO DE EQUILIBRIO EXACTO (donde flujo de caja = 0)
+      let breakEvenYear = 0;
+      let breakEvenMonth = 0;
+      
+      // Buscar el año donde cambia de negativo a positivo
+      for (let año = 1; año <= años; año++) {
+        if (flujoCaja[año - 1] <= 0 && flujoCaja[año] >= 0) {
+          // Interpolación lineal para encontrar el mes exacto
+          const valorAnterior = flujoCaja[año - 1];
+          const valorActual = flujoCaja[año];
+          const fraccionDelAño = -valorAnterior / (valorActual - valorAnterior);
+          
+          breakEvenYear = año - 1 + fraccionDelAño;
+          breakEvenMonth = Math.round(fraccionDelAño * 12);
+          break;
+        }
+      }
+      
+      // Si no se encontró punto de equilibrio, usar el payback calculado
+      if (breakEvenYear === 0) {
+        breakEvenYear = payback;
+        breakEvenMonth = Math.round((payback - Math.floor(payback)) * 12);
+      }
+      
+      const añoEquilibrio = Math.floor(breakEvenYear);
+      const mesEquilibrio = breakEvenMonth;
+
+      // Configurar área de dibujo
+      const margin = 80;
+      const graphWidth = canvas.width - margin * 2;
+      const graphHeight = canvas.height - margin * 2;
+      
+      // Encontrar máximo y mínimo
+      const maxVal = Math.max(...flujoCaja);
+      const minVal = Math.min(...flujoCaja);
+      const range = Math.max(maxVal - minVal, 1);
+
+      // Función para mapear coordenadas
+      const x = (año) => margin + (año / años) * graphWidth;
+      const y = (valor) => {
+        const normalized = (valor - minVal) / range;
+        return margin + graphHeight - (normalized * graphHeight);
+      };
+
+      // DIBUJAR LÍNEA DE CERO (más visible)
+      const zeroY = y(0);
+      ctx.strokeStyle = '#666';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([5, 3]);
+      ctx.beginPath();
+      ctx.moveTo(margin, zeroY);
+      ctx.lineTo(margin + graphWidth, zeroY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      
+      // Etiqueta de línea cero
+      ctx.fillStyle = '#666';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'right';
+      ctx.fillText('$0', margin - 5, zeroY + 4);
+
+      // DIBUJAR LÍNEAS VERTICALES PUNTEADAS PARA CADA AÑO (cada 5 años para mejor legibilidad)
+      for (let año = 0; año <= años; año += 5) {
+        const xPos = x(año);
+        
+        // Línea vertical punteada gris para cada 5 años
+        ctx.strokeStyle = '#e0e0e0';
+        ctx.setLineDash([2, 2]);
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(xPos, margin);
+        ctx.lineTo(xPos, margin + graphHeight);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // DIBUJAR LÍNEA PRINCIPAL
+      ctx.strokeStyle = '#00704a';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      
+      for (let año = 0; año <= años; año++) {
+        const xPos = x(año);
+        const yPos = y(flujoCaja[año]);
+        
+        if (año === 0) {
+          ctx.moveTo(xPos, yPos);
+        } else {
+          ctx.lineTo(xPos, yPos);
+        }
+      }
+      ctx.stroke();
+
+      // DIBUJAR PUNTOS EN CADA 5 AÑOS (para mejor legibilidad)
+      for (let año = 0; año <= años; año += 5) {
+        const xPos = x(año);
+        const yPos = y(flujoCaja[año]);
+        const valor = flujoCaja[año];
+        
+        // Determinar color según si es negativo o positivo
+        let puntoColor, textoColor;
+        if (valor < 0) {
+          puntoColor = '#e67e22'; // Naranja para negativos
+          textoColor = '#c0392b';
+        } else {
+          puntoColor = '#27ae60'; // Verde para positivos
+          textoColor = '#27ae60';
+        }
+        
+        // Dibujar punto
+        ctx.fillStyle = puntoColor;
+        ctx.beginPath();
+        ctx.arc(xPos, yPos, 6, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Borde blanco para mejor visibilidad
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // Etiqueta de valor
+        ctx.fillStyle = textoColor;
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        
+        // Posicionar etiqueta arriba o abajo según el valor
+        const labelY = valor >= 0 ? yPos - 20 : yPos + 20;
+        ctx.fillText(`$${valor.toFixed(1)}M`, xPos, labelY);
+      }
+
+      // DIBUJAR LÍNEA VERTICAL PUNTEADA EN EL PUNTO DE EQUILIBRIO
+      if (breakEvenYear > 0 && breakEvenYear <= años) {
+        const eqX = x(breakEvenYear);
+        const eqY = y(0);
+        
+        // Línea vertical punteada naranja desde el punto hasta el eje X
+        ctx.strokeStyle = '#f39c12';
+        ctx.setLineDash([3, 3]);
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(eqX, eqY);
+        ctx.lineTo(eqX, margin + graphHeight);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        
+        // Punto grande naranja en la línea de cero
+        ctx.fillStyle = '#f39c12';
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(eqX, eqY, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Etiqueta del punto de equilibrio A LA DERECHA
+        ctx.fillStyle = '#d35400';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'right';
+        ctx.fillText('Punto de Equilibrio', eqX + 10, eqY - 10);
+      }
+
+      // DIBUJAR EJES PRINCIPALES
+      ctx.strokeStyle = '#333';
+      ctx.lineWidth = 2;
+      
+      // Eje X
+      ctx.beginPath();
+      ctx.moveTo(margin, margin + graphHeight);
+      ctx.lineTo(margin + graphWidth, margin + graphHeight);
+      ctx.stroke();
+      
+      // Eje Y
+      ctx.beginPath();
+      ctx.moveTo(margin, margin);
+      ctx.lineTo(margin, margin + graphHeight);
+      ctx.stroke();
+
+      // ETIQUETAS DEL EJE X (cada 5 años)
+      ctx.fillStyle = '#333';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'center';
+      
+      for (let año = 0; año <= años; año += 5) {
+        const xPos = x(año);
+        
+        // Etiqueta numérica cada 5 años
+        if (año > 0) {
+          ctx.fillText(año.toString(), xPos, margin + graphHeight + 20);
+        } else {
+          ctx.fillText('Inv', xPos, margin + graphHeight + 20); // Inversión
+        }
+      }
+
+      // ETIQUETAS DEL EJE Y
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#333';
+      
+      // Calcular valores para las marcas del eje Y
+      const yStep = range / 4;
+      for (let i = 0; i <= 4; i++) {
+        const value = minVal + (i * yStep);
+        const yPos = y(value);
+        
+        // Línea de guía horizontal
+        ctx.strokeStyle = '#f0f0f0';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(margin, yPos);
+        ctx.lineTo(margin + graphWidth, yPos);
+        ctx.stroke();
+        
+        // Etiqueta del valor
+        ctx.fillStyle = '#333';
+        ctx.fillText(`$${value.toFixed(1)}M`, margin - 10, yPos + 4);
+      }
+
+      // TÍTULOS DE EJES
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 14px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Años', canvas.width / 2, canvas.height - 10);
+      
+      ctx.save();
+      ctx.translate(25, canvas.height / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('Flujo de Caja Acumulado (Millones COP)', 0, 0);
+      ctx.restore();
+
+      // RESULTADOS FINALES - PROYECCIÓN A 25 AÑOS
+      const gananciaTotal = flujoCaja[años] * 1000000;
+      const retornoTotal = inversion > 0 ? ((gananciaTotal / inversion) * 100) : 0;
+      const ahorroTotal25anios = ahorroMensual * 12 * 25;
+      
+      chartSummary.innerHTML = `
+        <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #27ae60;">
+          <div style="font-size: 16px; font-weight: bold; margin-bottom: 10px; color: #27ae60;">📊 Resumen Financiero (25 Años)</div>
+          <div><strong>Punto de equilibrio:</strong> Año ${añoEquilibrio}, Mes ${mesEquilibrio}</div>
+          <div><strong>Ganancia total a 25 años:</strong> $${gananciaTotal.toLocaleString()} COP</div>
+          <div><strong>Ahorro total en facturas:</strong> $${ahorroTotal25anios.toLocaleString()} COP</div>
+          <div><strong>Retorno total de inversión:</strong> ${retornoTotal.toFixed(0)}%</div>
+          <div><strong>Tiempo de retorno:</strong> ${breakEvenYear.toFixed(1)} años</div>
+          <div style="margin-top: 8px; font-size: 0.85rem; color: #666;">
+            * Proyección considera vida útil típica de paneles solares (25 años)
+          </div>
+        </div>
+      `;
+      
+      // Mostrar la gráfica
+      document.getElementById('cashflowChart').style.display = 'block';
     }
-  }
-  
-  // Si no se encontró punto de equilibrio, usar el payback calculado
-  if (breakEvenYear === 0) {
-    breakEvenYear = payback;
-    breakEvenMonth = Math.round((payback - Math.floor(payback)) * 12);
-  }
-  
-  const añoEquilibrio = Math.floor(breakEvenYear);
-  const mesEquilibrio = breakEvenMonth;
-
-  // Configurar área de dibujo
-  const margin = 80;
-  const graphWidth = canvas.width - margin * 2;
-  const graphHeight = canvas.height - margin * 2;
-  
-  // Encontrar máximo y mínimo
-  const maxVal = Math.max(...flujoCaja);
-  const minVal = Math.min(...flujoCaja);
-  const range = Math.max(maxVal - minVal, 1);
-
-  // Función para mapear coordenadas
-  const x = (año) => margin + (año / años) * graphWidth;
-  const y = (valor) => {
-    const normalized = (valor - minVal) / range;
-    return margin + graphHeight - (normalized * graphHeight);
-  };
-
-  // DIBUJAR LÍNEA DE CERO (más visible)
-  const zeroY = y(0);
-  ctx.strokeStyle = '#666';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([5, 3]);
-  ctx.beginPath();
-  ctx.moveTo(margin, zeroY);
-  ctx.lineTo(margin + graphWidth, zeroY);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  
-  // Etiqueta de línea cero
-  ctx.fillStyle = '#666';
-  ctx.font = '12px Arial';
-  ctx.textAlign = 'right';
-  ctx.fillText('$0', margin - 5, zeroY + 4);
-
-  // DIBUJAR LÍNEAS VERTICALES PUNTEADAS PARA CADA AÑO (cada 5 años para mejor legibilidad)
-  for (let año = 0; año <= años; año += 5) {
-    const xPos = x(año);
-    
-    // Línea vertical punteada gris para cada 5 años
-    ctx.strokeStyle = '#e0e0e0';
-    ctx.setLineDash([2, 2]);
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(xPos, margin);
-    ctx.lineTo(xPos, margin + graphHeight);
-    ctx.stroke();
-    ctx.setLineDash([]);
-  }
-
-  // DIBUJAR LÍNEA PRINCIPAL
-  ctx.strokeStyle = '#00704a';
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  
-  for (let año = 0; año <= años; año++) {
-    const xPos = x(año);
-    const yPos = y(flujoCaja[año]);
-    
-    if (año === 0) {
-      ctx.moveTo(xPos, yPos);
-    } else {
-      ctx.lineTo(xPos, yPos);
-    }
-  }
-  ctx.stroke();
-
-  // DIBUJAR PUNTOS EN CADA 5 AÑOS (para mejor legibilidad)
-  for (let año = 0; año <= años; año += 5) {
-    const xPos = x(año);
-    const yPos = y(flujoCaja[año]);
-    const valor = flujoCaja[año];
-    
-    // Determinar color según si es negativo o positivo
-    let puntoColor, textoColor;
-    if (valor < 0) {
-      puntoColor = '#e67e22'; // Naranja para negativos
-      textoColor = '#c0392b';
-    } else {
-      puntoColor = '#27ae60'; // Verde para positivos
-      textoColor = '#27ae60';
-    }
-    
-    // Dibujar punto
-    ctx.fillStyle = puntoColor;
-    ctx.beginPath();
-    ctx.arc(xPos, yPos, 6, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Borde blanco para mejor visibilidad
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    
-    // Etiqueta de valor
-    ctx.fillStyle = textoColor;
-    ctx.font = 'bold 12px Arial';
-    ctx.textAlign = 'center';
-    
-    // Posicionar etiqueta arriba o abajo según el valor
-    const labelY = valor >= 0 ? yPos - 20 : yPos + 20;
-    ctx.fillText(`$${valor.toFixed(1)}M`, xPos, labelY);
-  }
-
-  // DIBUJAR LÍNEA VERTICAL PUNTEADA EN EL PUNTO DE EQUILIBRIO
-  if (breakEvenYear > 0 && breakEvenYear <= años) {
-    const eqX = x(breakEvenYear);
-    const eqY = y(0);
-    
-    // Línea vertical punteada naranja desde el punto hasta el eje X
-    ctx.strokeStyle = '#f39c12';
-    ctx.setLineDash([3, 3]);
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(eqX, eqY);
-    ctx.lineTo(eqX, margin + graphHeight);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    
-    // Punto grande naranja en la línea de cero
-    ctx.fillStyle = '#f39c12';
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(eqX, eqY, 8, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    
-    // Etiqueta del punto de equilibrio A LA DERECHA
-    ctx.fillStyle = '#d35400';
-    ctx.font = 'bold 12px Arial';
-    ctx.textAlign = 'right';
-    ctx.fillText('Punto de Equilibrio', eqX + 10, eqY - 10);
-  }
-
-  // DIBUJAR EJES PRINCIPALES
-  ctx.strokeStyle = '#333';
-  ctx.lineWidth = 2;
-  
-  // Eje X
-  ctx.beginPath();
-  ctx.moveTo(margin, margin + graphHeight);
-  ctx.lineTo(margin + graphWidth, margin + graphHeight);
-  ctx.stroke();
-  
-  // Eje Y
-  ctx.beginPath();
-  ctx.moveTo(margin, margin);
-  ctx.lineTo(margin, margin + graphHeight);
-  ctx.stroke();
-
-  // ETIQUETAS DEL EJE X (cada 5 años)
-  ctx.fillStyle = '#333';
-  ctx.font = '12px Arial';
-  ctx.textAlign = 'center';
-  
-  for (let año = 0; año <= años; año += 5) {
-    const xPos = x(año);
-    
-    // Etiqueta numérica cada 5 años
-    if (año > 0) {
-      ctx.fillText(año.toString(), xPos, margin + graphHeight + 20);
-    } else {
-      ctx.fillText('Inv', xPos, margin + graphHeight + 20); // Inversión
-    }
-  }
-
-  // ETIQUETAS DEL EJE Y
-  ctx.textAlign = 'right';
-  ctx.fillStyle = '#333';
-  
-  // Calcular valores para las marcas del eje Y
-  const yStep = range / 4;
-  for (let i = 0; i <= 4; i++) {
-    const value = minVal + (i * yStep);
-    const yPos = y(value);
-    
-    // Línea de guía horizontal
-    ctx.strokeStyle = '#f0f0f0';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(margin, yPos);
-    ctx.lineTo(margin + graphWidth, yPos);
-    ctx.stroke();
-    
-    // Etiqueta del valor
-    ctx.fillStyle = '#333';
-    ctx.fillText(`$${value.toFixed(1)}M`, margin - 10, yPos + 4);
-  }
-
-  // TÍTULOS DE EJES
-  ctx.fillStyle = '#000';
-  ctx.font = 'bold 14px Arial';
-  ctx.textAlign = 'center';
-  ctx.fillText('Años', canvas.width / 2, canvas.height - 10);
-  
-  ctx.save();
-  ctx.translate(25, canvas.height / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.fillText('Flujo de Caja Acumulado (Millones COP)', 0, 0);
-  ctx.restore();
-
-  // RESULTADOS FINALES - PROYECCIÓN A 25 AÑOS
-  const gananciaTotal = flujoCaja[años] * 1000000;
-  const retornoTotal = inversion > 0 ? ((gananciaTotal / inversion) * 100) : 0;
-  const ahorroTotal25anios = ahorroMensual * 12 * 25;
-  
-  chartSummary.innerHTML = `
-    <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #27ae60;">
-      <div style="font-size: 16px; font-weight: bold; margin-bottom: 10px; color: #27ae60;">📊 Resumen Financiero (25 Años)</div>
-      <div><strong>Punto de equilibrio:</strong> Año ${añoEquilibrio}, Mes ${mesEquilibrio}</div>
-      <div><strong>Ganancia total a 25 años:</strong> $${gananciaTotal.toLocaleString()} COP</div>
-      <div><strong>Ahorro total en facturas:</strong> $${ahorroTotal25anios.toLocaleString()} COP</div>
-      <div><strong>Retorno total de inversión:</strong> ${retornoTotal.toFixed(0)}%</div>
-      <div><strong>Tiempo de retorno:</strong> ${breakEvenYear.toFixed(1)} años</div>
-      <div style="margin-top: 8px; font-size: 0.85rem; color: #666;">
-        * Proyección considera vida útil típica de paneles solares (25 años)
-      </div>
-    </div>
-  `;
-  
-  // Mostrar la gráfica
-  document.getElementById('cashflowChart').style.display = 'block';
-}
-
-
-    
   </script>
 
   <!-- Carga de Google Maps -->
   <script async
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKNxSVeV-p40IVdXtU7Ghk7p-WdMnrZes&libraries=places&callback=initMap">
   </script>
-<!-- Script para capturar el contenido de la página -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<script>
-// Función para capturar el contenido completo de la página
-function capturarContenidoParaPDF() {
-  return new Promise((resolve, reject) => {
-    // Ocultar elementos que no queremos en el PDF
-    const splashScreen = document.getElementById('splashScreen');
-    const confirmLocationScreen = document.getElementById('confirmLocationScreen');
-    const investmentScreen = document.getElementById('investmentScreen');
-    
-    const originalDisplaySplash = splashScreen.style.display;
-    const originalDisplayConfirm = confirmLocationScreen.style.display;
-    const originalDisplayInvestment = investmentScreen.style.display;
-    
-    splashScreen.style.display = 'none';
-    confirmLocationScreen.style.display = 'none';
-    investmentScreen.style.display = 'none';
-    
-    // Esperar un momento para que se oculte todo
-    setTimeout(() => {
-      // Capturar el contenido principal
-      html2canvas(document.getElementById('mainContent'), {
-        scale: 2, // Mayor calidad
-        useCORS: true,
-        allowTaint: true,
-        scrollY: -window.scrollY,
-        width: document.getElementById('mainContent').scrollWidth,
-        height: document.getElementById('mainContent').scrollHeight,
-        onclone: function(clonedDoc) {
-          // Asegurar que todo esté visible en el clone
-          const mainContent = clonedDoc.getElementById('mainContent');
-          if (mainContent) {
-            mainContent.style.display = 'block';
-            mainContent.style.width = '100%';
-          }
-          
-          // Asegurar que los canvas de gráficos se rendericen
-          const canvases = clonedDoc.querySelectorAll('canvas');
-          canvases.forEach(canvas => {
-            const context = canvas.getContext('2d');
-            if (context) {
-              context.imageSmoothingEnabled = true;
-              context.imageSmoothingQuality = 'high';
-            }
-          });
-        }
-      }).then(canvas => {
-        // Restaurar la visualización original
-        splashScreen.style.display = originalDisplaySplash;
-        confirmLocationScreen.style.display = originalDisplayConfirm;
-        investmentScreen.style.display = originalDisplayInvestment;
-        
-        // Convertir canvas a data URL
-        const imgData = canvas.toDataURL('image/png', 1.0);
-        resolve(imgData);
-      }).catch(error => {
-        // Restaurar en caso de error
-        splashScreen.style.display = originalDisplaySplash;
-        confirmLocationScreen.style.display = originalDisplayConfirm;
-        investmentScreen.style.display = originalDisplayInvestment;
-        reject(error);
-      });
-    }, 1000);
-  });
-}
-
-// Función modificada para enviar el PDF con captura de pantalla
-async function enviarInformeConCaptura() {
-  const userName = document.getElementById('userName').value;
-  const userEmail = document.getElementById('userEmail').value;
-  const userPhone = document.getElementById('userPhone').value;
-
-  if (!userName || !userEmail || !userPhone) {
-    alert('Por favor completa todos los campos');
-    return;
-  }
-
-  // Mostrar loading
-  document.getElementById('sendReportBtn').textContent = 'Generando PDF...';
-  document.getElementById('sendReportBtn').disabled = true;
-
-  try {
-    // Capturar la página completa
-    console.log('📸 Capturando contenido de la página...');
-    const imagenData = await capturarContenidoParaPDF();
-    console.log('✅ Captura completada');
-    
-    // Guardar en Google Sheets y enviar email con captura
-    const exito = await guardarEnBaseDeDatosConCaptura(userName, userEmail, userPhone, imagenData);
-
-    if (exito) {
-      // Transferir datos al contenido principal
-      document.getElementById('bill').value = document.getElementById('billSplash').value;
-      document.getElementById('latTxt').value = document.getElementById('latTxtSplash').value;
-      document.getElementById('lonTxt').value = document.getElementById('lonTxtSplash').value;
-      document.getElementById('searchBox').value = document.getElementById('searchBoxSplash').value;
-
-      // Ocultar splash y mostrar contenido principal
-      document.getElementById('investmentScreen').style.display = 'none';
-      document.getElementById('mainContent').style.display = 'block';
-
-      // Ejecutar cotización automáticamente
-      cotizar();
-    } else {
-      alert('Error al guardar los datos. Por favor intenta nuevamente.');
-      document.getElementById('sendReportBtn').textContent = 'Enviar mi informe';
-      document.getElementById('sendReportBtn').disabled = false;
-    }
-  } catch (error) {
-    console.error('Error en captura:', error);
-    alert('Error generando el PDF. Por favor intenta nuevamente.');
-    document.getElementById('sendReportBtn').textContent = 'Enviar mi informe';
-    document.getElementById('sendReportBtn').disabled = false;
-  }
-}
-
-// Reemplazar la función original de enviar informe
-document.getElementById('sendReportBtn').addEventListener('click', enviarInformeConCaptura);
-</script>
-
-
-  
 </body>
 </html>
-
-
-
-
-
-
