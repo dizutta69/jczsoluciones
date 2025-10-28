@@ -343,7 +343,6 @@
     .coord-inputs input {
       flex: 1;
     }
-    <!-- Agregar al final del CSS -->
 
   /* ESTILOS PARA BOTONES VOLVER */
   .back-button {
@@ -676,52 +675,11 @@
     let currentPriceCop = 0;
     let currentPanels = 0;
     let currentArea = 0;
+    let currentCotizacionId = null;
 
     // CONFIGURACIÓN GOOGLE APPS SCRIPT - ACTUALIZA CON TU URL
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzidMv2QUfpI-ZnbhWPP8p3AHBGyANszR13WkDEv4J1lg6HgMZ3GplF5XiMIGnsYZGzjQ/exec';
-function verificarCotizacionURL() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const cotizacionId = urlParams.get('id');
-  
-  if (cotizacionId) {
-    const cotizacionGuardada = cargarCotizacionActual();
-    
-    // Si tenemos una cotización guardada con ese ID, mostrar los resultados
-    if (cotizacionGuardada && cotizacionGuardada.id === cotizacionId) {
-      // Ocultar splash screen y mostrar main content con los datos
-      document.getElementById('splashScreen').style.display = 'none';
-      document.getElementById('mainContent').style.display = 'block';
-      
-      // Aquí cargarías los datos en la interfaz
-      // Puedes implementar esta función según tus necesidades
-      cargarDatosCotizacion(cotizacionGuardada);
-    }
-  }
-  
-  // Si hay parámetro nueva=1, recargar limpio
-  if (urlParams.get('nueva') === '1') {
-    sessionStorage.removeItem('cotizacionActual');
-    // Mostrar splash screen normal
-  }
-}
 
-// Función para cargar datos de cotización (puedes expandirla)
-function cargarDatosCotizacion(datos) {
-  // Cargar los datos en los campos correspondientes
-  document.getElementById('latTxt').value = datos.lat || '';
-  document.getElementById('lonTxt').value = datos.lon || '';
-  document.getElementById('bill').value = datos.factura || '';
-  document.getElementById('searchBox').value = datos.direccion || '';
-  
-  // Ejecutar cotización con estos datos
-  if (datos.lat && datos.lon && datos.factura) {
-    setTimeout(() => {
-      cotizar();
-    }, 1000);
-  }
-}
-
-    
     // FUNCIONES DE FORMATEO
     function formatoDineroCOP(valor) {
       const numeroFormateado = valor.toLocaleString('es-CO', {
@@ -964,6 +922,81 @@ function cargarDatosCotizacion(datos) {
       document.getElementById('lonTxt').value = lng.toFixed(5);
     }
 
+    // FUNCIÓN PARA GUARDAR COTIZACIÓN ACTUAL
+    function guardarCotizacionActual(datos) {
+      currentCotizacionId = 'cotizacion_' + Date.now();
+      const cotizacionData = {
+        id: currentCotizacionId,
+        timestamp: Date.now(),
+        datos: datos,
+        lat: document.getElementById('latTxtSplash').value,
+        lon: document.getElementById('lonTxtSplash').value,
+        factura: document.getElementById('billSplash').value,
+        direccion: document.getElementById('searchBoxSplash').value,
+        inversion: currentPriceCop,
+        paneles: currentPanels,
+        area: currentArea
+      };
+      
+      sessionStorage.setItem('cotizacionActual', JSON.stringify(cotizacionData));
+      return currentCotizacionId;
+    }
+
+    // FUNCIÓN PARA CARGAR COTIZACIÓN DESDE SESSION STORAGE
+    function cargarCotizacionActual() {
+      const guardada = sessionStorage.getItem('cotizacionActual');
+      return guardada ? JSON.parse(guardada) : null;
+    }
+
+    // VERIFICAR SI HAY COTIZACIÓN EN LA URL AL CARGAR LA PÁGINA
+    function verificarCotizacionURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const cotizacionId = urlParams.get('id');
+      
+      if (cotizacionId) {
+        const cotizacionGuardada = cargarCotizacionActual();
+        
+        // Si tenemos una cotización guardada con ese ID, mostrar los resultados
+        if (cotizacionGuardada && cotizacionGuardada.id === cotizacionId) {
+          // Ocultar splash screen y mostrar main content con los datos
+          document.getElementById('splashScreen').style.display = 'none';
+          document.getElementById('mainContent').style.display = 'block';
+          
+          // Cargar datos en la interfaz
+          cargarDatosCotizacion(cotizacionGuardada);
+        }
+      }
+      
+      // Si hay parámetro nueva=1, recargar limpio
+      if (urlParams.get('nueva') === '1') {
+        sessionStorage.removeItem('cotizacionActual');
+        // Mostrar splash screen normal
+      }
+    }
+
+    // Función para cargar datos de cotización
+    function cargarDatosCotizacion(datos) {
+      // Cargar los datos en los campos correspondientes
+      document.getElementById('latTxt').value = datos.lat || '';
+      document.getElementById('lonTxt').value = datos.lon || '';
+      document.getElementById('bill').value = datos.factura || '';
+      document.getElementById('searchBox').value = datos.direccion || '';
+      
+      // Si tenemos datos de inversión, mostrarlos
+      if (datos.inversion) {
+        currentPriceCop = datos.inversion;
+        currentPanels = datos.paneles;
+        currentArea = datos.area;
+        
+        // Ejecutar cotización con estos datos
+        if (datos.lat && datos.lon && datos.factura) {
+          setTimeout(() => {
+            cotizar();
+          }, 500);
+        }
+      }
+    }
+
     // FLUJO PRINCIPAL MEJORADO
     async function cotizarDesdeSplash() {
       // Primero intentar con coordenadas
@@ -1153,7 +1186,38 @@ function cargarDatosCotizacion(datos) {
       return numeroLimpio;
     }
 
+    // FUNCIÓN MEJORADA PARA CREAR MENSAJE DE WHATSAPP
+    function crearMensajeWhatsApp(nombre, email) {
+      const baseUrl = window.location.origin + window.location.pathname;
+      
+      // Guardar la cotización actual y obtener su ID
+      const datosCotizacion = {
+        nombre: nombre,
+        email: email,
+        telefono: document.getElementById('userPhone').value,
+        inversion: currentPriceCop,
+        paneles: currentPanels,
+        area: currentArea
+      };
+      
+      const cotizacionId = guardarCotizacionActual(datosCotizacion);
+      
+      const primerMensaje = `¡Hola ${nombre}! Tu cotización de energía solar está lista:
 
+🔗 Ver tu cotización: ${baseUrl}?id=${cotizacionId}
+📄 PDF enviado a: ${email}
+💰 Inversión: ${formatoDineroCOP(currentPriceCop)}
+☀️ Paneles: ${currentPanels} unidades
+
+-- Energialt SAS --`;
+
+      const segundoMensaje = `¿Deseas contactar a uno de nuestros asesores?
+Estamos aquí para resolver tus dudas 😊
+
+-- Energialt SAS --`;
+
+      return primerMensaje + '\n\n' + segundoMensaje;
+    }
 
     // FUNCIÓN MODIFICADA PARA ENVIAR INFORME
     async function enviarInforme() {
@@ -1167,10 +1231,11 @@ function cargarDatosCotizacion(datos) {
       }
 
       // Guardar estado original del botón
-      const botonOriginal = document.getElementById('sendReportBtn').textContent;
+      const botonOriginal = document.getElementById('sendReportBtn');
+      const textoOriginal = botonOriginal.textContent;
       
-      document.getElementById('sendReportBtn').textContent = 'Enviando...';
-      document.getElementById('sendReportBtn').disabled = true;
+      botonOriginal.textContent = 'Enviando...';
+      botonOriginal.disabled = true;
 
       try {
         const exito = await guardarEnBaseDeDatos(userName, userEmail, userPhone);
@@ -1179,7 +1244,7 @@ function cargarDatosCotizacion(datos) {
           // Formatear teléfono para WhatsApp
           const telefonoFormateado = formatearTelefonoColombia(userPhone);
           
-          // Crear mensaje de WhatsApp CON ENLACE CORRECTO
+          // Crear mensaje de WhatsApp
           const mensajeWhatsApp = crearMensajeWhatsApp(userName, userEmail);
           
           // Redirigir a WhatsApp
@@ -1195,89 +1260,31 @@ function cargarDatosCotizacion(datos) {
       } catch (error) {
         alert('Error al guardar los datos. Por favor intenta nuevamente.');
         // RESTAURAR ESTADO ORIGINAL DEL BOTÓN
-        document.getElementById('sendReportBtn').textContent = botonOriginal;
-        document.getElementById('sendReportBtn').disabled = false;
+        botonOriginal.textContent = textoOriginal;
+        botonOriginal.disabled = false;
       }
     }
 
-// FUNCIÓN MEJORADA PARA CREAR MENSAJE DE WHATSAPP
-function crearMensajeWhatsApp(nombre, email) {
-  const baseUrl = window.location.origin + window.location.pathname;
-  
-  // Guardar la cotización actual y obtener su ID
-  const datosCotizacion = {
-    nombre: nombre,
-    email: email,
-    telefono: document.getElementById('userPhone').value,
-    inversion: currentPriceCop,
-    paneles: currentPanels,
-    area: currentArea
-  };
-  
-  const cotizacionId = guardarCotizacionActual(datosCotizacion);
-  
-  const primerMensaje = `¡Hola ${nombre}! Tu cotización de energía solar está lista:
+    // FUNCIÓN MEJORADA PARA VOLVER AL MENÚ ANTERIOR
+    function volverAlMenuAnterior(pantallaActual, pantallaAnterior) {
+      document.getElementById(pantallaActual).style.display = 'none';
+      document.getElementById(pantallaAnterior).style.display = 'flex';
+      
+      // RESTAURAR ESTADO DEL BOTÓN DE ENVÍO SI VOLVEMOS DESDE FINAL O INVERSIÓN
+      if (pantallaActual === 'finalScreen' && pantallaAnterior === 'investmentScreen') {
+        const sendButton = document.getElementById('sendReportBtn');
+        sendButton.textContent = 'Enviar mi informe completo';
+        sendButton.disabled = false;
+      }
+      
+      // También restaurar si volvemos desde main content
+      if (pantallaActual === 'mainContent' && pantallaAnterior === 'investmentScreen') {
+        const sendButton = document.getElementById('sendReportBtn');
+        sendButton.textContent = 'Enviar mi informe completo';
+        sendButton.disabled = false;
+      }
+    }
 
-🔗 Ver tu cotización: ${baseUrl}?id=${cotizacionId}
-📄 PDF enviado a: ${email}
-💰 Inversión: ${formatoDineroCOP(currentPriceCop)}
-☀️ Paneles: ${currentPanels} unidades
-
--- Energialt SAS --`;
-
-  const segundoMensaje = `¿Deseas contactar a uno de nuestros asesores?
-Estamos aquí para resolver tus dudas 😊
-
--- Energialt SAS --`;
-
-  return primerMensaje + '\n\n' + segundoMensaje;
-}
-
-    // FUNCIÓN MODIFICADA PARA VOLVER AL MENÚ ANTERIOR - RESTAURA ESTADO
-function volverAlMenuAnterior(pantallaActual, pantallaAnterior) {
-  document.getElementById(pantallaActual).style.display = 'none';
-  document.getElementById(pantallaAnterior).style.display = 'flex';
-  
-  // RESTAURAR ESTADO DEL BOTÓN DE ENVÍO SI VOLVEMOS DESDE FINAL O INVERSIÓN
-  if (pantallaActual === 'finalScreen' && pantallaAnterior === 'investmentScreen') {
-    const sendButton = document.getElementById('sendReportBtn');
-    sendButton.textContent = 'Enviar mi informe completo';
-    sendButton.disabled = false;
-  }
-  
-  // También restaurar si volvemos desde main content
-  if (pantallaActual === 'mainContent' && pantallaAnterior === 'investmentScreen') {
-    const sendButton = document.getElementById('sendReportBtn');
-    sendButton.textContent = 'Enviar mi informe completo';
-    sendButton.disabled = false;
-  }
-}
-
-    // FUNCIÓN PARA GUARDAR COTIZACIÓN ACTUAL EN SESSION STORAGE
-function guardarCotizacionActual(datos) {
-  const cotizacionId = 'cotizacion_' + Date.now();
-  const cotizacionData = {
-    id: cotizacionId,
-    timestamp: Date.now(),
-    datos: datos,
-    lat: document.getElementById('latTxtSplash').value,
-    lon: document.getElementById('lonTxtSplash').value,
-    factura: document.getElementById('billSplash').value,
-    direccion: document.getElementById('searchBoxSplash').value,
-    inversion: currentPriceCop,
-    paneles: currentPanels,
-    area: currentArea
-  };
-  
-  sessionStorage.setItem('cotizacionActual', JSON.stringify(cotizacionData));
-  return cotizacionId;
-}
-
-// FUNCIÓN PARA CARGAR COTIZACIÓN DESDE SESSION STORAGE
-function cargarCotizacionActual() {
-  const guardada = sessionStorage.getItem('cotizacionActual');
-  return guardada ? JSON.parse(guardada) : null;
-}
     // FUNCIÓN PARA REENVIAR PDF - MEJORADA
     async function reenviarPdf() {
       const emailReenvio = document.getElementById('reenviarEmail').value;
@@ -1303,23 +1310,24 @@ function cargarCotizacionActual() {
       }, 1500);
     }
 
-// FUNCIÓN MEJORADA PARA NUEVA COTIZACIÓN
-function nuevaCotizacion() {
-  // Limpiar session storage
-  sessionStorage.removeItem('cotizacionActual');
-  
-  // Recargar sin parámetros
-  window.location.href = window.location.origin + window.location.pathname;
-}
+    // FUNCIÓN MEJORADA PARA NUEVA COTIZACIÓN
+    function nuevaCotizacion() {
+      // Limpiar session storage
+      sessionStorage.removeItem('cotizacionActual');
+      
+      // Recargar sin parámetros
+      window.location.href = window.location.origin + window.location.pathname;
+    }
 
     // EVENT LISTENERS - ACTUALIZADOS
-document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('barSolar').style.width = '0%';
-  document.getElementById('barGrid').style.width = '0%';
-  document.getElementById('barHome').style.width = '0%';
-  // Verificar si hay cotización en la URL
-  verificarCotizacionURL();
-        
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('barSolar').style.width = '0%';
+      document.getElementById('barGrid').style.width = '0%';
+      document.getElementById('barHome').style.width = '0%';
+      
+      // Verificar si hay cotización en la URL
+      verificarCotizacionURL();
+      
       document.getElementById('cotizarSplash').addEventListener('click', cotizarDesdeSplash);
       document.getElementById('confirmLocationBtn').addEventListener('click', confirmarUbicacion);
       document.getElementById('sendReportBtn').addEventListener('click', enviarInforme);
@@ -1348,8 +1356,6 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('reenviarPdfBtn').addEventListener('click', reenviarPdf);
     });
 
-
-    
     // FUNCIÓN ORIGINAL COTIZAR
     async function cotizar(){
       const lat = parseFloat(document.getElementById('latTxt').value);
@@ -1465,31 +1471,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('diagramContent').style.display = 'block';
       }
     }
-
-    // EVENT LISTENERS
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('barSolar').style.width = '0%';
-      document.getElementById('barGrid').style.width = '0%';
-      document.getElementById('barHome').style.width = '0%';
-      
-      document.getElementById('cotizarSplash').addEventListener('click', cotizarDesdeSplash);
-      document.getElementById('confirmLocationBtn').addEventListener('click', confirmarUbicacion);
-      document.getElementById('sendReportBtn').addEventListener('click', enviarInforme);
-  // NUEVOS: Event listeners para botones volver
-  document.getElementById('backToSplashFromConfirm').addEventListener('click', function() {
-    volverAlMenuAnterior('confirmLocationScreen', 'splashScreen');
-  });
-  
-  document.getElementById('backToConfirmFromInvestment').addEventListener('click', function() {
-    volverAlMenuAnterior('investmentScreen', 'confirmLocationScreen');
-  });
-  
-  document.getElementById('backToInvestmentFromMain').addEventListener('click', function() {
-    volverAlMenuAnterior('mainContent', 'investmentScreen');
-  });
-
-      
-    });
 
     /* FUNCIÓN PARA CREAR LA GRÁFICA DE LÍNEA */
     function crearGraficaLinea(inversion, ahorroMensual, payback) {
@@ -1776,30 +1757,6 @@ document.addEventListener('DOMContentLoaded', function() {
       // Mostrar la gráfica
       document.getElementById('cashflowChart').style.display = 'block';
     }
-// FUNCIONES DE NAVEGACIÓN "VOLVER"
-function volverAlMenuAnterior(pantallaActual, pantallaAnterior) {
-  document.getElementById(pantallaActual).style.display = 'none';
-  document.getElementById(pantallaAnterior).style.display = 'flex';
-}
-
-// EVENT LISTENERS PARA BOTONES VOLVER
-document.addEventListener('DOMContentLoaded', function() {
-  // Botón volver desde confirmación a splash
-  document.getElementById('backToSplashFromConfirm').addEventListener('click', function() {
-    volverAlMenuAnterior('confirmLocationScreen', 'splashScreen');
-  });
-  
-  // Botón volver desde inversión a confirmación
-  document.getElementById('backToConfirmFromInvestment').addEventListener('click', function() {
-    volverAlMenuAnterior('investmentScreen', 'confirmLocationScreen');
-  });
-  
-  // Botón volver desde main a inversión
-  document.getElementById('backToInvestmentFromMain').addEventListener('click', function() {
-    volverAlMenuAnterior('mainContent', 'investmentScreen');
-  });
-});
-
     
   </script>
 
@@ -1809,14 +1766,3 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
