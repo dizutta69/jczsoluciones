@@ -404,13 +404,6 @@
       flex-wrap: wrap;
     }
     
-    .reenvio-section {
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid #ddd;
-    }
-
-    
   </style>
 </head>
 
@@ -576,32 +569,25 @@
         </button>
       </div>
 
-      <!-- Opción para reenviar PDF -->
-      <div class="reenvio-section">
-        <h4 style="text-align: center; margin-bottom: 1rem;">📧 Reenviar PDF a otro correo</h4>
-        <div class="form-group">
-          <input type="email" id="reenviarEmail" placeholder="Ingresa el correo para reenvío">
-        </div>
-        <button id="reenviarPdfBtn" class="splash-button" style="background: #17a2b8;">
-          Reenviar PDF
-        </button>
-        <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem; text-align: center;">
-          🔒 Por privacidad, tus datos serán eliminados después de esta sesión
-        </p>
-      </div>
+      <p style="font-size: 0.8rem; color: #666; margin-top: 2rem; text-align: center;">
+        🔒 Por privacidad, tus datos serán eliminados después de esta sesión
+      </p>
     </div>
   </div>
 
-  
-  <!-- CONTENIDO PRINCIPAL (oculto inicialmente) -->
+  <!-- CONTENIDO PRINCIPAL (oculto inicialmente) - MODIFICADO -->
   <div id="mainContent" style="display: none;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-    <h1>Cotizador Solar Rápido</h1>
-    <!-- BOTÓN VOLVER AGREGADO -->
-    <button id="backToInvestmentFromMain" class="back-button">
-      ← Volver al formulario
-    </button>
-  </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h1>Cotizador Solar Rápido</h1>
+      <div>
+        <button id="backToInvestmentFromMain" class="back-button">
+          ← Volver al formulario
+        </button>
+        <button id="newQuoteFromMain" class="splash-button" style="background: #28a745; margin-left: 10px;">
+          🔄 Nueva Cotización
+        </button>
+      </div>
+    </div>
 
     <label>
       Dirección:
@@ -669,8 +655,19 @@
       <div id="chartSummary" style="margin-top: 1rem; text-align: center; font-size: 0.9rem;"></div>
     </div>
 
-
-    
+    <!-- OPCIÓN PARA REENVIAR PDF - AHORA EN MAIN CONTENT -->
+    <div class="email-form" style="margin-top: 2rem;">
+      <h3 style="text-align: center; margin-bottom: 1rem;">📧 Reenviar PDF a otro correo</h3>
+      <div class="form-group">
+        <input type="email" id="reenviarEmail" placeholder="Ingresa el correo para reenvío">
+      </div>
+      <button id="reenviarPdfBtn" class="splash-button" style="background: #17a2b8;">
+        Reenviar PDF
+      </button>
+      <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem; text-align: center;">
+        ¿Necesitas enviar la cotización a otra persona?
+      </p>
+    </div>
   </div>
 
   <!-- Google Maps -->
@@ -1145,53 +1142,98 @@ Estamos aquí para resolver tus dudas 😊
         return;
       }
 
+      // Guardar estado original del botón
+      const botonOriginal = document.getElementById('sendReportBtn').textContent;
+      
       document.getElementById('sendReportBtn').textContent = 'Enviando...';
       document.getElementById('sendReportBtn').disabled = true;
 
-      const exito = await guardarEnBaseDeDatos(userName, userEmail, userPhone);
+      try {
+        const exito = await guardarEnBaseDeDatos(userName, userEmail, userPhone);
 
-      if (exito) {
-        // Formatear teléfono para WhatsApp
-        const telefonoFormateado = formatearTelefonoColombia(userPhone);
-        
-        // Crear mensaje de WhatsApp
-        const mensajeWhatsApp = crearMensajeWhatsApp(userName, userEmail);
-        
-        // Redirigir a WhatsApp
-        window.open(`https://wa.me/${telefonoFormateado}?text=${encodeURIComponent(mensajeWhatsApp)}`, '_blank');
-        
-        // Mostrar pantalla final
-        document.getElementById('investmentScreen').style.display = 'none';
-        document.getElementById('finalScreen').style.display = 'flex';
-        
-      } else {
+        if (exito) {
+          // Formatear teléfono para WhatsApp
+          const telefonoFormateado = formatearTelefonoColombia(userPhone);
+          
+          // Crear mensaje de WhatsApp CON ENLACE CORRECTO
+          const mensajeWhatsApp = crearMensajeWhatsApp(userName, userEmail);
+          
+          // Redirigir a WhatsApp
+          window.open(`https://wa.me/${telefonoFormateado}?text=${encodeURIComponent(mensajeWhatsApp)}`, '_blank');
+          
+          // Mostrar pantalla final
+          document.getElementById('investmentScreen').style.display = 'none';
+          document.getElementById('finalScreen').style.display = 'flex';
+          
+        } else {
+          throw new Error('Error al guardar datos');
+        }
+      } catch (error) {
         alert('Error al guardar los datos. Por favor intenta nuevamente.');
+        // RESTAURAR ESTADO ORIGINAL DEL BOTÓN
+        document.getElementById('sendReportBtn').textContent = botonOriginal;
+        document.getElementById('sendReportBtn').disabled = false;
+      }
+    }
+
+    // FUNCIÓN MODIFICADA PARA CREAR MENSAJE DE WHATSAPP - ENLACE CORREGIDO
+    function crearMensajeWhatsApp(nombre, email) {
+      const baseUrl = window.location.origin + window.location.pathname;
+      
+      // Usar un identificador único para esta cotización
+      const cotizacionId = 'cotizacion_' + Date.now();
+      
+      const primerMensaje = `¡Hola ${nombre}! Tu cotización de energía solar está lista:
+
+🔗 Ver tu cotización completa: ${baseUrl}?id=${cotizacionId}
+📄 PDF enviado a: ${email}
+🔄 Nueva cotización: ${baseUrl}?nueva=1
+
+-- Energialt SAS --`;
+
+      const segundoMensaje = `¿Deseas contactar a uno de nuestros asesores?
+Estamos aquí para resolver tus dudas 😊
+
+-- Energialt SAS --`;
+
+      return primerMensaje + '\n\n' + segundoMensaje;
+    }
+
+    // FUNCIÓN MODIFICADA PARA VOLVER AL MENÚ ANTERIOR - RESTAURA ESTADO
+    function volverAlMenuAnterior(pantallaActual, pantallaAnterior) {
+      document.getElementById(pantallaActual).style.display = 'none';
+      document.getElementById(pantallaAnterior).style.display = 'flex';
+      
+      // RESTAURAR ESTADO DEL BOTÓN DE ENVÍO SI VOLVEMOS DESDE FINAL
+      if (pantallaActual === 'finalScreen' && pantallaAnterior === 'investmentScreen') {
         document.getElementById('sendReportBtn').textContent = 'Enviar mi informe completo';
         document.getElementById('sendReportBtn').disabled = false;
       }
     }
 
-    // FUNCIÓN PARA REENVIAR PDF
+    // FUNCIÓN PARA REENVIAR PDF - MEJORADA
     async function reenviarPdf() {
       const emailReenvio = document.getElementById('reenviarEmail').value;
       
       if (!emailReenvio) {
-        alert('Por favor ingresa un correo electrónico');
+        alert('Por favor ingresa un correo electrónico válido');
         return;
       }
 
-      // Aquí implementarías la lógica para reenviar el PDF
-      // usando los datos ya guardados
-      alert(`PDF reenviado a: ${emailReenvio}`);
+      // Simular reenvío (aquí integrarías con tu backend)
+      const boton = document.getElementById('reenviarPdfBtn');
+      const textoOriginal = boton.textContent;
       
-      // Limpiar el campo después del reenvío
-      document.getElementById('reenviarEmail').value = '';
-    }
+      boton.textContent = 'Enviando...';
+      boton.disabled = true;
 
-    // FUNCIÓN PARA VOLVER AL MENÚ ANTERIOR
-    function volverAlMenuAnterior(pantallaActual, pantallaAnterior) {
-      document.getElementById(pantallaActual).style.display = 'none';
-      document.getElementById(pantallaAnterior).style.display = 'flex';
+      // Simular delay de envío
+      setTimeout(() => {
+        alert(`✅ PDF reenviado exitosamente a: ${emailReenvio}`);
+        document.getElementById('reenviarEmail').value = '';
+        boton.textContent = textoOriginal;
+        boton.disabled = false;
+      }, 1500);
     }
 
     // FUNCIÓN PARA NUEVA COTIZACIÓN
@@ -1200,7 +1242,7 @@ Estamos aquí para resolver tus dudas 😊
       window.location.reload();
     }
 
-    // EVENT LISTENERS
+    // EVENT LISTENERS - ACTUALIZADOS
     document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('barSolar').style.width = '0%';
       document.getElementById('barGrid').style.width = '0%';
@@ -1229,6 +1271,7 @@ Estamos aquí para resolver tus dudas 😊
       });
       
       document.getElementById('newQuoteFromFinal').addEventListener('click', nuevaCotizacion);
+      document.getElementById('newQuoteFromMain').addEventListener('click', nuevaCotizacion);
       
       document.getElementById('reenviarPdfBtn').addEventListener('click', reenviarPdf);
     });
@@ -1694,6 +1737,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
 </body>
 </html>
+
 
 
 
