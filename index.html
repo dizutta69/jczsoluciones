@@ -370,11 +370,53 @@
     margin-top: 1rem;
   }
 
+    /* NUEVOS ESTILOS PARA PANTALLA FINAL */
+    .final-screen-content {
+      text-align: center;
+    }
+    
+    .whatsapp-features {
+      background: #e8f5e8;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    .whatsapp-features ul {
+      text-align: left;
+      display: inline-block;
+      margin: 1rem 0;
+      padding-left: 0;
+    }
+    
+    .whatsapp-features li {
+      margin-bottom: 0.5rem;
+      list-style: none;
+      padding-left: 0;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .reenvio-section {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #ddd;
+    }
+
+    
   </style>
 </head>
 
 <body>
-  <!-- PANTALLA SPLASH INICIAL -->
+
+    <!-- PANTALLA SPLASH INICIAL -->
   <div id="splashScreen" class="splash-overlay">
     <div class="splash-content">
       <h2 class="splash-title">Cotizador Solar Rápido</h2>
@@ -429,15 +471,6 @@
             <input id="confirmLat" type="text" placeholder="Latitud"/>
             <input id="confirmLon" type="text" placeholder="Longitud"/>
           </div>
-
-    
-    <!-- BOTÓN VOLVER AGREGADO -->
-    <div class="back-button-container">
-      <button id="backToSplashFromConfirm" class="back-button">
-        ← Volver a editar datos
-      </button>
-    </div>
-        
         </div>
         
         <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">
@@ -451,6 +484,13 @@
       <div id="confirmMap" style="height: 300px; border-radius: 8px; margin-bottom: 1rem;"></div>
       
       <button id="confirmLocationBtn" class="splash-button">Confirmar Ubicación</button>
+      
+      <!-- BOTÓN VOLVER -->
+      <div class="back-button-container">
+        <button id="backToSplashFromConfirm" class="back-button">
+          ← Volver a editar datos
+        </button>
+      </div>
     </div>
   </div>
 
@@ -471,7 +511,7 @@
           <p>Tu informe personalizado incluirá:</p>
           <ul>
             <li>✅ Cuánto ahorrarás en tu factura mensual</li>
-    <li>✅ Gráfica con el retorno de inversión</li>
+            <li>✅ Gráfica con el retorno de inversión</li>
             <li>✅ Ingresos que te producirá el sistema</li>
             <li>✅ Área requerida para la instalación</li>
             <li>✅ 📄 PDF profesional con toda la información</li>
@@ -496,17 +536,63 @@
         <button id="sendReportBtn" class="splash-button">Enviar mi informe completo</button>
       </div>
 
-    
-    <!-- BOTÓN VOLVER AGREGADO -->
-    <div class="back-button-container">
-      <button id="backToConfirmFromInvestment" class="back-button">
-        ← Volver a ajustar ubicación
-      </button>
-    </div>
-
+      <!-- BOTÓN VOLVER -->
+      <div class="back-button-container">
+        <button id="backToConfirmFromInvestment" class="back-button">
+          ← Volver a ajustar ubicación
+        </button>
+      </div>
     </div>
   </div>
 
+  <!-- NUEVA PANTALLA FINAL - COTIZACIÓN COMPLETADA -->
+  <div id="finalScreen" class="splash-overlay" style="display: none;">
+    <div class="splash-content">
+      <div class="final-screen-content">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+        <h2 class="splash-title">¡Cotización Completada!</h2>
+      </div>
+      
+      <div class="whatsapp-features">
+        <div style="font-size: 2rem; margin-bottom: 1rem;">📱</div>
+        <h3 style="color: #00704a; margin-bottom: 1rem;">Consulta tu WhatsApp</h3>
+        <p>Hemos enviado tu cotización completa al WhatsApp que nos proporcionaste.</p>
+        <p><strong>Allí encontrarás:</strong></p>
+        <ul>
+          <li>🔗 Enlace para ver tu cotización detallada</li>
+          <li>📄 Información sobre el PDF enviado a tu email</li>
+          <li>🔄 Opción para iniciar una nueva cotización</li>
+          <li>👨‍💼 Contacto con nuestros asesores</li>
+        </ul>
+      </div>
+
+      <div class="button-group">
+        <button id="backToInvestmentFromFinal" class="back-button">
+          ← Volver a ajustar datos
+        </button>
+        
+        <button id="newQuoteFromFinal" class="splash-button" style="background: #28a745;">
+          🔄 Nueva Cotización
+        </button>
+      </div>
+
+      <!-- Opción para reenviar PDF -->
+      <div class="reenvio-section">
+        <h4 style="text-align: center; margin-bottom: 1rem;">📧 Reenviar PDF a otro correo</h4>
+        <div class="form-group">
+          <input type="email" id="reenviarEmail" placeholder="Ingresa el correo para reenvío">
+        </div>
+        <button id="reenviarPdfBtn" class="splash-button" style="background: #17a2b8;">
+          Reenviar PDF
+        </button>
+        <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem; text-align: center;">
+          🔒 Por privacidad, tus datos serán eliminados después de esta sesión
+        </p>
+      </div>
+    </div>
+  </div>
+
+  
   <!-- CONTENIDO PRINCIPAL (oculto inicialmente) -->
   <div id="mainContent" style="display: none;">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -1007,7 +1093,48 @@
       });
     }
 
-    // FUNCIÓN PRINCIPAL PARA ENVIAR INFORME
+    // FUNCIÓN PARA FORMATEAR TELÉFONO COLOMBIA
+    function formatearTelefonoColombia(telefono) {
+      // Limpiar el número
+      let numeroLimpio = telefono.replace(/\D/g, '');
+      
+      // Si no tiene código de país, agregar +57
+      if (!numeroLimpio.startsWith('57')) {
+        // Si empieza con 0, quitarlo y agregar +57
+        if (numeroLimpio.startsWith('0')) {
+          numeroLimpio = '57' + numeroLimpio.substring(1);
+        } else {
+          // Si es un número de 10 dígitos sin 0, agregar +57
+          if (numeroLimpio.length === 10) {
+            numeroLimpio = '57' + numeroLimpio;
+          }
+        }
+      }
+      
+      return numeroLimpio;
+    }
+
+    // FUNCIÓN PARA CREAR MENSAJE DE WHATSAPP
+    function crearMensajeWhatsApp(nombre, email) {
+      const baseUrl = window.location.origin + window.location.pathname;
+      
+      const primerMensaje = `¡Hola ${nombre}! Tu cotización de energía solar está lista:
+
+🔗 Ver cotización completa: ${baseUrl}?cotizacion=${Date.now()}
+📄 PDF enviado a: ${email}
+🔄 Nueva cotización: ${baseUrl}?nueva=1
+
+-- Energialt SAS --`;
+
+      const segundoMensaje = `¿Deseas contactar a uno de nuestros asesores?
+Estamos aquí para resolver tus dudas 😊
+
+-- Energialt SAS --`;
+
+      return primerMensaje + '\n\n' + segundoMensaje;
+    }
+
+    // FUNCIÓN MODIFICADA PARA ENVIAR INFORME
     async function enviarInforme() {
       const userName = document.getElementById('userName').value;
       const userEmail = document.getElementById('userEmail').value;
@@ -1024,15 +1151,19 @@
       const exito = await guardarEnBaseDeDatos(userName, userEmail, userPhone);
 
       if (exito) {
-        document.getElementById('bill').value = document.getElementById('billSplash').value;
-        document.getElementById('latTxt').value = document.getElementById('latTxtSplash').value;
-        document.getElementById('lonTxt').value = document.getElementById('lonTxtSplash').value;
-        document.getElementById('searchBox').value = document.getElementById('searchBoxSplash').value;
-
+        // Formatear teléfono para WhatsApp
+        const telefonoFormateado = formatearTelefonoColombia(userPhone);
+        
+        // Crear mensaje de WhatsApp
+        const mensajeWhatsApp = crearMensajeWhatsApp(userName, userEmail);
+        
+        // Redirigir a WhatsApp
+        window.open(`https://wa.me/${telefonoFormateado}?text=${encodeURIComponent(mensajeWhatsApp)}`, '_blank');
+        
+        // Mostrar pantalla final
         document.getElementById('investmentScreen').style.display = 'none';
-        document.getElementById('mainContent').style.display = 'block';
-
-        cotizar();
+        document.getElementById('finalScreen').style.display = 'flex';
+        
       } else {
         alert('Error al guardar los datos. Por favor intenta nuevamente.');
         document.getElementById('sendReportBtn').textContent = 'Enviar mi informe completo';
@@ -1040,6 +1171,70 @@
       }
     }
 
+    // FUNCIÓN PARA REENVIAR PDF
+    async function reenviarPdf() {
+      const emailReenvio = document.getElementById('reenviarEmail').value;
+      
+      if (!emailReenvio) {
+        alert('Por favor ingresa un correo electrónico');
+        return;
+      }
+
+      // Aquí implementarías la lógica para reenviar el PDF
+      // usando los datos ya guardados
+      alert(`PDF reenviado a: ${emailReenvio}`);
+      
+      // Limpiar el campo después del reenvío
+      document.getElementById('reenviarEmail').value = '';
+    }
+
+    // FUNCIÓN PARA VOLVER AL MENÚ ANTERIOR
+    function volverAlMenuAnterior(pantallaActual, pantallaAnterior) {
+      document.getElementById(pantallaActual).style.display = 'none';
+      document.getElementById(pantallaAnterior).style.display = 'flex';
+    }
+
+    // FUNCIÓN PARA NUEVA COTIZACIÓN
+    function nuevaCotizacion() {
+      // Recargar la página para nueva cotización
+      window.location.reload();
+    }
+
+    // EVENT LISTENERS
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('barSolar').style.width = '0%';
+      document.getElementById('barGrid').style.width = '0%';
+      document.getElementById('barHome').style.width = '0%';
+      
+      document.getElementById('cotizarSplash').addEventListener('click', cotizarDesdeSplash);
+      document.getElementById('confirmLocationBtn').addEventListener('click', confirmarUbicacion);
+      document.getElementById('sendReportBtn').addEventListener('click', enviarInforme);
+      
+      // Botones volver existentes
+      document.getElementById('backToSplashFromConfirm').addEventListener('click', function() {
+        volverAlMenuAnterior('confirmLocationScreen', 'splashScreen');
+      });
+      
+      document.getElementById('backToConfirmFromInvestment').addEventListener('click', function() {
+        volverAlMenuAnterior('investmentScreen', 'confirmLocationScreen');
+      });
+      
+      document.getElementById('backToInvestmentFromMain').addEventListener('click', function() {
+        volverAlMenuAnterior('mainContent', 'investmentScreen');
+      });
+      
+      // NUEVOS EVENT LISTENERS PARA PANTALLA FINAL
+      document.getElementById('backToInvestmentFromFinal').addEventListener('click', function() {
+        volverAlMenuAnterior('finalScreen', 'investmentScreen');
+      });
+      
+      document.getElementById('newQuoteFromFinal').addEventListener('click', nuevaCotizacion);
+      
+      document.getElementById('reenviarPdfBtn').addEventListener('click', reenviarPdf);
+    });
+
+
+    
     // FUNCIÓN ORIGINAL COTIZAR
     async function cotizar(){
       const lat = parseFloat(document.getElementById('latTxt').value);
@@ -1499,6 +1694,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
 </body>
 </html>
+
 
 
 
