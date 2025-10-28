@@ -343,6 +343,33 @@
     .coord-inputs input {
       flex: 1;
     }
+    <!-- Agregar al final del CSS -->
+
+  /* ESTILOS PARA BOTONES VOLVER */
+  .back-button {
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .back-button:hover {
+    background: #5a6268;
+  }
+  
+  .back-button-container {
+    text-align: center;
+    margin-top: 1rem;
+  }
+
   </style>
 </head>
 
@@ -402,6 +429,15 @@
             <input id="confirmLat" type="text" placeholder="Latitud"/>
             <input id="confirmLon" type="text" placeholder="Longitud"/>
           </div>
+          <button id="confirmLocationBtn" class="splash-button">Confirmar Ubicación</button>
+    
+    <!-- BOTÓN VOLVER AGREGADO -->
+    <div class="back-button-container">
+      <button id="backToSplashFromConfirm" class="back-button">
+        ← Volver a editar datos
+      </button>
+    </div>
+        
         </div>
         
         <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">
@@ -459,12 +495,27 @@
         
         <button id="sendReportBtn" class="splash-button">Enviar mi informe completo</button>
       </div>
+    <button id="sendReportBtn" class="splash-button">Enviar mi informe completo</button>
+    
+    <!-- BOTÓN VOLVER AGREGADO -->
+    <div class="back-button-container">
+      <button id="backToConfirmFromInvestment" class="back-button">
+        ← Volver a ajustar ubicación
+      </button>
+    </div>
+
     </div>
   </div>
 
   <!-- CONTENIDO PRINCIPAL (oculto inicialmente) -->
   <div id="mainContent" style="display: none;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
     <h1>Cotizador Solar Rápido</h1>
+    <!-- BOTÓN VOLVER AGREGADO -->
+    <button id="backToInvestmentFromMain" class="back-button">
+      ← Volver al formulario
+    </button>
+  </div>
 
     <label>
       Dirección:
@@ -531,6 +582,9 @@
       </div>
       <div id="chartSummary" style="margin-top: 1rem; text-align: center; font-size: 0.9rem;"></div>
     </div>
+
+
+    
   </div>
 
   <!-- Google Maps -->
@@ -1111,6 +1165,20 @@
       document.getElementById('cotizarSplash').addEventListener('click', cotizarDesdeSplash);
       document.getElementById('confirmLocationBtn').addEventListener('click', confirmarUbicacion);
       document.getElementById('sendReportBtn').addEventListener('click', enviarInforme);
+  // NUEVOS: Event listeners para botones volver
+  document.getElementById('backToSplashFromConfirm').addEventListener('click', function() {
+    volverAlMenuAnterior('confirmLocationScreen', 'splashScreen');
+  });
+  
+  document.getElementById('backToConfirmFromInvestment').addEventListener('click', function() {
+    volverAlMenuAnterior('investmentScreen', 'confirmLocationScreen');
+  });
+  
+  document.getElementById('backToInvestmentFromMain').addEventListener('click', function() {
+    volverAlMenuAnterior('mainContent', 'investmentScreen');
+  });
+
+      
     });
 
     /* FUNCIÓN PARA CREAR LA GRÁFICA DE LÍNEA */
@@ -1398,6 +1466,31 @@
       // Mostrar la gráfica
       document.getElementById('cashflowChart').style.display = 'block';
     }
+// FUNCIONES DE NAVEGACIÓN "VOLVER"
+function volverAlMenuAnterior(pantallaActual, pantallaAnterior) {
+  document.getElementById(pantallaActual).style.display = 'none';
+  document.getElementById(pantallaAnterior).style.display = 'flex';
+}
+
+// EVENT LISTENERS PARA BOTONES VOLVER
+document.addEventListener('DOMContentLoaded', function() {
+  // Botón volver desde confirmación a splash
+  document.getElementById('backToSplashFromConfirm').addEventListener('click', function() {
+    volverAlMenuAnterior('confirmLocationScreen', 'splashScreen');
+  });
+  
+  // Botón volver desde inversión a confirmación
+  document.getElementById('backToConfirmFromInvestment').addEventListener('click', function() {
+    volverAlMenuAnterior('investmentScreen', 'confirmLocationScreen');
+  });
+  
+  // Botón volver desde main a inversión
+  document.getElementById('backToInvestmentFromMain').addEventListener('click', function() {
+    volverAlMenuAnterior('mainContent', 'investmentScreen');
+  });
+});
+
+    
   </script>
 
   <!-- Carga de Google Maps -->
@@ -1406,6 +1499,7 @@
   </script>
 </body>
 </html>
+
 
 
 
