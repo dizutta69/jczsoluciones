@@ -679,7 +679,49 @@
 
     // CONFIGURACIÓN GOOGLE APPS SCRIPT - ACTUALIZA CON TU URL
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzidMv2QUfpI-ZnbhWPP8p3AHBGyANszR13WkDEv4J1lg6HgMZ3GplF5XiMIGnsYZGzjQ/exec';
+function verificarCotizacionURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const cotizacionId = urlParams.get('id');
+  
+  if (cotizacionId) {
+    const cotizacionGuardada = cargarCotizacionActual();
+    
+    // Si tenemos una cotización guardada con ese ID, mostrar los resultados
+    if (cotizacionGuardada && cotizacionGuardada.id === cotizacionId) {
+      // Ocultar splash screen y mostrar main content con los datos
+      document.getElementById('splashScreen').style.display = 'none';
+      document.getElementById('mainContent').style.display = 'block';
+      
+      // Aquí cargarías los datos en la interfaz
+      // Puedes implementar esta función según tus necesidades
+      cargarDatosCotizacion(cotizacionGuardada);
+    }
+  }
+  
+  // Si hay parámetro nueva=1, recargar limpio
+  if (urlParams.get('nueva') === '1') {
+    sessionStorage.removeItem('cotizacionActual');
+    // Mostrar splash screen normal
+  }
+}
 
+// Función para cargar datos de cotización (puedes expandirla)
+function cargarDatosCotizacion(datos) {
+  // Cargar los datos en los campos correspondientes
+  document.getElementById('latTxt').value = datos.lat || '';
+  document.getElementById('lonTxt').value = datos.lon || '';
+  document.getElementById('bill').value = datos.factura || '';
+  document.getElementById('searchBox').value = datos.direccion || '';
+  
+  // Ejecutar cotización con estos datos
+  if (datos.lat && datos.lon && datos.factura) {
+    setTimeout(() => {
+      cotizar();
+    }, 1000);
+  }
+}
+
+    
     // FUNCIONES DE FORMATEO
     function formatoDineroCOP(valor) {
       const numeroFormateado = valor.toLocaleString('es-CO', {
@@ -1111,25 +1153,7 @@
       return numeroLimpio;
     }
 
-    // FUNCIÓN PARA CREAR MENSAJE DE WHATSAPP
-    function crearMensajeWhatsApp(nombre, email) {
-      const baseUrl = window.location.origin + window.location.pathname;
-      
-      const primerMensaje = `¡Hola ${nombre}! Tu cotización de energía solar está lista:
 
-🔗 Ver cotización completa: ${baseUrl}?cotizacion=${Date.now()}
-📄 PDF enviado a: ${email}
-🔄 Nueva cotización: ${baseUrl}?nueva=1
-
--- Energialt SAS --`;
-
-      const segundoMensaje = `¿Deseas contactar a uno de nuestros asesores?
-Estamos aquí para resolver tus dudas 😊
-
--- Energialt SAS --`;
-
-      return primerMensaje + '\n\n' + segundoMensaje;
-    }
 
     // FUNCIÓN MODIFICADA PARA ENVIAR INFORME
     async function enviarInforme() {
@@ -1176,41 +1200,84 @@ Estamos aquí para resolver tus dudas 😊
       }
     }
 
-    // FUNCIÓN MODIFICADA PARA CREAR MENSAJE DE WHATSAPP - ENLACE CORREGIDO
-    function crearMensajeWhatsApp(nombre, email) {
-      const baseUrl = window.location.origin + window.location.pathname;
-      
-      // Usar un identificador único para esta cotización
-      const cotizacionId = 'cotizacion_' + Date.now();
-      
-      const primerMensaje = `¡Hola ${nombre}! Tu cotización de energía solar está lista:
+// FUNCIÓN MEJORADA PARA CREAR MENSAJE DE WHATSAPP
+function crearMensajeWhatsApp(nombre, email) {
+  const baseUrl = window.location.origin + window.location.pathname;
+  
+  // Guardar la cotización actual y obtener su ID
+  const datosCotizacion = {
+    nombre: nombre,
+    email: email,
+    telefono: document.getElementById('userPhone').value,
+    inversion: currentPriceCop,
+    paneles: currentPanels,
+    area: currentArea
+  };
+  
+  const cotizacionId = guardarCotizacionActual(datosCotizacion);
+  
+  const primerMensaje = `¡Hola ${nombre}! Tu cotización de energía solar está lista:
 
-🔗 Ver tu cotización completa: ${baseUrl}?id=${cotizacionId}
+🔗 Ver tu cotización: ${baseUrl}?id=${cotizacionId}
 📄 PDF enviado a: ${email}
-🔄 Nueva cotización: ${baseUrl}?nueva=1
+💰 Inversión: ${formatoDineroCOP(currentPriceCop)}
+☀️ Paneles: ${currentPanels} unidades
 
 -- Energialt SAS --`;
 
-      const segundoMensaje = `¿Deseas contactar a uno de nuestros asesores?
+  const segundoMensaje = `¿Deseas contactar a uno de nuestros asesores?
 Estamos aquí para resolver tus dudas 😊
 
 -- Energialt SAS --`;
 
-      return primerMensaje + '\n\n' + segundoMensaje;
-    }
+  return primerMensaje + '\n\n' + segundoMensaje;
+}
 
     // FUNCIÓN MODIFICADA PARA VOLVER AL MENÚ ANTERIOR - RESTAURA ESTADO
-    function volverAlMenuAnterior(pantallaActual, pantallaAnterior) {
-      document.getElementById(pantallaActual).style.display = 'none';
-      document.getElementById(pantallaAnterior).style.display = 'flex';
-      
-      // RESTAURAR ESTADO DEL BOTÓN DE ENVÍO SI VOLVEMOS DESDE FINAL
-      if (pantallaActual === 'finalScreen' && pantallaAnterior === 'investmentScreen') {
-        document.getElementById('sendReportBtn').textContent = 'Enviar mi informe completo';
-        document.getElementById('sendReportBtn').disabled = false;
-      }
-    }
+function volverAlMenuAnterior(pantallaActual, pantallaAnterior) {
+  document.getElementById(pantallaActual).style.display = 'none';
+  document.getElementById(pantallaAnterior).style.display = 'flex';
+  
+  // RESTAURAR ESTADO DEL BOTÓN DE ENVÍO SI VOLVEMOS DESDE FINAL O INVERSIÓN
+  if (pantallaActual === 'finalScreen' && pantallaAnterior === 'investmentScreen') {
+    const sendButton = document.getElementById('sendReportBtn');
+    sendButton.textContent = 'Enviar mi informe completo';
+    sendButton.disabled = false;
+  }
+  
+  // También restaurar si volvemos desde main content
+  if (pantallaActual === 'mainContent' && pantallaAnterior === 'investmentScreen') {
+    const sendButton = document.getElementById('sendReportBtn');
+    sendButton.textContent = 'Enviar mi informe completo';
+    sendButton.disabled = false;
+  }
+}
 
+    // FUNCIÓN PARA GUARDAR COTIZACIÓN ACTUAL EN SESSION STORAGE
+function guardarCotizacionActual(datos) {
+  const cotizacionId = 'cotizacion_' + Date.now();
+  const cotizacionData = {
+    id: cotizacionId,
+    timestamp: Date.now(),
+    datos: datos,
+    lat: document.getElementById('latTxtSplash').value,
+    lon: document.getElementById('lonTxtSplash').value,
+    factura: document.getElementById('billSplash').value,
+    direccion: document.getElementById('searchBoxSplash').value,
+    inversion: currentPriceCop,
+    paneles: currentPanels,
+    area: currentArea
+  };
+  
+  sessionStorage.setItem('cotizacionActual', JSON.stringify(cotizacionData));
+  return cotizacionId;
+}
+
+// FUNCIÓN PARA CARGAR COTIZACIÓN DESDE SESSION STORAGE
+function cargarCotizacionActual() {
+  const guardada = sessionStorage.getItem('cotizacionActual');
+  return guardada ? JSON.parse(guardada) : null;
+}
     // FUNCIÓN PARA REENVIAR PDF - MEJORADA
     async function reenviarPdf() {
       const emailReenvio = document.getElementById('reenviarEmail').value;
@@ -1236,18 +1303,23 @@ Estamos aquí para resolver tus dudas 😊
       }, 1500);
     }
 
-    // FUNCIÓN PARA NUEVA COTIZACIÓN
-    function nuevaCotizacion() {
-      // Recargar la página para nueva cotización
-      window.location.reload();
-    }
+// FUNCIÓN MEJORADA PARA NUEVA COTIZACIÓN
+function nuevaCotizacion() {
+  // Limpiar session storage
+  sessionStorage.removeItem('cotizacionActual');
+  
+  // Recargar sin parámetros
+  window.location.href = window.location.origin + window.location.pathname;
+}
 
     // EVENT LISTENERS - ACTUALIZADOS
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('barSolar').style.width = '0%';
-      document.getElementById('barGrid').style.width = '0%';
-      document.getElementById('barHome').style.width = '0%';
-      
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('barSolar').style.width = '0%';
+  document.getElementById('barGrid').style.width = '0%';
+  document.getElementById('barHome').style.width = '0%';
+  // Verificar si hay cotización en la URL
+  verificarCotizacionURL();
+        
       document.getElementById('cotizarSplash').addEventListener('click', cotizarDesdeSplash);
       document.getElementById('confirmLocationBtn').addEventListener('click', confirmarUbicacion);
       document.getElementById('sendReportBtn').addEventListener('click', enviarInforme);
@@ -1737,6 +1809,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
 </body>
 </html>
+
 
 
 
