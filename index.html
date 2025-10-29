@@ -5,51 +5,14 @@
   <title>Cotizador Solar – Energialt SAS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <style>
-    /* ESTILOS GENERALES */
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      margin: 0;
-      padding: 1rem;
-      background: #f7f7f7;
-      color: #333;
-    }
+    body{font-family:system-ui;margin:0;padding:1rem;background:#f7f7f7}
+    #map, #confirmMap{height:55vh;border-radius:8px;margin:.5rem 0}
+    label,input,button{font-size:1rem;padding:.4rem .6rem;margin:.2rem 0}
+    #searchBox, #searchBoxSplash, #confirmAddress{width:60%}
+    button{cursor:pointer;background:#00704a;color:#fff;border:none;border-radius:4px}
+    pre{background:#fff;padding:1rem;border-radius:4px;overflow:auto}
     
-    /* MAPAS */
-    #map, #confirmMap {
-      height: 55vh;
-      border-radius: 8px;
-      margin: 0.5rem 0;
-      border: 1px solid #ddd;
-    }
-    
-    /* FORMULARIOS */
-    label, input, button {
-      font-size: 1rem;
-      padding: 0.4rem 0.6rem;
-      margin: 0.2rem 0;
-    }
-    
-    #searchBox, #searchBoxSplash, #confirmAddress {
-      width: 60%;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-    
-    /* BOTONES */
-    button {
-      cursor: pointer;
-      background: #00704a;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      transition: background 0.3s;
-    }
-    
-    button:hover {
-      background: #005a3c;
-    }
-    
-    /* PANTALLAS OVERLAY */
+    /* ESTILOS PARA EL SPLASH SCREEN */
     .splash-overlay {
       position: fixed;
       top: 0;
@@ -62,7 +25,6 @@
       align-items: center;
       z-index: 1000;
     }
-    
     .splash-content {
       background: white;
       padding: 2rem;
@@ -73,38 +35,20 @@
       overflow-y: auto;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     }
-    
     .splash-title {
       color: #00704a;
       text-align: center;
       margin-bottom: 1.5rem;
       font-size: 1.8rem;
     }
-    
-    .splash-button {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      background: #00704a;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      margin-top: 1rem;
+    .splash-instructions {
+      margin-bottom: 2rem;
     }
-    
-    .splash-button:hover {
-      background: #005a3c;
-    }
-    
-    /* PASOS DEL FORMULARIO */
     .splash-step {
       display: flex;
       margin-bottom: 1rem;
       align-items: flex-start;
     }
-    
     .step-number {
       background: #00704a;
       color: white;
@@ -117,11 +61,26 @@
       margin-right: 1rem;
       flex-shrink: 0;
     }
-    
     .step-text {
       flex: 1;
     }
-    
+    .splash-button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: #00704a;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .splash-button:hover {
+      background: #005a3c;
+    }
+
+    /* ESTILOS PARA LOS CAMPOS DEL SPLASH SCREEN */
     .splash-step input {
       width: 100%;
       margin-top: 0.5rem;
@@ -129,6 +88,21 @@
       border: 1px solid #ddd;
       border-radius: 4px;
       font-size: 1rem;
+    }
+    
+    .splash-step button {
+      margin-top: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: #00704a;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    
+    .splash-step button:hover {
+      background: #005a3c;
     }
     
     .splash-coords {
@@ -144,8 +118,8 @@
       background: #f9f9f9;
       margin: 0 0.5rem;
     }
-    
-    /* CONTROLES DE UBICACIÓN */
+
+    /* ESTILOS PARA LA PANTALLA DE CONFIRMACIÓN */
     .location-controls {
       background: #f8f9fa;
       padding: 1rem;
@@ -172,8 +146,33 @@
     .coord-inputs input {
       flex: 1;
     }
+
+    /* ESTILOS PARA BOTONES VOLVER */
+    .back-button {
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 15px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: background 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
     
-    /* PANTALLA DE INVERSIÓN */
+    .back-button:hover {
+      background: #5a6268;
+    }
+    
+    .back-button-container {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    /* ESTILOS PANTALLA INVERSIÓN */
     .investment-display {
       text-align: center;
       padding: 2rem;
@@ -223,35 +222,13 @@
     .benefits-list li {
       margin-bottom: 0.5rem;
     }
-    
-    /* BOTONES VOLVER */
-    .back-button {
-      background: #6c757d;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 10px 15px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      margin-top: 1rem;
-      transition: background 0.3s;
-    }
-    
-    .back-button:hover {
-      background: #5a6268;
-    }
-    
-    .back-button-container {
-      text-align: center;
-      margin-top: 1rem;
-    }
-    
-    /* PANTALLA FINAL */
+
+    /* ESTILOS PANTALLA FINAL */
     .final-screen-content {
       text-align: center;
     }
     
-    .whatsapp-features {
+    .success-message {
       background: #e8f5e8;
       padding: 1.5rem;
       border-radius: 8px;
@@ -259,16 +236,12 @@
       text-align: center;
     }
     
-    .whatsapp-features ul {
-      text-align: left;
-      display: inline-block;
-      margin: 1rem 0;
-      padding-left: 0;
-    }
-    
-    .whatsapp-features li {
-      margin-bottom: 0.5rem;
-      list-style: none;
+    .company-links {
+      background: #e3f2fd;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      text-align: center;
     }
     
     .button-group {
@@ -277,15 +250,6 @@
       justify-content: center;
       margin-bottom: 1rem;
       flex-wrap: wrap;
-    }
-    
-    /* ENLACES EMPRESA */
-    .company-links {
-      background: #e3f2fd;
-      padding: 1.5rem;
-      border-radius: 8px;
-      margin: 1.5rem 0;
-      text-align: center;
     }
     
     .link-button {
@@ -304,72 +268,45 @@
       background: #005a3c;
       color: white;
     }
-    
-    /* CONTENIDO PRINCIPAL */
-    #mainContent {
+
+    /* ESTILOS CONTENIDO PRINCIPAL (OCULTO) */
+    .main-content {
       display: none;
-    }
-    
-    .main-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    
-    /* RESPONSIVE */
-    @media (max-width: 768px) {
-      .splash-content {
-        padding: 1rem;
-      }
-      
-      .main-header {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      
-      #searchBox, #searchBoxSplash, #confirmAddress {
-        width: 100%;
-      }
-      
-      .button-group {
-        flex-direction: column;
-      }
-      
-      .coord-inputs {
-        flex-direction: column;
-      }
     }
   </style>
 </head>
 
 <body>
-  <!-- PANTALLA INICIAL -->
+
+  <!-- PANTALLA SPLASH INICIAL -->
   <div id="splashScreen" class="splash-overlay">
     <div class="splash-content">
       <h2 class="splash-title">Cotizador Solar Rápido</h2>
       
       <div class="splash-instructions">
-        <p style="text-align: center; margin-bottom: 1.5rem;">Sigue estos pasos para obtener tu cotización:</p>
+        <p style="text-align: center; margin-bottom: 1.5rem;">Sigue estos pasos para obtener tu cotización de energía solar:</p>
         
+        <!-- PASO 1: Dirección o Coordenadas -->
         <div class="splash-step">
           <div class="step-number">1</div>
           <div class="step-text">
-            <strong>Ingresa tu dirección o coordenadas</strong>
-            <input id="searchBoxSplash" type="text" placeholder="Ej: Cra 15 # 120-30, Bogotá"/>
+            <strong>Ingresa tu dirección O coordenadas</strong>
+            <input id="searchBoxSplash" type="text" placeholder="Cra 15 # 120-30, Bogotá"/>
             <div class="splash-coords">
               <label>Lat: <input id="latTxtSplash" type="text" placeholder="4.711"/></label>
               <label>Lon: <input id="lonTxtSplash" type="text" placeholder="-74.072"/></label>
             </div>
+            <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">
+              💡 <strong>Prioridad:</strong> Si ingresas coordenadas válidas, se usarán esas. Si no, usaremos la dirección.
+            </p>
           </div>
         </div>
         
+        <!-- PASO 2: Factura mensual -->
         <div class="splash-step">
           <div class="step-number">2</div>
           <div class="step-text">
-            <strong>Valor de tu factura mensual (COP)</strong>
+            <strong>Ingresa el valor de tu factura mensual</strong>
             <input id="billSplash" type="number" placeholder="200000"/>
           </div>
         </div>
@@ -379,15 +316,15 @@
     </div>
   </div>
 
-  <!-- CONFIRMACIÓN DE UBICACIÓN -->
+  <!-- PANTALLA DE CONFIRMACIÓN DE UBICACIÓN -->
   <div id="confirmLocationScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
-      <h2 class="splash-title">Confirma tu ubicación</h2>
+      <h2 class="splash-title">Confirma y ajusta tu ubicación</h2>
       
       <div class="location-controls">
         <div class="location-field">
           <label for="confirmAddress">Dirección:</label>
-          <input id="confirmAddress" type="text" placeholder="Ajusta la dirección si es necesario"/>
+          <input id="confirmAddress" type="text" placeholder="Ingresa o ajusta la dirección"/>
         </div>
         
         <div class="location-field">
@@ -397,19 +334,29 @@
             <input id="confirmLon" type="text" placeholder="Longitud"/>
           </div>
         </div>
+        
+        <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">
+          💡 Puedes ajustar la ubicación de 3 formas:<br>
+          1. Escribir una nueva dirección<br>
+          2. Editar las coordenadas directamente<br>
+          3. Arrastrar el marcador en el mapa
+        </p>
       </div>
       
       <div id="confirmMap" style="height: 300px; border-radius: 8px; margin-bottom: 1rem;"></div>
       
       <button id="confirmLocationBtn" class="splash-button">Confirmar Ubicación</button>
       
+      <!-- BOTÓN VOLVER -->
       <div class="back-button-container">
-        <button id="backToSplashFromConfirm" class="back-button">← Volver</button>
+        <button id="backToSplashFromConfirm" class="back-button">
+          ← Volver a editar datos
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- FORMULARIO DE CONTACTO -->
+  <!-- PANTALLA DE INVERSIÓN Y FORMULARIO -->
   <div id="investmentScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
       <h2 class="splash-title">¡Tu Inversión en Energía Solar!</h2>
@@ -425,10 +372,11 @@
         <div class="benefits-list">
           <p>Tu informe personalizado incluirá:</p>
           <ul>
-            <li>✅ Ahorro mensual estimado</li>
-            <li>✅ Retorno de inversión</li>
-            <li>✅ Área requerida</li>
-            <li>✅ PDF profesional</li>
+            <li>✅ Cuánto ahorrarás en tu factura mensual</li>
+            <li>✅ Gráfica con el retorno de inversión</li>
+            <li>✅ Ingresos que te producirá el sistema</li>
+            <li>✅ Área requerida para la instalación</li>
+            <li>✅ 📄 PDF profesional con toda la información</li>
           </ul>
         </div>
 
@@ -450,13 +398,16 @@
         <button id="sendReportBtn" class="splash-button">Enviar mi informe completo</button>
       </div>
 
+      <!-- BOTÓN VOLVER -->
       <div class="back-button-container">
-        <button id="backToConfirmFromInvestment" class="back-button">← Ajustar ubicación</button>
+        <button id="backToConfirmFromInvestment" class="back-button">
+          ← Volver a ajustar ubicación
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- PANTALLA FINAL -->
+  <!-- PANTALLA FINAL - COTIZACIÓN COMPLETADA -->
   <div id="finalScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
       <div class="final-screen-content">
@@ -464,91 +415,184 @@
         <h2 class="splash-title">¡Cotización Completada!</h2>
       </div>
       
-      <div class="whatsapp-features">
-        <div style="font-size: 2rem; margin-bottom: 1rem;">📧</div>
-        <h3 style="color: #00704a; margin-bottom: 1rem;">¡PDF Enviado!</h3>
-        <p>Hemos enviado tu cotización completa al correo electrónico que nos proporcionaste.</p>
-        <p><strong>Próximos pasos:</strong></p>
-        <ul>
-          <li>📄 Revisa tu correo (incluido spam)</li>
-          <li>📱 Te contactaremos por WhatsApp</li>
-          <li>📅 Coordinaremos consultoría gratuita</li>
-        </ul>
+      <div class="success-message">
+        <div style="font-size: 2rem; margin-bottom: 1rem;">📧✅</div>
+        <h3 style="color: #00704a; margin-bottom: 1rem;">¡Todo listo!</h3>
+        <p><strong>Hemos enviado tu PDF completo al correo:</strong></p>
+        <p style="background: #fff3cd; padding: 10px; border-radius: 5px; margin: 10px 0; font-weight: bold;">
+          📧 <span id="clienteEmailFinal">usuario@email.com</span>
+        </p>
+        <p>Y hemos notificado a nuestro equipo para contactarte por WhatsApp en breve.</p>
+        
+        <div style="margin-top: 1.5rem; text-align: left;">
+          <p><strong>Próximos pasos:</strong></p>
+          <ul>
+            <li>📄 <strong>Revisa tu correo</strong> (incluido spam)</li>
+            <li>📱 <strong>Recibirás WhatsApp</strong> de nuestro equipo</li>
+            <li>📅 <strong>Coordinaremos consultoría</strong> gratuita</li>
+            <li>💬 <strong>Resolveremos todas tus dudas</strong></li>
+          </ul>
+        </div>
       </div>
 
       <div class="company-links">
-        <h3>📖 Conoce más sobre nosotros</h3>
-        <p>Visita nuestra página web:</p>
-        <a href="https://www.energialt.co" target="_blank" class="link-button">🌐 energialt.co</a>
+        <h3 style="color: #00704a; margin-bottom: 1rem;">📖 Conoce más sobre nosotros</h3>
+        <p>Visita nuestra página web para conocer nuestros proyectos y el proceso de instalación:</p>
+        <div style="margin: 1.5rem 0;">
+          <a href="https://www.energialt.co" target="_blank" class="link-button">
+            🌐 Visitar energialt.co
+          </a>
+        </div>
+        <p style="font-size: 0.9rem; color: #666;">
+          Descubre proyectos realizados, testimonios de clientes y nuestro proceso de instalación paso a paso.
+        </p>
       </div>
 
       <div class="button-group">
-        <button id="backToInvestmentFromFinal" class="back-button">← Volver</button>
-        <button id="newQuoteFromFinal" class="splash-button">🔄 Nueva Cotización</button>
+        <button id="backToInvestmentFromFinal" class="back-button">
+          ← Volver a ajustar datos
+        </button>
+        
+        <button id="newQuoteFromFinal" class="splash-button" style="background: #28a745;">
+          🔄 Nueva Cotización
+        </button>
       </div>
+
+      <p style="font-size: 0.8rem; color: #666; margin-top: 2rem; text-align: center;">
+        🔒 Por privacidad, tus datos serán eliminados después de esta sesión
+      </p>
     </div>
   </div>
 
-  <!-- CONTENIDO PRINCIPAL -->
-  <div id="mainContent" style="display: none;">
-    <div class="main-header">
+  <!-- CONTENIDO PRINCIPAL (OCULTO) -->
+  <div id="mainContent" class="main-content">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
       <h1>Cotizador Solar Rápido</h1>
       <div>
-        <button id="backToInvestmentFromMain" class="back-button">← Formulario</button>
-        <button id="newQuoteFromMain" class="splash-button">🔄 Nueva</button>
+        <button id="backToInvestmentFromMain" class="back-button">
+          ← Volver al formulario
+        </button>
+        <button id="newQuoteFromMain" class="splash-button" style="background: #28a745; margin-left: 10px;">
+          🔄 Nueva Cotización
+        </button>
       </div>
     </div>
 
-    <div>
-      <label>Dirección:
-        <input id="searchBox" type="text" placeholder="Ingresa dirección"/>
-        <button onclick="buscaConBoton()">Buscar</button>
-      </label>
-    </div>
+    <p style="background: #e8f5e8; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+      ⚠️ <strong>Nota:</strong> Esta vista está disponible para desarrollo. Los clientes usan el flujo guiado desde el inicio.
+    </p>
+
+    <label>
+      Dirección:
+      <input id="searchBox" type="text" placeholder="Cra 15 # 120-30, Bogotá"/>
+      <button onclick="buscaConBoton()">Buscar</button>
+    </label>
+    <br/>
 
     <div id="map"></div>
 
-    <div>
-      <label>Factura mensual (COP):
-        <input id="bill" type="number" placeholder="200000"/>
-      </label>
-    </div>
+    <label>Factura mensual (COP):
+      <input id="bill" type="number" placeholder="200000"/>
+    </label>
+    <br/>
 
-    <div>
-      <label>Lat: <input id="latTxt" readonly/></label>
-      <label>Lon: <input id="lonTxt" readonly/></label>
-    </div>
+    <label>Lat: <input id="latTxt" readonly/></label>
+    <label>Lon: <input id="lonTxt" readonly/></label>
+    <br/>
 
     <button onclick="cotizar()">Cotizar</button>
 
+    <!-- Resultados simplificados -->
     <div id="textOutput" style="background: #fff; padding: 1rem; border-radius: 4px; margin-top: 1rem; border: 1px solid #ddd;"></div>
 
-    <div class="company-links">
-      <h3>¿Necesitas más información?</h3>
-      <p>Visita nuestra página web para conocer proyectos y proceso de instalación:</p>
-      <a href="https://www.energialt.co" target="_blank" class="link-button">🌐 Visitar energialt.co</a>
+    <!-- SECCIÓN PARA VISITAR LA PÁGINA WEB -->
+    <div class="company-links" style="margin-top: 2rem;">
+      <h3>📖 Conoce más sobre Energialt</h3>
+      <p>Visita nuestra página web para conocer nuestros proyectos, testimonios y el proceso de instalación:</p>
+      <div style="margin: 1.5rem 0;">
+        <a href="https://www.energialt.co" target="_blank" class="link-button">
+          🌐 Visitar energialt.co
+        </a>
+      </div>
     </div>
   </div>
 
-  <!-- GOOGLE MAPS -->
+  <!-- Google Maps -->
   <script>
     let map, marker, autocomplete, confirmMap, confirmMarker, confirmAutocomplete;
     let currentPriceCop = 0;
     let currentPanels = 0;
     let currentArea = 0;
 
+    // CONFIGURACIÓN GOOGLE APPS SCRIPT
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzidMv2QUfpI-ZnbhWPP8p3AHBGyANszR13WkDEv4J1lg6HgMZ3GplF5XiMIGnsYZGzjQ/exec';
 
     // FUNCIONES DE FORMATEO
     function formatoDineroCOP(valor) {
-      return '$' + valor.toLocaleString('es-CO', {maximumFractionDigits: 0});
+      const numeroFormateado = valor.toLocaleString('es-CO', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+      
+      if (valor >= 1000000) {
+        return '$' + numeroFormateado.replace('.', "'");
+      } else {
+        return '$' + numeroFormateado;
+      }
     }
 
     function formatoNumeroEntero(valor) {
-      return Math.round(valor).toLocaleString('es-CO');
+      const valorEntero = Math.round(valor);
+      const numeroFormateado = valorEntero.toLocaleString('es-CO', {
+        maximumFractionDigits: 0
+      });
+      
+      if (valorEntero >= 1000000) {
+        return numeroFormateado.replace('.', "'");
+      } else {
+        return numeroFormateado;
+      }
     }
 
-    // INICIALIZACIÓN DEL MAPA
+    // FUNCIONES PARA VALIDACIÓN DE COORDENADAS
+    function sonCoordenadasValidas(lat, lon) {
+      const numLat = parseFloat(lat);
+      const numLon = parseFloat(lon);
+      return !isNaN(numLat) && !isNaN(numLon) && 
+             numLat >= -90 && numLat <= 90 && 
+             numLon >= -180 && numLon <= 180;
+    }
+
+    function obtenerCoordenadasDeInputs() {
+      const lat = document.getElementById('latTxtSplash').value;
+      const lon = document.getElementById('lonTxtSplash').value;
+      
+      if (sonCoordenadasValidas(lat, lon)) {
+        return {
+          lat: parseFloat(lat),
+          lng: parseFloat(lon),
+          source: 'coordenadas'
+        };
+      }
+      return null;
+    }
+
+    // FUNCIONES PARA EL FLUJO MEJORADO
+    function buscarDesdeSplash() {
+      const input = document.getElementById('searchBoxSplash');
+      const service = new google.maps.places.PlacesService(map);
+      
+      service.textSearch({query: input.value}, (results, status) => {
+        if(status === google.maps.places.PlacesServiceStatus.OK && results[0]) {
+          const latLng = results[0].geometry.location;
+          document.getElementById('latTxtSplash').value = latLng.lat().toFixed(5);
+          document.getElementById('lonTxtSplash').value = latLng.lng().toFixed(5);
+        } else {
+          console.log('Dirección no encontrada, usando coordenadas si están disponibles');
+        }
+      });
+    }
+
     function initMap(){
       const bogota = {lat:4.711, lng:-74.072};
       map = new google.maps.Map(document.getElementById('map'),{
@@ -566,16 +610,16 @@
         title: 'Arrastra para ajustar'
       });
 
-      // Autocomplete para búsqueda
       const input = document.getElementById('searchBox');
       autocomplete = new google.maps.places.Autocomplete(input, {
         fields: ['geometry', 'formatted_address'],
         types: ['address']
       });
-      
+      autocomplete.bindTo('bounds', map);
       autocomplete.addListener('place_changed', ()=>{
         const place = autocomplete.getPlace();
-        if(place.geometry) muestraLugar(place.geometry.location);
+        if(!place.geometry){ return; }
+        muestraLugar(place.geometry.location);
       });
 
       marker.addListener('dragend', ()=>{
@@ -586,9 +630,30 @@
       actualizaCoords(bogota.lat, bogota.lng);
       document.getElementById('latTxtSplash').value = bogota.lat.toFixed(5);
       document.getElementById('lonTxtSplash').value = bogota.lng.toFixed(5);
+
+      // Búsqueda automática al cambiar la dirección
+      document.getElementById('searchBoxSplash').addEventListener('change', function() {
+        if (this.value.trim()) {
+          buscarDesdeSplash();
+        }
+      });
+
+      // Actualización automática al cambiar coordenadas
+      document.getElementById('latTxtSplash').addEventListener('change', actualizarDesdeCoordenadas);
+      document.getElementById('lonTxtSplash').addEventListener('change', actualizarDesdeCoordenadas);
     }
 
-    // FUNCIONES DEL MAPA
+    function actualizarDesdeCoordenadas() {
+      const coordenadas = obtenerCoordenadasDeInputs();
+      if (coordenadas) {
+        const latLng = new google.maps.LatLng(coordenadas.lat, coordenadas.lng);
+        if (map && marker) {
+          map.setCenter(latLng);
+          marker.setPosition(latLng);
+        }
+      }
+    }
+
     function initConfirmMap(lat, lng, address) {
       const location = {lat: lat, lng: lng};
       confirmMap = new google.maps.Map(document.getElementById('confirmMap'),{
@@ -599,20 +664,62 @@
         fullscreenControl: false
       });
 
+      // Configurar autocomplete para la dirección en confirmación
+      const confirmAddressInput = document.getElementById('confirmAddress');
+      confirmAutocomplete = new google.maps.places.Autocomplete(confirmAddressInput, {
+        fields: ['geometry', 'formatted_address'],
+        types: ['address']
+      });
+      confirmAutocomplete.bindTo('bounds', confirmMap);
+      confirmAutocomplete.addListener('place_changed', ()=>{
+        const place = confirmAutocomplete.getPlace();
+        if(!place.geometry){ return; }
+        const newLocation = place.geometry.location;
+        confirmMap.setCenter(newLocation);
+        confirmMarker.setPosition(newLocation);
+        updateConfirmCoords(newLocation.lat(), newLocation.lng());
+      });
+
       confirmMarker = new google.maps.Marker({
         position: location,
         map: confirmMap,
         draggable: true,
-        title: 'Arrastra para ajustar'
+        title: 'Arrastra para ajustar la ubicación'
       });
 
+      // Actualizar coordenadas cuando se mueve el marcador
       confirmMarker.addListener('dragend', ()=>{
         const newPosition = confirmMarker.getPosition();
         updateConfirmCoords(newPosition.lat(), newPosition.lng());
+        reverseGeocode(newPosition.lat(), newPosition.lng());
       });
 
+      // Inicializar campos
       document.getElementById('confirmAddress').value = address || '';
       updateConfirmCoords(lat, lng);
+
+      // Event listeners para coordenadas editables
+      document.getElementById('confirmLat').addEventListener('change', function() {
+        const lat = parseFloat(this.value);
+        const lon = parseFloat(document.getElementById('confirmLon').value);
+        if (sonCoordenadasValidas(lat, lon)) {
+          const newLocation = new google.maps.LatLng(lat, lon);
+          confirmMap.setCenter(newLocation);
+          confirmMarker.setPosition(newLocation);
+          reverseGeocode(lat, lon);
+        }
+      });
+
+      document.getElementById('confirmLon').addEventListener('change', function() {
+        const lat = parseFloat(document.getElementById('confirmLat').value);
+        const lon = parseFloat(this.value);
+        if (sonCoordenadasValidas(lat, lon)) {
+          const newLocation = new google.maps.LatLng(lat, lon);
+          confirmMap.setCenter(newLocation);
+          confirmMarker.setPosition(newLocation);
+          reverseGeocode(lat, lon);
+        }
+      });
     }
 
     function updateConfirmCoords(lat, lng) {
@@ -620,13 +727,29 @@
       document.getElementById('confirmLon').value = lng.toFixed(5);
     }
 
+    function reverseGeocode(lat, lng) {
+      const geocoder = new google.maps.Geocoder();
+      const latLng = { lat: lat, lng: lng };
+      
+      geocoder.geocode({ location: latLng }, (results, status) => {
+        if (status === "OK" && results[0]) {
+          document.getElementById('confirmAddress').value = results[0].formatted_address;
+        }
+      });
+    }
+
     function buscaConBoton(){
+      const place = autocomplete.getPlace && autocomplete.getPlace();
+      if(place && place.geometry){
+        muestraLugar(place.geometry.location);
+        return;
+      }
       const service = new google.maps.places.PlacesService(map);
       service.textSearch({query: document.getElementById('searchBox').value}, (results, status)=>{
         if(status === google.maps.places.PlacesServiceStatus.OK && results[0]){
           muestraLugar(results[0].geometry.location);
         }else{
-          alert('Dirección no encontrada. Prueba con otra dirección.');
+          alert('Dirección no encontrada. Prueba otra forma o pega lat,lon');
         }
       });
     }
@@ -642,25 +765,43 @@
       document.getElementById('lonTxt').value = lng.toFixed(5);
     }
 
-    // FLUJO PRINCIPAL
+    // FLUJO PRINCIPAL MEJORADO
     async function cotizarDesdeSplash() {
-      const lat = parseFloat(document.getElementById('latTxtSplash').value);
-      const lon = parseFloat(document.getElementById('lonTxtSplash').value);
-      const bill = parseFloat(document.getElementById('billSplash').value);
-      const address = document.getElementById('searchBoxSplash').value;
+      // Primero intentar con coordenadas
+      let coordenadas = obtenerCoordenadasDeInputs();
+      let address = document.getElementById('searchBoxSplash').value;
       
-      if((isNaN(lat) || isNaN(lon)) && !address.trim()){
+      if (!coordenadas && !address.trim()) {
         alert('Por favor ingresa una dirección o coordenadas válidas');
         return;
       }
 
+      let lat, lon;
+      
+      if (coordenadas) {
+        // Usar coordenadas si son válidas
+        lat = coordenadas.lat;
+        lon = coordenadas.lng;
+        console.log('✅ Usando coordenadas ingresadas:', lat, lon);
+      } else {
+        // Usar dirección si no hay coordenadas válidas
+        console.log('📍 Usando dirección, buscando coordenadas...');
+        lat = 4.711;
+        lon = -74.072;
+      }
+
+      const bill = parseFloat(document.getElementById('billSplash').value);
+      
       if(isNaN(bill) || bill <= 0){ 
         alert('Define una factura mayor a 0'); 
         return; 
       }
 
+      // Mostrar pantalla de confirmación de ubicación
       document.getElementById('splashScreen').style.display = 'none';
       document.getElementById('confirmLocationScreen').style.display = 'flex';
+      
+      // Inicializar mapa de confirmación con la ubicación actual
       initConfirmMap(lat, lon, address);
     }
 
@@ -669,9 +810,18 @@
       const lon = parseFloat(document.getElementById('confirmLon').value);
       const bill = parseFloat(document.getElementById('billSplash').value);
       
+      // Actualizar los campos originales con los valores confirmados
+      document.getElementById('latTxtSplash').value = lat.toFixed(5);
+      document.getElementById('lonTxtSplash').value = lon.toFixed(5);
+      document.getElementById('searchBoxSplash').value = document.getElementById('confirmAddress').value;
+
+      // Calcular cotización
       calcularCotizacion(lat, lon, bill).then(() => {
+        // Mostrar pantalla de inversión
         document.getElementById('confirmLocationScreen').style.display = 'none';
         document.getElementById('investmentScreen').style.display = 'flex';
+        
+        // Mostrar valor de inversión
         document.getElementById('investmentAmount').textContent = formatoDineroCOP(currentPriceCop);
       });
     }
@@ -687,7 +837,23 @@
       try {
         const kwhMonth = bill / PRICE_KWH;
         const kwh70 = kwhMonth * TARGET;
+
         let specific = 1350; // Valor por defecto
+
+        try {
+          const response = await fetch(
+            `https://developer.nrel.gov/api/pvwatts/v8.json?api_key=ECmQDDWbYsWgQ4pFg2zFUZdlbTirJhA1pnfQRRC4&lat=${lat}&lon=${lon}&system_capacity=1&azimuth=180&tilt=${Math.abs(lat)}&array_type=1&module_type=0&losses=14&timeframe=monthly`
+          );
+          
+          if (response.ok) {
+            const pvw = await response.json();
+            if(pvw && pvw.outputs && pvw.outputs.ac_annual) {
+              specific = pvw.outputs.ac_annual;
+            }
+          }
+        } catch(error) {
+          console.warn('Error PVWatts, usando valor por defecto:', error);
+        }
 
         const kwp = (kwh70 * 12) / specific;
         currentPanels = Math.ceil(kwp / (PANEL_W/1000));
@@ -698,44 +864,12 @@
         currentArea = currentPanels * AREA_POR_PANEL;
 
       } catch (error) {
-        console.error('Error en cálculo:', error);
+        console.error('Error en cotización:', error);
         alert('Error en el cálculo. Verifica los datos.');
       }
     }
 
-    // ENVÍO DE DATOS
-    async function enviarInforme() {
-      const userName = document.getElementById('userName').value;
-      const userEmail = document.getElementById('userEmail').value;
-      const userPhone = document.getElementById('userPhone').value;
-
-      if (!userName || !userEmail || !userPhone) {
-        alert('Por favor completa todos los campos');
-        return;
-      }
-
-      const boton = document.getElementById('sendReportBtn');
-      const textoOriginal = boton.textContent;
-      
-      boton.textContent = 'Enviando...';
-      boton.disabled = true;
-
-      try {
-        const exito = await guardarEnBaseDeDatos(userName, userEmail, userPhone);
-        
-        if (exito) {
-          document.getElementById('investmentScreen').style.display = 'none';
-          document.getElementById('finalScreen').style.display = 'flex';
-        } else {
-          throw new Error('Error al guardar datos');
-        }
-      } catch (error) {
-        alert('Error al enviar los datos. Por favor intenta nuevamente.');
-        boton.textContent = textoOriginal;
-        boton.disabled = false;
-      }
-    }
-
+    // FUNCIÓN PARA ENVIAR DATOS AL BACKEND
     async function guardarEnBaseDeDatos(nombre, email, telefono) {
       const datos = {
         nombre: nombre,
@@ -750,8 +884,11 @@
         direccion: document.getElementById('searchBoxSplash').value
       };
 
+      console.log('Enviando datos a Google Sheets:', datos);
+
       return new Promise((resolve, reject) => {
         const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+        
         const script = document.createElement('script');
         const url = new URL(GOOGLE_SCRIPT_URL);
         
@@ -765,12 +902,20 @@
         window[callbackName] = function(response) {
           delete window[callbackName];
           document.body.removeChild(script);
-          resolve(response.success);
+          
+          if (response.success) {
+            console.log('✅ Datos guardados en Google Sheets');
+            resolve(true);
+          } else {
+            console.error('❌ Error del servidor:', response.error);
+            resolve(false);
+          }
         };
         
         script.onerror = function() {
           delete window[callbackName];
           document.body.removeChild(script);
+          console.error('❌ Error de conexión JSONP');
           resolve(false);
         };
         
@@ -778,18 +923,58 @@
       });
     }
 
-    // NAVEGACIÓN
+    // FUNCIÓN PARA ENVIAR INFORME
+    async function enviarInforme() {
+      const userName = document.getElementById('userName').value;
+      const userEmail = document.getElementById('userEmail').value;
+      const userPhone = document.getElementById('userPhone').value;
+
+      if (!userName || !userEmail || !userPhone) {
+        alert('Por favor completa todos los campos');
+        return;
+      }
+
+      // Guardar estado original del botón
+      const botonOriginal = document.getElementById('sendReportBtn');
+      const textoOriginal = botonOriginal.textContent;
+      
+      botonOriginal.textContent = 'Enviando...';
+      botonOriginal.disabled = true;
+
+      try {
+        const exito = await guardarEnBaseDeDatos(userName, userEmail, userPhone);
+
+        if (exito) {
+          // Mostrar pantalla final con el email del cliente
+          document.getElementById('clienteEmailFinal').textContent = userEmail;
+          document.getElementById('investmentScreen').style.display = 'none';
+          document.getElementById('finalScreen').style.display = 'flex';
+          
+        } else {
+          throw new Error('Error al guardar datos');
+        }
+      } catch (error) {
+        alert('Error al guardar los datos. Por favor intenta nuevamente.');
+        // RESTAURAR ESTADO ORIGINAL DEL BOTÓN
+        botonOriginal.textContent = textoOriginal;
+        botonOriginal.disabled = false;
+      }
+    }
+
+    // FUNCIÓN MEJORADA PARA VOLVER AL MENÚ ANTERIOR
     function volverAlMenuAnterior(pantallaActual, pantallaAnterior) {
       document.getElementById(pantallaActual).style.display = 'none';
       document.getElementById(pantallaAnterior).style.display = 'flex';
       
-      if (pantallaActual === 'finalScreen') {
+      // RESTAURAR ESTADO DEL BOTÓN DE ENVÍO SI VOLVEMOS DESDE FINAL
+      if (pantallaActual === 'finalScreen' && pantallaAnterior === 'investmentScreen') {
         const sendButton = document.getElementById('sendReportBtn');
         sendButton.textContent = 'Enviar mi informe completo';
         sendButton.disabled = false;
       }
     }
 
+    // FUNCIÓN PARA NUEVA COTIZACIÓN
     function nuevaCotizacion() {
       window.location.reload();
     }
@@ -801,23 +986,38 @@
       document.getElementById('sendReportBtn').addEventListener('click', enviarInforme);
       
       // Botones volver
-      document.getElementById('backToSplashFromConfirm').addEventListener('click', () => volverAlMenuAnterior('confirmLocationScreen', 'splashScreen'));
-      document.getElementById('backToConfirmFromInvestment').addEventListener('click', () => volverAlMenuAnterior('investmentScreen', 'confirmLocationScreen'));
-      document.getElementById('backToInvestmentFromMain').addEventListener('click', () => volverAlMenuAnterior('mainContent', 'investmentScreen'));
-      document.getElementById('backToInvestmentFromFinal').addEventListener('click', () => volverAlMenuAnterior('finalScreen', 'investmentScreen'));
+      document.getElementById('backToSplashFromConfirm').addEventListener('click', function() {
+        volverAlMenuAnterior('confirmLocationScreen', 'splashScreen');
+      });
       
-      // Nueva cotización
+      document.getElementById('backToConfirmFromInvestment').addEventListener('click', function() {
+        volverAlMenuAnterior('investmentScreen', 'confirmLocationScreen');
+      });
+      
+      document.getElementById('backToInvestmentFromFinal').addEventListener('click', function() {
+        volverAlMenuAnterior('finalScreen', 'investmentScreen');
+      });
+      
+      document.getElementById('backToInvestmentFromMain').addEventListener('click', function() {
+        document.getElementById('mainContent').style.display = 'none';
+        document.getElementById('investmentScreen').style.display = 'flex';
+      });
+      
+      // Botones nueva cotización
       document.getElementById('newQuoteFromFinal').addEventListener('click', nuevaCotizacion);
       document.getElementById('newQuoteFromMain').addEventListener('click', nuevaCotizacion);
     });
 
-    // FUNCIÓN COMPATIBILIDAD
+    // FUNCIÓN ORIGINAL COTIZAR (para main content)
     async function cotizar(){
-      alert('Usa el flujo guiado desde el inicio para mejor experiencia.');
+      alert('Usa el flujo guiado desde la pantalla de inicio para mejor experiencia.');
     }
+
   </script>
 
-  <!-- CARGA DE GOOGLE MAPS -->
-  <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKNxSVeV-p40IVdXtU7Ghk7p-WdMnrZes&libraries=places&callback=initMap"></script>
+  <!-- Carga de Google Maps -->
+  <script async
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKNxSVeV-p40IVdXtU7Ghk7p-WdMnrZes&libraries=places&callback=initMap">
+  </script>
 </body>
 </html>
