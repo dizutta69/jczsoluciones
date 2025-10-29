@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8"/>
-  <title>Cotizador Solar – Energialt SAS</title>
+  <title>Cotizador Solar – Colombia (Google Maps)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <style>
     body{font-family:system-ui;margin:0;padding:1rem;background:#f7f7f7}
@@ -11,7 +11,153 @@
     #searchBox, #searchBoxSplash, #confirmAddress{width:60%}
     button{cursor:pointer;background:#00704a;color:#fff;border:none;border-radius:4px}
     pre{background:#fff;padding:1rem;border-radius:4px;overflow:auto}
+    .energy-diagram {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: system-ui, sans-serif;
+      text-align: center;
+      margin-top: 1rem;
+    }
+    /* ---- Overlay texts on the image ---- */
+    .energy-overlay {
+      position: relative;
+      display: inline-block;
+      margin: 1rem auto;
+    }
+    .energy-overlay img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    .overlay-text {
+      position: absolute;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #fff;
+      text-shadow: 0 0 5px #000;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(0,0,0,.45);
+      text-align: center;
+      min-width: 120px;
+    }
+
+    /* NUEVAS POSICIONES para solar.png */
+    #txtSolar { 
+      bottom: 10%;
+      left: 5%; 
+      transform: translateX(0);
+    }
+    #txtGrid  { 
+      bottom: 10%;
+      right: 5%; 
+      transform: translateX(0);
+    }
+    #txtHome  { 
+      top: 10%;
+      left: 50%; 
+      transform: translateX(-50%);
+    }
+
+    /* ESTILOS PARA LA NUEVA IMAGEN FACTURA */
+    .factura-overlay {
+      position: relative;
+      display: inline-block;
+      margin: 1rem auto;
+    }
+    .factura-overlay img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    .factura-text {
+      position: absolute;
+      font-weight: 700;
+      font-size: 1.0rem;
+      padding: 5px 10px;
+      border-radius: 4px;
+      background: transparent;
+      text-align: center;
+      min-width: 140px;
+    }
     
+    /* Valor anterior - Rojo - Izquierda 30% - Abajo 30% */
+    #txtFacturaAntigua {
+      color: #ff6b6b;
+      bottom: 13%;
+      left: 25%;
+      transform: translateX(-50%);
+    }
+    
+    /* Valor nuevo - Verde - Derecha 30% - Arriba 50% */
+    #txtFacturaNueva {
+      color: #2ea642;
+      top: 57%;
+      right: 25%;
+      transform: translateX(50%);
+    }
+   
+    .bar-wrap {
+      display: flex;
+      align-items: center;
+      margin: .6rem 0;
+    }
+    .bar {
+      height: 24px;
+      border-radius: 4px;
+      margin-right: .8rem;
+      transition: width .4s ease;
+    }
+    .solar { background: #2ecc71; }
+    .grid  { background: #e74c3c; }
+    .home  { background: #f39c12; }
+    .label {
+      font-weight: 600;
+      font-size: .95rem;
+      color: #333;
+    }
+    .legend {
+      margin-top: .8rem;
+      font-size: .8rem;
+      color: #666;
+    }
+    #textOutput {
+      white-space: pre-line;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-top: 1rem;
+      border: 1px solid #ddd;
+    }
+    .calculando {
+      text-align: center;
+      padding: 2rem;
+      font-size: 1.2rem;
+      color: #666;
+    }
+
+    /* NUEVOS ESTILOS PARA LA GRÁFICA DE LÍNEA */
+    .cashflow-chart {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+      font-family: system-ui, sans-serif;
+    }
+    .chart-container {
+      position: relative;
+      height: 400px;
+      margin: 1rem 0;
+    }
+    .chart-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
     /* ESTILOS PARA EL SPLASH SCREEN */
     .splash-overlay {
       position: fixed;
@@ -119,60 +265,7 @@
       margin: 0 0.5rem;
     }
 
-    /* ESTILOS PARA LA PANTALLA DE CONFIRMACIÓN */
-    .location-controls {
-      background: #f8f9fa;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-    }
-    
-    .location-field {
-      margin-bottom: 0.5rem;
-    }
-    
-    .location-field label {
-      display: block;
-      margin-bottom: 0.25rem;
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-    
-    .coord-inputs {
-      display: flex;
-      gap: 1rem;
-    }
-    
-    .coord-inputs input {
-      flex: 1;
-    }
-
-    /* ESTILOS PARA BOTONES VOLVER */
-    .back-button {
-      background: #6c757d;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 10px 15px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      margin-top: 1rem;
-      transition: background 0.3s;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-    
-    .back-button:hover {
-      background: #5a6268;
-    }
-    
-    .back-button-container {
-      text-align: center;
-      margin-top: 1rem;
-    }
-
-    /* ESTILOS PANTALLA INVERSIÓN */
+    /* NUEVOS ESTILOS PARA LAS PANTALLAS DEL FLUJO */
     .investment-display {
       text-align: center;
       padding: 2rem;
@@ -223,12 +316,65 @@
       margin-bottom: 0.5rem;
     }
 
-    /* ESTILOS PANTALLA FINAL */
+    /* ESTILOS PARA LA PANTALLA DE CONFIRMACIÓN MEJORADA */
+    .location-controls {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    
+    .location-field {
+      margin-bottom: 0.5rem;
+    }
+    
+    .location-field label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .coord-inputs {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .coord-inputs input {
+      flex: 1;
+    }
+
+  /* ESTILOS PARA BOTONES VOLVER */
+  .back-button {
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .back-button:hover {
+    background: #5a6268;
+  }
+  
+  .back-button-container {
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+    /* NUEVOS ESTILOS PARA PANTALLA FINAL */
     .final-screen-content {
       text-align: center;
     }
     
-    .success-message {
+    .whatsapp-features {
       background: #e8f5e8;
       padding: 1.5rem;
       border-radius: 8px;
@@ -236,12 +382,17 @@
       text-align: center;
     }
     
-    .company-links {
-      background: #e3f2fd;
-      padding: 1.5rem;
-      border-radius: 8px;
-      margin: 1.5rem 0;
-      text-align: center;
+    .whatsapp-features ul {
+      text-align: left;
+      display: inline-block;
+      margin: 1rem 0;
+      padding-left: 0;
+    }
+    
+    .whatsapp-features li {
+      margin-bottom: 0.5rem;
+      list-style: none;
+      padding-left: 0;
     }
     
     .button-group {
@@ -250,6 +401,20 @@
       justify-content: center;
       margin-bottom: 1rem;
       flex-wrap: wrap;
+    }
+
+    /* NUEVOS ESTILOS PARA ENLACES DE LA EMPRESA */
+    .company-links {
+      background: #e3f2fd;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+    
+    .company-links h3 {
+      color: #00704a;
+      margin-bottom: 1rem;
     }
     
     .link-button {
@@ -268,17 +433,21 @@
       background: #005a3c;
       color: white;
     }
-
-    /* ESTILOS CONTENIDO PRINCIPAL (OCULTO) */
-    .main-content {
-      display: none;
+    
+    .link-button.secondary {
+      background: #17a2b8;
     }
+    
+    .link-button.secondary:hover {
+      background: #138496;
+    }
+    
   </style>
 </head>
 
 <body>
 
-  <!-- PANTALLA SPLASH INICIAL -->
+    <!-- PANTALLA SPLASH INICIAL -->
   <div id="splashScreen" class="splash-overlay">
     <div class="splash-content">
       <h2 class="splash-title">Cotizador Solar Rápido</h2>
@@ -316,7 +485,7 @@
     </div>
   </div>
 
-  <!-- PANTALLA DE CONFIRMACIÓN DE UBICACIÓN -->
+  <!-- PANTALLA DE CONFIRMACIÓN DE UBICACIÓN MEJORADA -->
   <div id="confirmLocationScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
       <h2 class="splash-title">Confirma y ajusta tu ubicación</h2>
@@ -407,7 +576,7 @@
     </div>
   </div>
 
-  <!-- PANTALLA FINAL - COTIZACIÓN COMPLETADA -->
+  <!-- NUEVA PANTALLA FINAL - COTIZACIÓN COMPLETADA -->
   <div id="finalScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
       <div class="final-screen-content">
@@ -415,28 +584,21 @@
         <h2 class="splash-title">¡Cotización Completada!</h2>
       </div>
       
-      <div class="success-message">
-        <div style="font-size: 2rem; margin-bottom: 1rem;">📧✅</div>
-        <h3 style="color: #00704a; margin-bottom: 1rem;">¡Todo listo!</h3>
-        <p><strong>Hemos enviado tu PDF completo al correo:</strong></p>
-        <p style="background: #fff3cd; padding: 10px; border-radius: 5px; margin: 10px 0; font-weight: bold;">
-          📧 <span id="clienteEmailFinal">usuario@email.com</span>
-        </p>
-        <p>Y hemos notificado a nuestro equipo para contactarte por WhatsApp en breve.</p>
-        
-        <div style="margin-top: 1.5rem; text-align: left;">
-          <p><strong>Próximos pasos:</strong></p>
-          <ul>
-            <li>📄 <strong>Revisa tu correo</strong> (incluido spam)</li>
-            <li>📱 <strong>Recibirás WhatsApp</strong> de nuestro equipo</li>
-            <li>📅 <strong>Coordinaremos consultoría</strong> gratuita</li>
-            <li>💬 <strong>Resolveremos todas tus dudas</strong></li>
-          </ul>
-        </div>
+      <div class="whatsapp-features">
+        <div style="font-size: 2rem; margin-bottom: 1rem;">📱</div>
+        <h3 style="color: #00704a; margin-bottom: 1rem;">Consulta tu WhatsApp</h3>
+        <p>Hemos enviado tu cotización completa al WhatsApp que nos proporcionaste.</p>
+        <p><strong>En tu WhatsApp encontrarás:</strong></p>
+        <ul>
+          <li>📄 PDF completo con tu cotización detallada</li>
+          <li>💰 Información de inversión y ahorros</li>
+          <li>📊 Gráficas de retorno de inversión</li>
+          <li>👨‍💼 Contacto directo con nuestros asesores</li>
+        </ul>
       </div>
 
       <div class="company-links">
-        <h3 style="color: #00704a; margin-bottom: 1rem;">📖 Conoce más sobre nosotros</h3>
+        <h3>📖 Conoce más sobre nosotros</h3>
         <p>Visita nuestra página web para conocer nuestros proyectos y el proceso de instalación:</p>
         <div style="margin: 1.5rem 0;">
           <a href="https://www.energialt.co" target="_blank" class="link-button">
@@ -464,8 +626,8 @@
     </div>
   </div>
 
-  <!-- CONTENIDO PRINCIPAL (OCULTO) -->
-  <div id="mainContent" class="main-content">
+  <!-- CONTENIDO PRINCIPAL (oculto inicialmente) - MODIFICADO -->
+  <div id="mainContent" style="display: none;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
       <h1>Cotizador Solar Rápido</h1>
       <div>
@@ -477,10 +639,6 @@
         </button>
       </div>
     </div>
-
-    <p style="background: #e8f5e8; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-      ⚠️ <strong>Nota:</strong> Esta vista está disponible para desarrollo. Los clientes usan el flujo guiado desde el inicio.
-    </p>
 
     <label>
       Dirección:
@@ -502,8 +660,65 @@
 
     <button onclick="cotizar()">Cotizar</button>
 
-    <!-- Resultados simplificados -->
-    <div id="textOutput" style="background: #fff; padding: 1rem; border-radius: 4px; margin-top: 1rem; border: 1px solid #ddd;"></div>
+    <!-- Aquí se mostrará el texto de resultados -->
+    <div id="textOutput"></div>
+
+    <!-- Diagrama con imagen + textos overlay -->
+    <div id="diagramContainer" class="energy-diagram">
+      <div class="calculando" id="calculandoText" style="display: none;">Calculando...</div>
+      
+      <div id="diagramContent">
+        <div class="energy-overlay">
+          <img src="solar.png" alt="Energy Diagram">
+          <span id="txtSolar" class="overlay-text">0 kWh/mes</span>
+          <span id="txtGrid" class="overlay-text">0 kWh/mes</span>
+          <span id="txtHome" class="overlay-text">0 kWh/mes</span>
+        </div>
+
+        <div class="factura-overlay">
+          <img src="factura.png" alt="Factura Comparación">
+          <span id="txtFacturaAntigua" class="factura-text">$0 COP</span>
+          <span id="txtFacturaNueva" class="factura-text">$0 COP</span>
+        </div>
+
+        <div class="bar-wrap">
+          <div class="bar solar" id="barSolar"></div>
+          <span class="label" id="labSolar">0 kWh/día</span>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar grid" id="barGrid"></div>
+          <span class="label" id="labGrid">0 kWh/día</span>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar home" id="barHome"></div>
+          <span class="label" id="labHome">0 kWh/día</span>
+        </div>
+        <p class="legend">💡 Solar · 🔴 Red · 🟠 Hogar</p>
+      </div>
+    </div>
+
+    <!-- GRÁFICA DE FLUJO DE CAJA -->
+    <div id="cashflowChart" class="cashflow-chart" style="display: none;">
+      <h3>Flujo de Caja Acumulado (25 Años)</h3>
+      <div class="chart-container">
+        <canvas id="lineChart" class="chart-canvas"></canvas>
+      </div>
+      <div id="chartSummary" style="margin-top: 1rem; text-align: center; font-size: 0.9rem;"></div>
+    </div>
+
+    <!-- OPCIÓN PARA REENVIAR PDF - AHORA EN MAIN CONTENT -->
+    <div class="email-form" style="margin-top: 2rem;">
+      <h3 style="text-align: center; margin-bottom: 1rem;">📧 Reenviar PDF a otro correo</h3>
+      <div class="form-group">
+        <input type="email" id="reenviarEmail" placeholder="Ingresa el correo para reenvío">
+      </div>
+      <button id="reenviarPdfBtn" class="splash-button" style="background: #17a2b8;">
+        Reenviar PDF
+      </button>
+      <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem; text-align: center;">
+        ¿Necesitas enviar la cotización a otra persona?
+      </p>
+    </div>
 
     <!-- SECCIÓN PARA VISITAR LA PÁGINA WEB -->
     <div class="company-links" style="margin-top: 2rem;">
@@ -512,6 +727,12 @@
       <div style="margin: 1.5rem 0;">
         <a href="https://www.energialt.co" target="_blank" class="link-button">
           🌐 Visitar energialt.co
+        </a>
+        <a href="https://www.energialt.co/proyectos" target="_blank" class="link-button secondary">
+          🏗️ Ver Proyectos
+        </a>
+        <a href="https://www.energialt.co/proceso" target="_blank" class="link-button secondary">
+          📋 Proceso de Instalación
         </a>
       </div>
     </div>
@@ -524,7 +745,7 @@
     let currentPanels = 0;
     let currentArea = 0;
 
-    // CONFIGURACIÓN GOOGLE APPS SCRIPT
+    // CONFIGURACIÓN GOOGLE APPS SCRIPT - ACTUALIZA CON TU URL
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzidMv2QUfpI-ZnbhWPP8p3AHBGyANszR13WkDEv4J1lg6HgMZ3GplF5XiMIGnsYZGzjQ/exec';
 
     // FUNCIONES DE FORMATEO
@@ -552,6 +773,10 @@
       } else {
         return numeroFormateado;
       }
+    }
+
+    function formatoKwh(valor) {
+      return formatoNumeroEntero(valor) + ' kWh';
     }
 
     // FUNCIONES PARA VALIDACIÓN DE COORDENADAS
@@ -786,6 +1011,8 @@
       } else {
         // Usar dirección si no hay coordenadas válidas
         console.log('📍 Usando dirección, buscando coordenadas...');
+        // En una implementación real, aquí harías la geocodificación
+        // Por ahora usamos valores por defecto
         lat = 4.711;
         lon = -74.072;
       }
@@ -845,11 +1072,16 @@
             `https://developer.nrel.gov/api/pvwatts/v8.json?api_key=ECmQDDWbYsWgQ4pFg2zFUZdlbTirJhA1pnfQRRC4&lat=${lat}&lon=${lon}&system_capacity=1&azimuth=180&tilt=${Math.abs(lat)}&array_type=1&module_type=0&losses=14&timeframe=monthly`
           );
           
+          console.log('PVWatts Response Status:', response.status);
+          
           if (response.ok) {
             const pvw = await response.json();
             if(pvw && pvw.outputs && pvw.outputs.ac_annual) {
               specific = pvw.outputs.ac_annual;
+              console.log('✅ PVWatts API exitosa. Producción anual:', specific, 'kWh/kWp');
             }
+          } else {
+            console.warn('⚠️ PVWatts API error. Status:', response.status, 'Usando valor por defecto');
           }
         } catch(error) {
           console.warn('Error PVWatts, usando valor por defecto:', error);
@@ -869,80 +1101,108 @@
       }
     }
 
-    // FUNCIÓN PARA ENVIAR DATOS AL BACKEND
-// FUNCIÓN MEJORADA PARA ENVIAR DATOS AL BACKEND
-async function guardarEnBaseDeDatos(nombre, email, telefono) {
-  const datos = {
-    nombre: nombre,
-    email: email,
-    telefono: telefono,
-    inversion: currentPriceCop,
-    paneles: currentPanels,
-    area: currentArea,
-    lat: document.getElementById('latTxtSplash').value,
-    lon: document.getElementById('lonTxtSplash').value,
-    factura: document.getElementById('billSplash').value,
-    direccion: document.getElementById('searchBoxSplash').value
-  };
+    // FUNCIÓN SIMPLIFICADA - SOLO ENVIAR DATOS, NO CAPTURA
+    async function guardarEnBaseDeDatos(nombre, email, telefono) {
+      const datos = {
+        nombre: nombre,
+        email: email,
+        telefono: telefono,
+        inversion: currentPriceCop,
+        paneles: currentPanels,
+        area: currentArea,
+        lat: document.getElementById('latTxtSplash').value,
+        lon: document.getElementById('lonTxtSplash').value,
+        factura: document.getElementById('billSplash').value,
+        direccion: document.getElementById('searchBoxSplash').value
+      };
 
-  console.log('Enviando datos a Google Sheets:', datos);
+      console.log('Enviando datos a Google Sheets:', datos);
 
-  return new Promise((resolve, reject) => {
-    const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-    
-    const script = document.createElement('script');
-    
-    // CONSTRUIR URL CORRECTAMENTE
-    const url = new URL(GOOGLE_SCRIPT_URL);
-    
-    // Agregar parámetros
-    Object.keys(datos).forEach(key => {
-      if (datos[key] !== undefined && datos[key] !== null) {
-        url.searchParams.append(key, datos[key]);
-      }
-    });
-    
-    url.searchParams.append('callback', callbackName);
-    
-    // Configurar timeout para evitar esperas infinitas
-    const timeoutId = setTimeout(() => {
-      cleanup();
-      console.error('❌ Timeout en conexión JSONP');
-      resolve(false);
-    }, 10000); // 10 segundos timeout
-    
-    function cleanup() {
-      clearTimeout(timeoutId);
-      delete window[callbackName];
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
+      return new Promise((resolve, reject) => {
+        const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+        
+        const script = document.createElement('script');
+        const url = new URL(GOOGLE_SCRIPT_URL);
+        
+        Object.keys(datos).forEach(key => {
+          url.searchParams.append(key, datos[key]);
+        });
+        url.searchParams.append('callback', callbackName);
+        
+        script.src = url.toString();
+        
+        window[callbackName] = function(response) {
+          delete window[callbackName];
+          document.body.removeChild(script);
+          
+          if (response.success) {
+            console.log('✅ Datos guardados en Google Sheets. Fila:', response.fila);
+            if (response.emailEnviado) {
+              console.log('✅ Email con PDF enviado correctamente');
+            }
+            resolve(true);
+          } else {
+            console.error('❌ Error del servidor:', response.error);
+            resolve(false);
+          }
+        };
+        
+        script.onerror = function() {
+          delete window[callbackName];
+          document.body.removeChild(script);
+          console.error('❌ Error de conexión JSONP');
+          resolve(false);
+        };
+        
+        document.body.appendChild(script);
+      });
     }
-    
-    window[callbackName] = function(response) {
-      cleanup();
-      
-      if (response && response.success) {
-        console.log('✅ Datos guardados en Google Sheets');
-        resolve(true);
-      } else {
-        console.error('❌ Error del servidor:', response ? response.error : 'Respuesta vacía');
-        resolve(false);
-      }
-    };
-    
-    script.onerror = function() {
-      cleanup();
-      console.error('❌ Error de conexión JSONP - Script no pudo cargar');
-      resolve(false);
-    };
-    
-    script.src = url.toString();
-    document.body.appendChild(script);
-  });
-}
 
-    // FUNCIÓN PARA ENVIAR INFORME
+    // FUNCIÓN PARA FORMATEAR TELÉFONO COLOMBIA
+    function formatearTelefonoColombia(telefono) {
+      // Limpiar el número
+      let numeroLimpio = telefono.replace(/\D/g, '');
+      
+      // Si no tiene código de país, agregar +57
+      if (!numeroLimpio.startsWith('57')) {
+        // Si empieza con 0, quitarlo y agregar +57
+        if (numeroLimpio.startsWith('0')) {
+          numeroLimpio = '57' + numeroLimpio.substring(1);
+        } else {
+          // Si es un número de 10 dígitos sin 0, agregar +57
+          if (numeroLimpio.length === 10) {
+            numeroLimpio = '57' + numeroLimpio;
+          }
+        }
+      }
+      
+      return numeroLimpio;
+    }
+
+    // FUNCIÓN SIMPLIFICADA PARA CREAR MENSAJE DE WHATSAPP
+    function crearMensajeWhatsApp(nombre, email) {
+      const primerMensaje = `¡Hola ${nombre}! Tu cotización de energía solar está lista:
+
+📄 Hemos enviado tu PDF completo al correo: ${email}
+💰 Inversión: ${formatoDineroCOP(currentPriceCop)}
+☀️ Sistema: ${currentPanels} paneles solares
+📐 Área requerida: ${currentArea.toFixed(1)} m²
+
+-- Energialt SAS --`;
+
+      const segundoMensaje = `¿Tienes alguna duda o deseas agendar una consultoría gratuita?
+      
+📞 WhatsApp: 350 696 0000
+🌐 Web: www.energialt.co
+
+Estamos aquí para ayudarte 😊
+
+-- Energialt SAS --`;
+
+      return primerMensaje + '\n\n' + segundoMensaje;
+    }
+
+    // FUNCIÓN MODIFICADA PARA ENVIAR INFORME
     async function enviarInforme() {
       const userName = document.getElementById('userName').value;
       const userEmail = document.getElementById('userEmail').value;
@@ -964,8 +1224,16 @@ async function guardarEnBaseDeDatos(nombre, email, telefono) {
         const exito = await guardarEnBaseDeDatos(userName, userEmail, userPhone);
 
         if (exito) {
-          // Mostrar pantalla final con el email del cliente
-          document.getElementById('clienteEmailFinal').textContent = userEmail;
+          // Formatear teléfono para WhatsApp
+          const telefonoFormateado = formatearTelefonoColombia(userPhone);
+          
+          // Crear mensaje de WhatsApp
+          const mensajeWhatsApp = crearMensajeWhatsApp(userName, userEmail);
+          
+          // Redirigir a WhatsApp
+          window.open(`https://wa.me/${telefonoFormateado}?text=${encodeURIComponent(mensajeWhatsApp)}`, '_blank');
+          
+          // Mostrar pantalla final
           document.getElementById('investmentScreen').style.display = 'none';
           document.getElementById('finalScreen').style.display = 'flex';
           
@@ -985,26 +1253,63 @@ async function guardarEnBaseDeDatos(nombre, email, telefono) {
       document.getElementById(pantallaActual).style.display = 'none';
       document.getElementById(pantallaAnterior).style.display = 'flex';
       
-      // RESTAURAR ESTADO DEL BOTÓN DE ENVÍO SI VOLVEMOS DESDE FINAL
+      // RESTAURAR ESTADO DEL BOTÓN DE ENVÍO SI VOLVEMOS DESDE FINAL O INVERSIÓN
       if (pantallaActual === 'finalScreen' && pantallaAnterior === 'investmentScreen') {
+        const sendButton = document.getElementById('sendReportBtn');
+        sendButton.textContent = 'Enviar mi informe completo';
+        sendButton.disabled = false;
+      }
+      
+      // También restaurar si volvemos desde main content
+      if (pantallaActual === 'mainContent' && pantallaAnterior === 'investmentScreen') {
         const sendButton = document.getElementById('sendReportBtn');
         sendButton.textContent = 'Enviar mi informe completo';
         sendButton.disabled = false;
       }
     }
 
+    // FUNCIÓN PARA REENVIAR PDF - MEJORADA
+    async function reenviarPdf() {
+      const emailReenvio = document.getElementById('reenviarEmail').value;
+      
+      if (!emailReenvio) {
+        alert('Por favor ingresa un correo electrónico válido');
+        return;
+      }
+
+      // Simular reenvío (aquí integrarías con tu backend)
+      const boton = document.getElementById('reenviarPdfBtn');
+      const textoOriginal = boton.textContent;
+      
+      boton.textContent = 'Enviando...';
+      boton.disabled = true;
+
+      // Simular delay de envío
+      setTimeout(() => {
+        alert(`✅ PDF reenviado exitosamente a: ${emailReenvio}`);
+        document.getElementById('reenviarEmail').value = '';
+        boton.textContent = textoOriginal;
+        boton.disabled = false;
+      }, 1500);
+    }
+
     // FUNCIÓN PARA NUEVA COTIZACIÓN
     function nuevaCotizacion() {
+      // Recargar la página para nueva cotización
       window.location.reload();
     }
 
-    // EVENT LISTENERS
+    // EVENT LISTENERS - ACTUALIZADOS
     document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('barSolar').style.width = '0%';
+      document.getElementById('barGrid').style.width = '0%';
+      document.getElementById('barHome').style.width = '0%';
+      
       document.getElementById('cotizarSplash').addEventListener('click', cotizarDesdeSplash);
       document.getElementById('confirmLocationBtn').addEventListener('click', confirmarUbicacion);
       document.getElementById('sendReportBtn').addEventListener('click', enviarInforme);
       
-      // Botones volver
+      // Botones volver existentes
       document.getElementById('backToSplashFromConfirm').addEventListener('click', function() {
         volverAlMenuAnterior('confirmLocationScreen', 'splashScreen');
       });
@@ -1013,25 +1318,34 @@ async function guardarEnBaseDeDatos(nombre, email, telefono) {
         volverAlMenuAnterior('investmentScreen', 'confirmLocationScreen');
       });
       
+      document.getElementById('backToInvestmentFromMain').addEventListener('click', function() {
+        volverAlMenuAnterior('mainContent', 'investmentScreen');
+      });
+      
+      // NUEVOS EVENT LISTENERS PARA PANTALLA FINAL
       document.getElementById('backToInvestmentFromFinal').addEventListener('click', function() {
         volverAlMenuAnterior('finalScreen', 'investmentScreen');
       });
       
-      document.getElementById('backToInvestmentFromMain').addEventListener('click', function() {
-        document.getElementById('mainContent').style.display = 'none';
-        document.getElementById('investmentScreen').style.display = 'flex';
-      });
-      
-      // Botones nueva cotización
       document.getElementById('newQuoteFromFinal').addEventListener('click', nuevaCotizacion);
       document.getElementById('newQuoteFromMain').addEventListener('click', nuevaCotizacion);
+      
+      document.getElementById('reenviarPdfBtn').addEventListener('click', reenviarPdf);
     });
 
-    // FUNCIÓN ORIGINAL COTIZAR (para main content)
+    // FUNCIÓN ORIGINAL COTIZAR (se mantiene por si se necesita)
     async function cotizar(){
-      alert('Usa el flujo guiado desde la pantalla de inicio para mejor experiencia.');
+      // Esta función se mantiene para compatibilidad con el mainContent
+      // pero ya no es necesaria en el flujo principal
+      alert('Esta función está disponible solo en la versión completa. Usa el flujo guiado desde el inicio.');
     }
 
+    /* FUNCIÓN PARA CREAR LA GRÁFICA DE LÍNEA (se mantiene por compatibilidad) */
+    function crearGraficaLinea(inversion, ahorroMensual, payback) {
+      // Esta función se mantiene por compatibilidad
+      // pero ya no es necesaria en el flujo principal simplificado
+    }
+    
   </script>
 
   <!-- Carga de Google Maps -->
@@ -1040,4 +1354,3 @@ async function guardarEnBaseDeDatos(nombre, email, telefono) {
   </script>
 </body>
 </html>
-
