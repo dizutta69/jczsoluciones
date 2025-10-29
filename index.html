@@ -1257,7 +1257,8 @@ async function enviarCorreoConEnlaceWhatsApp(nombre, email, telefono, mensaje) {
     email: email,
     telefono: telefono,
     whatsappLink: whatsappLink,
-    mensaje: mensaje
+    mensaje: mensaje,
+    action: 'enviar_correo_whatsapp' // Este parámetro es crucial
   };
 
   return new Promise((resolve, reject) => {
@@ -1267,9 +1268,10 @@ async function enviarCorreoConEnlaceWhatsApp(nombre, email, telefono, mensaje) {
     const url = new URL(GOOGLE_SCRIPT_URL);
     
     // Agregar parámetros específicos para el correo de WhatsApp
-    url.searchParams.append('action', 'enviar_correo_whatsapp');
     Object.keys(datosCorreo).forEach(key => {
-      url.searchParams.append(key, datosCorreo[key]);
+      if (datosCorreo[key]) { // Solo agregar si tiene valor
+        url.searchParams.append(key, datosCorreo[key]);
+      }
     });
     url.searchParams.append('callback', callbackName);
     
@@ -1406,4 +1408,5 @@ async function enviarCorreoConEnlaceWhatsApp(nombre, email, telefono, mensaje) {
   </script>
 </body>
 </html>
+
 
