@@ -870,58 +870,77 @@
     }
 
     // FUNCIÓN PARA ENVIAR DATOS AL BACKEND
-    async function guardarEnBaseDeDatos(nombre, email, telefono) {
-      const datos = {
-        nombre: nombre,
-        email: email,
-        telefono: telefono,
-        inversion: currentPriceCop,
-        paneles: currentPanels,
-        area: currentArea,
-        lat: document.getElementById('latTxtSplash').value,
-        lon: document.getElementById('lonTxtSplash').value,
-        factura: document.getElementById('billSplash').value,
-        direccion: document.getElementById('searchBoxSplash').value
-      };
+// FUNCIÓN MEJORADA PARA ENVIAR DATOS AL BACKEND
+async function guardarEnBaseDeDatos(nombre, email, telefono) {
+  const datos = {
+    nombre: nombre,
+    email: email,
+    telefono: telefono,
+    inversion: currentPriceCop,
+    paneles: currentPanels,
+    area: currentArea,
+    lat: document.getElementById('latTxtSplash').value,
+    lon: document.getElementById('lonTxtSplash').value,
+    factura: document.getElementById('billSplash').value,
+    direccion: document.getElementById('searchBoxSplash').value
+  };
 
-      console.log('Enviando datos a Google Sheets:', datos);
+  console.log('Enviando datos a Google Sheets:', datos);
 
-      return new Promise((resolve, reject) => {
-        const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-        
-        const script = document.createElement('script');
-        const url = new URL(GOOGLE_SCRIPT_URL);
-        
-        Object.keys(datos).forEach(key => {
-          url.searchParams.append(key, datos[key]);
-        });
-        url.searchParams.append('callback', callbackName);
-        
-        script.src = url.toString();
-        
-        window[callbackName] = function(response) {
-          delete window[callbackName];
-          document.body.removeChild(script);
-          
-          if (response.success) {
-            console.log('✅ Datos guardados en Google Sheets');
-            resolve(true);
-          } else {
-            console.error('❌ Error del servidor:', response.error);
-            resolve(false);
-          }
-        };
-        
-        script.onerror = function() {
-          delete window[callbackName];
-          document.body.removeChild(script);
-          console.error('❌ Error de conexión JSONP');
-          resolve(false);
-        };
-        
-        document.body.appendChild(script);
-      });
+  return new Promise((resolve, reject) => {
+    const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+    
+    const script = document.createElement('script');
+    
+    // CONSTRUIR URL CORRECTAMENTE
+    const url = new URL(GOOGLE_SCRIPT_URL);
+    
+    // Agregar parámetros
+    Object.keys(datos).forEach(key => {
+      if (datos[key] !== undefined && datos[key] !== null) {
+        url.searchParams.append(key, datos[key]);
+      }
+    });
+    
+    url.searchParams.append('callback', callbackName);
+    
+    // Configurar timeout para evitar esperas infinitas
+    const timeoutId = setTimeout(() => {
+      cleanup();
+      console.error('❌ Timeout en conexión JSONP');
+      resolve(false);
+    }, 10000); // 10 segundos timeout
+    
+    function cleanup() {
+      clearTimeout(timeoutId);
+      delete window[callbackName];
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
     }
+    
+    window[callbackName] = function(response) {
+      cleanup();
+      
+      if (response && response.success) {
+        console.log('✅ Datos guardados en Google Sheets');
+        resolve(true);
+      } else {
+        console.error('❌ Error del servidor:', response ? response.error : 'Respuesta vacía');
+        resolve(false);
+      }
+    };
+    
+    script.onerror = function() {
+      cleanup();
+      console.error('❌ Error de conexión JSONP - Script no pudo cargar');
+      resolve(false);
+    };
+    
+    script.src = url.toString();
+    document.body.appendChild(script);
+  });
+}
 
     // FUNCIÓN PARA ENVIAR INFORME
     async function enviarInforme() {
@@ -1021,3 +1040,4 @@
   </script>
 </body>
 </html>
+
