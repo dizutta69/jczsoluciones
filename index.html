@@ -1060,6 +1060,7 @@
       const PANEL_W = 450;
       const TARGET = 0.7;
       const AREA_POR_PANEL = 2.2;
+      const COSTO_FIJO_COP = 2000000;
 
       try {
         const kwhMonth = bill / PRICE_KWH;
@@ -1092,7 +1093,7 @@
         const kwpReal = currentPanels * (PANEL_W/1000);
 
         const priceUsd = kwpReal * 1000 * USD_W_INSTALLED;
-        currentPriceCop = priceUsd * USD_COP;
+        currentPriceCop = priceUsd * USD_COP + COSTO_FIJO_COP;
         currentArea = currentPanels * AREA_POR_PANEL;
 
       } catch (error) {
@@ -1408,6 +1409,7 @@ async function enviarCorreoConEnlaceWhatsApp(nombre, email, telefono, mensaje) {
   </script>
 </body>
 </html>
+
 
 
 
