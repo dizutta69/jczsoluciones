@@ -441,7 +441,64 @@
     .link-button.secondary:hover {
       background: #138496;
     }
+
+
+        .logo-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #00704a;
+    }
     
+    .logo-img {
+      max-height: 60px;
+      width: auto;
+    }
+    
+    .investment-details {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+    
+    .investment-item {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+    
+    .retorno-destacado {
+      background: #e8f5e8;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      border-left: 4px solid #28a745;
+      text-align: center;
+    }
+    
+    .retorno-titulo {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #28a745;
+      margin-bottom: 0.5rem;
+    }
+    
+    .retorno-valor {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #00704a;
+    }
+    
+    .investment-amount {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #00704a;
+      margin: 1rem 0;
+      background: #e8f5e8;
+      padding: 1rem;
+      border-radius: 8px;
+    }
   </style>
 </head>
 
@@ -450,6 +507,9 @@
     <!-- PANTALLA SPLASH INICIAL -->
   <div id="splashScreen" class="splash-overlay">
     <div class="splash-content">
+      <!-- LOGO EN HEADER -->
+      <div class="logo-header">
+        <img src="logo.png" alt="Energialt SAS" class="logo-img" onerror="this.style.display='none'">
       <h2 class="splash-title">Cotizador Solar Rápido</h2>
       
       <div class="splash-instructions">
@@ -488,6 +548,9 @@
   <!-- PANTALLA DE CONFIRMACIÓN DE UBICACIÓN MEJORADA -->
   <div id="confirmLocationScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
+        <!-- LOGO EN HEADER -->
+      <div class="logo-header">
+        <img src="logo.png" alt="Energialt SAS" class="logo-img" onerror="this.style.display='none'">
       <h2 class="splash-title">Confirma y ajusta tu ubicación</h2>
       
       <div class="location-controls">
@@ -528,10 +591,24 @@
   <!-- PANTALLA DE INVERSIÓN Y FORMULARIO -->
   <div id="investmentScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
-      <h2 class="splash-title">¡Tu Inversión en Energía Solar!</h2>
+      <!-- LOGO EN HEADER -->
+      <div class="logo-header">
+        <img src="logo.png" alt="Energialt SAS" class="logo-img" onerror="this.style.display='none'">
+        <h2 class="splash-title">¡Tu Inversión en Energía Solar!</h2>
       
-      <div class="investment-display">
-        <div class="investment-amount" id="investmentAmount">$0</div>
+<div class="investment-details">
+        <div class="investment-item">
+          <strong>Producción del sistema @25 años:</strong>
+          <div id="produccion25anios">$0 COP</div>
+        </div>
+        
+        <div class="retorno-destacado">
+          <div class="retorno-titulo">¡Recuperas tu inversión en:</div>
+          <div class="retorno-valor" id="retornoInversion">0 años 0 meses</div>
+        </div>
+        
+        <div class="investment-item">
+          <strong>Tu inversión en Energía Solar:</strong>
         <p>Inversión aproximada para tu sistema solar</p>
       </div>
 
@@ -579,6 +656,8 @@
   <!-- NUEVA PANTALLA FINAL - COTIZACIÓN COMPLETADA -->
   <div id="finalScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
+    <div class="logo-header" style="text-align: center; margin-bottom: 2rem;">
+      <img src="logo.png" alt="Energialt SAS" class="logo-img" onerror="this.style.display='none'">
       <div class="final-screen-content">
         <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
         <h2 class="splash-title">¡Cotización Completada!</h2>
@@ -1044,13 +1123,32 @@
 
       // Calcular cotización
       calcularCotizacion(lat, lon, bill).then(() => {
-        // Mostrar pantalla de inversión
+        // MOSTRAR LOS NUEVOS DATOS EN LA PANTALLA
+        if (window.cotizacionData) {
+          const data = window.cotizacionData;
+          
+          document.getElementById('investmentAmount').textContent = formatoDineroCOP(data.inversion);
+          document.getElementById('produccion25anios').textContent = formatoDineroCOP(data.produccion25anios);
+          
+          let retornoTexto = '';
+          if (data.retornoAnios > 0) {
+            retornoTexto += data.retornoAnios + ' año' + (data.retornoAnios !== 1 ? 's' : '');
+          }
+          if (data.retornoMeses > 0) {
+            if (data.retornoAnios > 0) retornoTexto += ' ';
+            retornoTexto += data.retornoMeses + ' mes' + (data.retornoMeses !== 1 ? 'es' : '');
+          }
+          if (data.retornoAnios === 0 && data.retornoMeses === 0) {
+            retornoTexto = 'Menos de 1 mes';
+          }
+          
+          document.getElementById('retornoInversion').textContent = retornoTexto;
+        }
+        
         document.getElementById('confirmLocationScreen').style.display = 'none';
         document.getElementById('investmentScreen').style.display = 'flex';
-        
-        // Mostrar valor de inversión
-        document.getElementById('investmentAmount').textContent = formatoDineroCOP(currentPriceCop);
       });
+
     }
 
     async function calcularCotizacion(lat, lon, bill) {
@@ -1060,7 +1158,7 @@
       const PANEL_W = 450;
       const TARGET = 0.7;
       const AREA_POR_PANEL = 2.2;
-      const COSTO_FIJO_COP = 2000000;
+      const COSTO_FIJO_COP = 3000000;
 
       try {
         const kwhMonth = bill / PRICE_KWH;
@@ -1095,7 +1193,30 @@
         const priceUsd = kwpReal * 1000 * USD_W_INSTALLED;
         currentPriceCop = priceUsd * USD_COP + COSTO_FIJO_COP;
         currentArea = currentPanels * AREA_POR_PANEL;
+        // CALCULAR NUEVOS DATOS PARA MOSTRAR
+        const ahorroMensual = bill * TARGET;
+        const ahorroAnual = ahorroMensual * 12;
+        const paybackAnios = currentPriceCop / ahorroAnual;
+        
+        // Producción a 25 años
+        const produccionKwh25anios = kwh70 * 12 * 25;
+        const valorProduccionCOP = produccionKwh25anios * PRICE_KWH;
+        
+        // Calcular años y meses para el retorno
+        const añosRetorno = Math.floor(paybackAnios);
+        const mesesRetorno = Math.round((paybackAnios - añosRetorno) * 12);
+        
+        // GUARDAR ESTOS DATOS PARA USAR EN LA PANTALLA
+        window.cotizacionData = {
+          produccion25anios: valorProduccionCOP,
+          retornoAnios: añosRetorno,
+          retornoMeses: mesesRetorno,
+          inversion: currentPriceCop
+        };
 
+        console.log('📊 Datos calculados:', window.cotizacionData);
+
+        
       } catch (error) {
         console.error('Error en cotización:', error);
         alert('Error en el cálculo. Verifica los datos.');
@@ -1409,6 +1530,7 @@ async function enviarCorreoConEnlaceWhatsApp(nombre, email, telefono, mensaje) {
   </script>
 </body>
 </html>
+
 
 
 
