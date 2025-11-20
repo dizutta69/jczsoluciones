@@ -344,30 +344,30 @@
       flex: 1;
     }
 
-  /* ESTILOS PARA BOTONES VOLVER */
-  .back-button {
-    background: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 15px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    margin-top: 1rem;
-    transition: background 0.3s;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-  }
-  
-  .back-button:hover {
-    background: #5a6268;
-  }
-  
-  .back-button-container {
-    text-align: center;
-    margin-top: 1rem;
-  }
+    /* ESTILOS PARA BOTONES VOLVER */
+    .back-button {
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 15px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: background 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .back-button:hover {
+      background: #5a6268;
+    }
+    
+    .back-button-container {
+      text-align: center;
+      margin-top: 1rem;
+    }
 
     /* NUEVOS ESTILOS PARA PANTALLA FINAL */
     .final-screen-content {
@@ -442,8 +442,7 @@
       background: #138496;
     }
 
-
-        .logo-header {
+    .logo-header {
       text-align: center;
       margin-bottom: 1.5rem;
       padding-bottom: 1rem;
@@ -504,13 +503,14 @@
 
 <body>
 
-    <!-- PANTALLA SPLASH INICIAL -->
+  <!-- PANTALLA SPLASH INICIAL -->
   <div id="splashScreen" class="splash-overlay">
     <div class="splash-content">
       <!-- LOGO EN HEADER -->
       <div class="logo-header">
         <img src="logo.png" alt="Energialt SAS" class="logo-img" onerror="this.style.display='none'">
-      <h2 class="splash-title">Cotizador Solar Rápido</h2>
+        <h2 class="splash-title">Cotizador Solar Rápido</h2>
+      </div>
       
       <div class="splash-instructions">
         <p style="text-align: center; margin-bottom: 1.5rem;">Sigue estos pasos para obtener tu cotización de energía solar:</p>
@@ -548,10 +548,11 @@
   <!-- PANTALLA DE CONFIRMACIÓN DE UBICACIÓN MEJORADA -->
   <div id="confirmLocationScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
-        <!-- LOGO EN HEADER -->
+      <!-- LOGO EN HEADER -->
       <div class="logo-header">
         <img src="logo.png" alt="Energialt SAS" class="logo-img" onerror="this.style.display='none'">
-      <h2 class="splash-title">Confirma y ajusta tu ubicación</h2>
+        <h2 class="splash-title">Confirma y ajusta tu ubicación</h2>
+      </div>
       
       <div class="location-controls">
         <div class="location-field">
@@ -595,8 +596,9 @@
       <div class="logo-header">
         <img src="logo.png" alt="Energialt SAS" class="logo-img" onerror="this.style.display='none'">
         <h2 class="splash-title">¡Tu Inversión en Energía Solar!</h2>
+      </div>
       
-<div class="investment-details">
+      <div class="investment-details">
         <div class="investment-item">
           <strong>Producción del sistema @25 años:</strong>
           <div id="produccion25anios">$0 COP</div>
@@ -609,7 +611,8 @@
         
         <div class="investment-item">
           <strong>Tu inversión en Energía Solar:</strong>
-        <p>Inversión aproximada para tu sistema solar</p>
+          <div class="investment-amount" id="investmentAmount">$0 COP</div>
+        </div>
       </div>
 
       <div class="email-form">
@@ -656,25 +659,27 @@
   <!-- NUEVA PANTALLA FINAL - COTIZACIÓN COMPLETADA -->
   <div id="finalScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
-    <div class="logo-header" style="text-align: center; margin-bottom: 2rem;">
-      <img src="logo.png" alt="Energialt SAS" class="logo-img" onerror="this.style.display='none'">
+      <div class="logo-header" style="text-align: center; margin-bottom: 2rem;">
+        <img src="logo.png" alt="Energialt SAS" class="logo-img" onerror="this.style.display='none'">
+      </div>
+      
       <div class="final-screen-content">
         <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
         <h2 class="splash-title">¡Cotización Completada!</h2>
       </div>
       
-<div class="whatsapp-features">
-  <div style="font-size: 2rem; margin-bottom: 1rem;">📧</div>
-  <h3 style="color: #00704a; margin-bottom: 1rem;">¡Solicitud Completada!</h3>
-  <p>Hemos enviado tu información a nuestro equipo de ventas.</p>
-  <p><strong>Próximos pasos:</strong></p>
-  <ul>
-    <li>📧 Nuestro equipo te contactará por WhatsApp pronto</li>
-    <li>📄 Recibirás tu cotización completa por correo</li>
-    <li>💰 Información de inversión y ahorros</li>
-    <li>📊 Gráficas de retorno de inversión</li>
-  </ul>
-</div>
+      <div class="whatsapp-features">
+        <div style="font-size: 2rem; margin-bottom: 1rem;">📧</div>
+        <h3 style="color: #00704a; margin-bottom: 1rem;">¡Solicitud Completada!</h3>
+        <p>Hemos enviado tu información a nuestro equipo de ventas.</p>
+        <p><strong>Próximos pasos:</strong></p>
+        <ul>
+          <li>📧 Nuestro equipo te contactará por WhatsApp pronto</li>
+          <li>📄 Recibirás tu cotización completa por correo</li>
+          <li>💰 Información de inversión y ahorros</li>
+          <li>📊 Gráficas de retorno de inversión</li>
+        </ul>
+      </div>
 
       <div class="company-links">
         <h3>📖 Conoce más sobre nosotros</h3>
@@ -1325,104 +1330,103 @@ Estamos aquí para ayudarte 😊
     }
 
     // FUNCIÓN MODIFICADA PARA ENVIAR INFORME
-async function enviarInforme() {
-  const userName = document.getElementById('userName').value;
-  const userEmail = document.getElementById('userEmail').value;
-  const userPhone = document.getElementById('userPhone').value;
+    async function enviarInforme() {
+      const userName = document.getElementById('userName').value;
+      const userEmail = document.getElementById('userEmail').value;
+      const userPhone = document.getElementById('userPhone').value;
 
-  if (!userName || !userEmail || !userPhone) {
-    alert('Por favor completa todos los campos');
-    return;
-  }
+      if (!userName || !userEmail || !userPhone) {
+        alert('Por favor completa todos los campos');
+        return;
+      }
 
-  // Guardar estado original del botón
-  const botonOriginal = document.getElementById('sendReportBtn');
-  const textoOriginal = botonOriginal.textContent;
-  
-  botonOriginal.textContent = 'Enviando...';
-  botonOriginal.disabled = true;
+      // Guardar estado original del botón
+      const botonOriginal = document.getElementById('sendReportBtn');
+      const textoOriginal = botonOriginal.textContent;
+      
+      botonOriginal.textContent = 'Enviando...';
+      botonOriginal.disabled = true;
 
-  try {
-    const exito = await guardarEnBaseDeDatos(userName, userEmail, userPhone);
+      try {
+        const exito = await guardarEnBaseDeDatos(userName, userEmail, userPhone);
 
-    if (exito) {
-      // Formatear teléfono para WhatsApp
-      const telefonoFormateado = formatearTelefonoColombia(userPhone);
-      
-      // Crear mensaje de WhatsApp
-      const mensajeWhatsApp = crearMensajeWhatsApp(userName, userEmail);
-      
-      // En lugar de abrir WhatsApp, enviar correo con el enlace
-      await enviarCorreoConEnlaceWhatsApp(userName, userEmail, telefonoFormateado, mensajeWhatsApp);
-      
-      // Mostrar pantalla final
-      document.getElementById('investmentScreen').style.display = 'none';
-      document.getElementById('finalScreen').style.display = 'flex';
-      
-    } else {
-      throw new Error('Error al guardar datos');
+        if (exito) {
+          // Formatear teléfono para WhatsApp
+          const telefonoFormateado = formatearTelefonoColombia(userPhone);
+          
+          // Crear mensaje de WhatsApp
+          const mensajeWhatsApp = crearMensajeWhatsApp(userName, userEmail);
+          
+          // En lugar de abrir WhatsApp, enviar correo con el enlace
+          await enviarCorreoConEnlaceWhatsApp(userName, userEmail, telefonoFormateado, mensajeWhatsApp);
+          
+          // Mostrar pantalla final
+          document.getElementById('investmentScreen').style.display = 'none';
+          document.getElementById('finalScreen').style.display = 'flex';
+          
+        } else {
+          throw new Error('Error al guardar datos');
+        }
+      } catch (error) {
+        alert('Error al guardar los datos. Por favor intenta nuevamente.');
+        // RESTAURAR ESTADO ORIGINAL DEL BOTÓN
+        botonOriginal.textContent = textoOriginal;
+        botonOriginal.disabled = false;
+      }
     }
-  } catch (error) {
-    alert('Error al guardar los datos. Por favor intenta nuevamente.');
-    // RESTAURAR ESTADO ORIGINAL DEL BOTÓN
-    botonOriginal.textContent = textoOriginal;
-    botonOriginal.disabled = false;
-  }
-}
 
-// NUEVA FUNCIÓN PARA ENVIAR CORREO CON ENLACE DE WHATSAPP
-async function enviarCorreoConEnlaceWhatsApp(nombre, email, telefono, mensaje) {
-  const whatsappLink = `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`;
-  
-  const datosCorreo = {
-    nombre: nombre,
-    email: email,
-    telefono: telefono,
-    whatsappLink: whatsappLink,
-    mensaje: mensaje,
-    action: 'enviar_correo_whatsapp' // Este parámetro es crucial
-  };
-
-  return new Promise((resolve, reject) => {
-    const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-    
-    const script = document.createElement('script');
-    const url = new URL(GOOGLE_SCRIPT_URL);
-    
-    // Agregar parámetros específicos para el correo de WhatsApp
-    Object.keys(datosCorreo).forEach(key => {
-      if (datosCorreo[key]) { // Solo agregar si tiene valor
-        url.searchParams.append(key, datosCorreo[key]);
-      }
-    });
-    url.searchParams.append('callback', callbackName);
-    
-    script.src = url.toString();
-    
-    window[callbackName] = function(response) {
-      delete window[callbackName];
-      document.body.removeChild(script);
+    // NUEVA FUNCIÓN PARA ENVIAR CORREO CON ENLACE DE WHATSAPP
+    async function enviarCorreoConEnlaceWhatsApp(nombre, email, telefono, mensaje) {
+      const whatsappLink = `https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`;
       
-      if (response.success) {
-        console.log('✅ Correo con enlace de WhatsApp enviado a energialt.info@gmail.com');
-        resolve(true);
-      } else {
-        console.error('❌ Error enviando correo:', response.error);
-        resolve(false);
-      }
-    };
-    
-    script.onerror = function() {
-      delete window[callbackName];
-      document.body.removeChild(script);
-      console.error('❌ Error de conexión JSONP para correo');
-      resolve(false);
-    };
-    
-    document.body.appendChild(script);
-  });
-}
+      const datosCorreo = {
+        nombre: nombre,
+        email: email,
+        telefono: telefono,
+        whatsappLink: whatsappLink,
+        mensaje: mensaje,
+        action: 'enviar_correo_whatsapp' // Este parámetro es crucial
+      };
 
+      return new Promise((resolve, reject) => {
+        const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+        
+        const script = document.createElement('script');
+        const url = new URL(GOOGLE_SCRIPT_URL);
+        
+        // Agregar parámetros específicos para el correo de WhatsApp
+        Object.keys(datosCorreo).forEach(key => {
+          if (datosCorreo[key]) { // Solo agregar si tiene valor
+            url.searchParams.append(key, datosCorreo[key]);
+          }
+        });
+        url.searchParams.append('callback', callbackName);
+        
+        script.src = url.toString();
+        
+        window[callbackName] = function(response) {
+          delete window[callbackName];
+          document.body.removeChild(script);
+          
+          if (response.success) {
+            console.log('✅ Correo con enlace de WhatsApp enviado a energialt.info@gmail.com');
+            resolve(true);
+          } else {
+            console.error('❌ Error enviando correo:', response.error);
+            resolve(false);
+          }
+        };
+        
+        script.onerror = function() {
+          delete window[callbackName];
+          document.body.removeChild(script);
+          console.error('❌ Error de conexión JSONP para correo');
+          resolve(false);
+        };
+        
+        document.body.appendChild(script);
+      });
+    }
 
     // FUNCIÓN MEJORADA PARA VOLVER AL MENÚ ANTERIOR
     function volverAlMenuAnterior(pantallaActual, pantallaAnterior) {
@@ -1530,8 +1534,3 @@ async function enviarCorreoConEnlaceWhatsApp(nombre, email, telefono, mensaje) {
   </script>
 </body>
 </html>
-
-
-
-
-
