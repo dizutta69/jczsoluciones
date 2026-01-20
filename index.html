@@ -5,139 +5,11 @@
   <title>Financiación Solar – Colombia (Google Maps)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <style>
-    /* ESTILOS BASE (iguales al original) */
+    /* ESTILOS BASE (iguales) */
     body{font-family:system-ui;margin:0;padding:1rem;background:#f7f7f7}
     #map, #confirmMap{height:55vh;border-radius:8px;margin:.5rem 0}
     label,input,button{font-size:1rem;padding:.4rem .6rem;margin:.2rem 0}
-    #searchBox, #searchBoxSplash, #confirmAddress{width:60%}
     button{cursor:pointer;background:#00704a;color:#fff;border:none;border-radius:4px}
-    pre{background:#fff;padding:1rem;border-radius:4px;overflow:auto}
-    .energy-diagram {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 1rem;
-      font-family: system-ui, sans-serif;
-      text-align: center;
-      margin-top: 1rem;
-    }
-    
-    /* OVERLAY TEXTS (igual que original) */
-    .energy-overlay {
-      position: relative;
-      display: inline-block;
-      margin: 1rem auto;
-    }
-    .energy-overlay img {
-      max-width: 100%;
-      height: auto;
-      display: block;
-    }
-    .overlay-text {
-      position: absolute;
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: #fff;
-      text-shadow: 0 0 5px #000;
-      padding: 3px 8px;
-      border-radius: 4px;
-      background: rgba(0,0,0,.45);
-      text-align: center;
-      min-width: 120px;
-    }
-
-    #txtSolar { 
-      bottom: 10%;
-      left: 5%; 
-      transform: translateX(0);
-    }
-    #txtGrid  { 
-      bottom: 10%;
-      right: 5%; 
-      transform: translateX(0);
-    }
-    #txtHome  { 
-      top: 10%;
-      left: 50%; 
-      transform: translateX(-50%);
-    }
-
-    /* ESTILOS PARA LA IMAGEN FACTURA (igual que original) */
-    .factura-overlay {
-      position: relative;
-      display: inline-block;
-      margin: 1rem auto;
-    }
-    .factura-overlay img {
-      max-width: 100%;
-      height: auto;
-      display: block;
-    }
-    .factura-text {
-      position: absolute;
-      font-weight: 700;
-      font-size: 1.0rem;
-      padding: 5px 10px;
-      border-radius: 4px;
-      background: transparent;
-      text-align: center;
-      min-width: 140px;
-    }
-    
-    #txtFacturaAntigua {
-      color: #ff6b6b;
-      bottom: 13%;
-      left: 25%;
-      transform: translateX(-50%);
-    }
-    
-    #txtFacturaNueva {
-      color: #2ea642;
-      top: 57%;
-      right: 25%;
-      transform: translateX(50%);
-    }
-   
-    .bar-wrap {
-      display: flex;
-      align-items: center;
-      margin: .6rem 0;
-    }
-    .bar {
-      height: 24px;
-      border-radius: 4px;
-      margin-right: .8rem;
-      transition: width .4s ease;
-    }
-    .solar { background: #2ecc71; }
-    .grid  { background: #e74c3c; }
-    .home  { background: #f39c12; }
-    .label {
-      font-weight: 600;
-      font-size: .95rem;
-      color: #333;
-    }
-    .legend {
-      margin-top: .8rem;
-      font-size: .8rem;
-      color: #666;
-    }
-    #textOutput {
-      white-space: pre-line;
-      background: #fff;
-      padding: 1rem;
-      border-radius: 4px;
-      margin-top: 1rem;
-      border: 1px solid #ddd;
-    }
-    .calculando {
-      text-align: center;
-      padding: 2rem;
-      font-size: 1.2rem;
-      color: #666;
-    }
-
-    /* ESTILOS PARA EL SPLASH SCREEN (igual que original) */
     .splash-overlay {
       position: fixed;
       top: 0;
@@ -205,43 +77,38 @@
       background: #005a3c;
     }
 
-    /* ESTILOS PARA LOS CAMPOS DEL SPLASH SCREEN (igual que original) */
+    /* MEJORAS PARA INPUTS */
     .splash-step input {
       width: 100%;
       margin-top: 0.5rem;
-      padding: 0.5rem;
+      padding: 0.75rem;
       border: 1px solid #ddd;
       border-radius: 4px;
       font-size: 1rem;
-    }
-    
-    .splash-step button {
-      margin-top: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: #00704a;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.9rem;
-    }
-    
-    .splash-step button:hover {
-      background: #005a3c;
+      box-sizing: border-box;
     }
     
     .splash-coords {
       margin-top: 0.5rem;
       font-size: 0.9rem;
       color: #666;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .splash-coords label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
     
     .splash-coords input {
       width: 120px;
-      padding: 0.3rem;
+      padding: 0.5rem;
       border: 1px solid #eee;
       background: #f9f9f9;
-      margin: 0 0.5rem;
+      border-radius: 4px;
     }
 
     /* NUEVOS ESTILOS PARA FINANCIACIÓN */
@@ -263,7 +130,7 @@
       border: 2px solid #00704a;
     }
     
-    /* Estilos mejorados para el slider */
+    /* Estilos para el slider */
     .slider-wrapper {
       position: relative;
       height: 40px;
@@ -307,7 +174,7 @@
       margin-top: 0.5rem;
     }
     
-    /* Resultados de financiación */
+    /* Resultados de financiación simplificados */
     .finance-results {
       background: #f8f9fa;
       padding: 1.5rem;
@@ -350,7 +217,19 @@
       margin-top: 0.25rem;
     }
     
-    /* Timeline chart */
+    /* Línea de financiamiento */
+    .finance-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem;
+      background: white;
+      border-radius: 8px;
+      margin: 0.5rem 0;
+      border-left: 4px solid #00704a;
+    }
+    
+    /* Timeline simplificado */
     .timeline-container {
       background: white;
       padding: 1.5rem;
@@ -378,25 +257,6 @@
       transition: width 0.5s ease;
     }
     
-    .timeline-marker {
-      position: absolute;
-      top: -5px;
-      width: 2px;
-      height: 40px;
-      background: #00704a;
-      transform: translateX(-50%);
-    }
-    
-    .timeline-marker-label {
-      position: absolute;
-      top: -30px;
-      transform: translateX(-50%);
-      font-size: 0.8rem;
-      color: #00704a;
-      font-weight: bold;
-      white-space: nowrap;
-    }
-    
     .timeline-ticks {
       display: flex;
       justify-content: space-between;
@@ -405,54 +265,36 @@
       color: #666;
     }
     
-    /* Tabla de amortización simplificada */
-    .amortization-summary {
-      background: #e8f5e8;
-      padding: 1.5rem;
-      border-radius: 8px;
-      margin: 1.5rem 0;
-    }
-    
-    .amortization-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.5rem 0;
-      border-bottom: 1px solid #d4edda;
-    }
-    
-    .amortization-row:last-child {
-      border-bottom: none;
-    }
-    
-    /* ESTILOS EXISTENTES QUE SE MANTIENEN */
-    .investment-details {
-      background: #f8f9fa;
+    /* Mensaje de inversión */
+    .investment-message {
+      background: linear-gradient(135deg, #e8f5e8, #d4edda);
       padding: 1.5rem;
       border-radius: 8px;
       margin: 1.5rem 0;
       text-align: center;
-    }
-    
-    .retorno-destacado {
-      background: #e8f5e8;
-      padding: 1.5rem;
-      border-radius: 8px;
-      margin: 1.5rem 0;
       border-left: 4px solid #28a745;
-      text-align: center;
     }
     
-    .retorno-titulo {
+    .investment-title {
       font-size: 1.5rem;
       font-weight: bold;
       color: #28a745;
       margin-bottom: 0.5rem;
     }
     
-    .retorno-valor {
+    .investment-value {
       font-size: 2rem;
       font-weight: bold;
       color: #00704a;
+    }
+    
+    /* Estilos existentes que se mantienen */
+    .investment-details {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      text-align: center;
     }
     
     .back-button {
@@ -491,7 +333,7 @@
       width: auto;
     }
     
-    /* FORMULARIO (igual que original) */
+    /* FORMULARIO */
     .email-form {
       background: #f8f9fa;
       padding: 1.5rem;
@@ -516,62 +358,11 @@
       border-radius: 4px;
       font-size: 1rem;
     }
-    
-    .benefits-list {
-      text-align: left;
-      margin: 1.5rem 0;
-    }
-    
-    .benefits-list ul {
-      padding-left: 1.5rem;
-    }
-    
-    .benefits-list li {
-      margin-bottom: 0.5rem;
-    }
-    
-    /* PANTALLA FINAL (igual que original) */
-    .final-screen-content {
-      text-align: center;
-    }
-    
-    .whatsapp-features {
-      background: #e8f5e8;
-      padding: 1.5rem;
-      border-radius: 8px;
-      margin-bottom: 2rem;
-      text-align: center;
-    }
-    
-    .company-links {
-      background: #e3f2fd;
-      padding: 1.5rem;
-      border-radius: 8px;
-      margin: 1.5rem 0;
-      text-align: center;
-    }
-    
-    .link-button {
-      display: inline-block;
-      background: #00704a;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 6px;
-      text-decoration: none;
-      margin: 0.5rem;
-      transition: background 0.3s;
-      font-weight: 600;
-    }
-    
-    .link-button:hover {
-      background: #005a3c;
-      color: white;
-    }
   </style>
 </head>
 
 <body>
-  <!-- PANTALLA SPLASH INICIAL (igual que original) -->
+  <!-- PANTALLA SPLASH INICIAL CON AUTOCOMPLETE FUNCIONAL -->
   <div id="splashScreen" class="splash-overlay">
     <div class="splash-content">
       <div class="logo-header">
@@ -586,13 +377,13 @@
           <div class="step-number">1</div>
           <div class="step-text">
             <strong>Ingresa tu dirección O coordenadas</strong>
-            <input id="searchBoxSplash" type="text" placeholder="Cra 15 # 120-30, Bogotá"/>
+            <input id="searchBoxSplash" type="text" placeholder="Cra 15 # 120-30, Bogotá" autocomplete="off"/>
             <div class="splash-coords">
               <label>Lat: <input id="latTxtSplash" type="text" placeholder="4.711"/></label>
               <label>Lon: <input id="lonTxtSplash" type="text" placeholder="-74.072"/></label>
             </div>
             <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">
-              💡 <strong>Prioridad:</strong> Si ingresas coordenadas válidas, se usarán esas.
+              💡 Escribe tu dirección o ingresa coordenadas manualmente
             </p>
           </div>
         </div>
@@ -613,12 +404,12 @@
     </div>
   </div>
 
-  <!-- PANTALLA DE CONFIRMACIÓN DE UBICACIÓN (igual que original) -->
+  <!-- PANTALLA DE CONFIRMACIÓN DE UBICACIÓN -->
   <div id="confirmLocationScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
       <div class="logo-header">
         <img src="logo.png" alt="Energialt SAS" class="logo-img" onerror="this.style.display='none'">
-        <h2 class="splash-title">Confirma y ajusta tu ubicación</h2>
+        <h2 class="splash-title">Confirma tu ubicación</h2>
       </div>
       
       <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
@@ -648,7 +439,7 @@
     </div>
   </div>
 
-  <!-- PANTALLA DE FINANCIACIÓN (NUEVA) -->
+  <!-- PANTALLA DE FINANCIACIÓN SIMPLIFICADA -->
   <div id="financeScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
       <div class="logo-header">
@@ -697,11 +488,11 @@
         
         <p style="text-align: center; font-size: 0.9rem; color: #666; margin-top: 1rem;">
           💡 Desliza para ajustar cuánto quieres pagar inicialmente.<br>
-          El saldo se financiará a 24% de interés anual.
+          <strong>A mayor cuota inicial, reduces tu cuenta de energía más rápido.</strong>
         </p>
       </div>
       
-      <!-- Resultados de financiación -->
+      <!-- Resultados de financiación SIMPLIFICADOS -->
       <div class="finance-results">
         <h3 style="text-align: center; margin-bottom: 1.5rem; color: #00704a;">
           📋 Resumen de tu financiación
@@ -711,7 +502,13 @@
           <div class="finance-card">
             <div class="finance-label">Pago inicial</div>
             <div class="finance-value" id="selectedDownPayment">$0 COP</div>
-            <div class="finance-detail" id="downPaymentPercent">0%</div>
+            <div class="finance-detail" id="downPaymentPercent">0% del total</div>
+          </div>
+          
+          <div class="finance-card">
+            <div class="finance-label">Valor financiado</div>
+            <div class="finance-value" id="financedAmount">$0 COP</div>
+            <div class="finance-detail">Saldo a pagar</div>
           </div>
           
           <div class="finance-card">
@@ -725,31 +522,26 @@
             <div class="finance-value" id="financeTerm">0 meses</div>
             <div class="finance-detail" id="financeYears">0 años</div>
           </div>
-          
-          <div class="finance-card">
-            <div class="finance-label">Interés anual</div>
-            <div class="finance-value">24%</div>
-            <div class="finance-detail">Tasa fija</div>
-          </div>
         </div>
         
-        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #ddd;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-            <span>Valor financiado:</span>
-            <strong id="financedAmount">$0 COP</strong>
+        <!-- Líneas de financiamiento simplificadas -->
+        <div style="margin-top: 1.5rem;">
+          <div class="finance-line">
+            <span>Valor del sistema solar:</span>
+            <strong id="systemValueLine">$0 COP</strong>
           </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-            <span>Intereses totales:</span>
-            <strong id="totalInterest">$0 COP</strong>
+          <div class="finance-line">
+            <span>Pago inicial seleccionado:</span>
+            <strong id="downPaymentLine">$0 COP</strong>
           </div>
-          <div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: bold; color: #00704a;">
-            <span>Total a pagar:</span>
-            <span id="totalToPay">$0 COP</span>
+          <div class="finance-line" style="background: #e8f5e8; font-weight: bold;">
+            <span>Saldo a financiar:</span>
+            <strong id="balanceToFinance">$0 COP</strong>
           </div>
         </div>
       </div>
       
-      <!-- Timeline de pagos -->
+      <!-- Timeline de pagos simplificado -->
       <div class="timeline-container">
         <h3 style="text-align: center; margin-bottom: 1rem; color: #00704a;">
           ⏱️ Línea de tiempo de pagos
@@ -757,48 +549,27 @@
         
         <div class="timeline-bar">
           <div class="timeline-progress" id="timelineProgress"></div>
-          <div class="timeline-marker" id="currentMarker" style="left: 0%;"></div>
         </div>
         
         <div class="timeline-ticks">
           <span>Hoy</span>
-          <span id="midTerm">50%</span>
-          <span id="endTerm">Fin</span>
+          <span id="midTerm">Mitad</span>
+          <span id="endTerm">Final</span>
         </div>
         
-        <div id="timelineLabels" style="position: relative; height: 30px; margin-top: 10px;">
-          <!-- Las etiquetas se generan dinámicamente -->
-        </div>
-      </div>
-      
-      <!-- Ahorro inmediato -->
-      <div class="retorno-destacado">
-        <div class="retorno-titulo">¡Ahorro desde el primer mes!</div>
-        <div class="retorno-valor" id="immediateSavings">$0 COP/mes</div>
-        <p style="margin-top: 0.5rem; color: #666; font-size: 0.9rem;">
-          Mientras pagas el sistema, tu factura baja inmediatamente.<br>
-          <strong id="originalBill">Factura actual: $0 COP</strong> → <strong id="newBill">Nueva factura: $0 COP</strong>
+        <p style="text-align: center; font-size: 0.9rem; color: #666; margin-top: 1rem;">
+          Tiempo estimado para completar el pago: <strong id="estimatedTime">0 meses</strong>
         </p>
       </div>
       
-      <!-- Tabla de amortización resumida -->
-      <div class="amortization-summary">
-        <h3 style="text-align: center; margin-bottom: 1rem; color: #00704a;">
-          📊 Resumen de amortización
-        </h3>
-        
-        <div class="amortization-row">
-          <span>Primer año:</span>
-          <strong id="firstYearInterest">$0 COP</strong>
-        </div>
-        <div class="amortization-row">
-          <span>Año pico de intereses:</span>
-          <strong id="peakInterestYear">Año 0 - $0 COP</strong>
-        </div>
-        <div class="amortization-row">
-          <span>Último año:</span>
-          <strong id="lastYearInterest">$0 COP</strong>
-        </div>
+      <!-- Mensaje de inversión (modificado) -->
+      <div class="investment-message">
+        <div class="investment-title">¡Convierte tu pago de energía en inversión desde el primer mes!</div>
+        <div class="investment-value" id="immediateSavings">$0 COP/mes</div>
+        <p style="margin-top: 0.5rem; color: #666; font-size: 0.9rem;">
+          Mientras pagas el sistema, tu factura baja inmediatamente<br>
+          <strong id="originalBill">Factura actual: $0 COP</strong> → <strong id="newBill">Nueva factura: $0 COP</strong>
+        </p>
       </div>
       
       <button id="nextToFormBtn" class="splash-button">Continuar con mis datos</button>
@@ -811,7 +582,7 @@
     </div>
   </div>
 
-  <!-- PANTALLA DE FORMULARIO (igual que original) -->
+  <!-- PANTALLA DE FORMULARIO -->
   <div id="formScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
       <div class="logo-header">
@@ -820,15 +591,10 @@
       </div>
       
       <div class="email-form">
-        <div class="benefits-list">
-          <p style="text-align: center; margin-bottom: 1rem;">Con tu financiación solar obtienes:</p>
-          <ul>
-            <li>✅ Ahorro inmediato en tu factura eléctrica</li>
-            <li>✅ Sistema solar de alta calidad</li>
-            <li>✅ Instalación profesional incluida</li>
-            <li>✅ Garantía de 25 años en paneles</li>
-            <li>✅ Asesoría personalizada</li>
-          </ul>
+        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+          <p style="text-align: center; margin: 0; color: #00704a; font-weight: bold;">
+            ¡Estás a un paso de convertir tu factura de luz en una inversión!
+          </p>
         </div>
 
         <div class="form-group">
@@ -857,56 +623,27 @@
     </div>
   </div>
 
-  <!-- PANTALLA FINAL (igual que original) -->
+  <!-- PANTALLA FINAL -->
   <div id="finalScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
       <div class="logo-header" style="text-align: center; margin-bottom: 2rem;">
         <img src="logo.png" alt="Energialt SAS" class="logo-img" onerror="this.style.display='none'">
       </div>
       
-      <div class="final-screen-content">
+      <div style="text-align: center; margin-bottom: 2rem;">
         <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
-        <h2 class="splash-title">¡Solicitud Completada!</h2>
+        <h2 class="splash-title">¡Solicitud Enviada!</h2>
       </div>
       
-      <div class="whatsapp-features">
-        <div style="font-size: 2rem; margin-bottom: 1rem;">📧</div>
-        <h3 style="color: #00704a; margin-bottom: 1rem;">¡Solicitud Enviada!</h3>
-        <p>Hemos enviado tu información a nuestro equipo de financiación.</p>
-        <p><strong>Próximos pasos:</strong></p>
-        <ul>
-          <li>📧 Nuestro equipo te contactará por WhatsApp pronto</li>
-          <li>📄 Recibirás tu propuesta de financiación por correo</li>
-          <li>💰 Información detallada de pagos y ahorros</li>
-          <li>📊 Gráficas de amortización completas</li>
-        </ul>
+      <div style="background: #e8f5e8; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h3 style="color: #00704a; margin-bottom: 1rem;">Resumen de tu solicitud</h3>
+        <div id="finalSummary"></div>
       </div>
-
-      <div class="company-links">
-        <h3>📖 Conoce más sobre nosotros</h3>
-        <p>Visita nuestra página web para conocer nuestros proyectos y el proceso de instalación:</p>
-        <div style="margin: 1.5rem 0;">
-          <a href="https://www.jzlsoluciones.com" target="_blank" class="link-button">
-            🌐 Visitar Web de JZL Soluciones
-          </a>
-        </div>
-      </div>
-
-      <div style="text-align: center; margin-top: 1rem;">
-        <button id="backToFormFromFinal" class="back-button">
-          ← Volver a ajustar datos
-        </button>
-        
-        <button id="newRequestFromFinal" class="splash-button" style="background: #28a745; margin-left: 10px;">
-          🔄 Nueva Solicitud
-        </button>
-      </div>
+      
+      <button id="newRequestBtn" class="splash-button" style="background: #28a745;">
+        🔄 Nueva Solicitud
+      </button>
     </div>
-  </div>
-
-  <!-- CONTENIDO PRINCIPAL (oculto - se mantiene por compatibilidad) -->
-  <div id="mainContent" style="display: none;">
-    <!-- Se mantiene igual que el original -->
   </div>
 
   <script>
@@ -922,13 +659,13 @@
     
     // Constantes
     const ANNUAL_INTEREST_RATE = 0.24; // 24% anual
-    const MONTHLY_INTEREST_RATE = Math.pow(1 + ANNUAL_INTEREST_RATE, 1/12) - 1; // INTERÉS COMPUESTO CORRECTO
+    const MONTHLY_INTEREST_RATE = Math.pow(1 + ANNUAL_INTEREST_RATE, 1/12) - 1; // Interés compuesto
     const TARGET_PERCENTAGE = 0.7; // 70% de la factura
     
-    // CONFIGURACIÓN GOOGLE APPS SCRIPT
+    // URL de Google Apps Script
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzidMv2QUfpI-ZnbhWPP8p3AHBGyANszR13WkDEv4J1lg6HgMZ3GplF5XiMIGnsYZGzjQ/exec';
 
-    // FUNCIONES DE FORMATEO (igual que original)
+    // FUNCIONES DE FORMATEO
     function formatoDineroCOP(valor) {
       const numeroFormateado = valor.toLocaleString('es-CO', {
         minimumFractionDigits: 0,
@@ -942,20 +679,7 @@
       }
     }
 
-    function formatoNumeroEntero(valor) {
-      const valorEntero = Math.round(valor);
-      const numeroFormateado = valorEntero.toLocaleString('es-CO', {
-        maximumFractionDigits: 0
-      });
-      
-      if (valorEntero >= 1000000) {
-        return numeroFormateado.replace('.', "'");
-      } else {
-        return numeroFormateado;
-      }
-    }
-
-    // FUNCIONES PARA VALIDACIÓN DE COORDENADAS (igual que original)
+    // FUNCIONES PARA VALIDACIÓN DE COORDENADAS
     function sonCoordenadasValidas(lat, lon) {
       const numLat = parseFloat(lat);
       const numLon = parseFloat(lon);
@@ -978,7 +702,7 @@
       return null;
     }
 
-    // FUNCIÓN PARA CALCULAR LA COTIZACIÓN DEL SISTEMA (igual que original)
+    // FUNCIÓN PARA CALCULAR LA COTIZACIÓN DEL SISTEMA
     async function calcularCotizacion(lat, lon, bill) {
       const PRICE_KWH = 890;
       const USD_COP = 4000;
@@ -1033,10 +757,10 @@
       }
     }
 
-    // FUNCIÓN PARA CALCULAR FINANCIACIÓN CON INTERÉS COMPUESTO (CORREGIDA)
+    // FUNCIÓN PARA CALCULAR FINANCIACIÓN CON INTERÉS COMPUESTO
     function calcularFinanciacion(valorTotal, pagoInicial, cuotaMensual) {
       const valorFinanciado = valorTotal - pagoInicial;
-      const r = MONTHLY_INTEREST_RATE; // Tasa mensual CORRECTA
+      const r = MONTHLY_INTEREST_RATE;
       const P = cuotaMensual;
       
       if (P <= 0) {
@@ -1053,14 +777,7 @@
         };
       }
       
-      // Fórmula CORRECTA para número de meses con interés compuesto
-      // n = -log(1 - (P / (A * r))) / log(1 + r)
-      // Donde:
-      // n = número de meses
-      // P = cuota mensual
-      // r = tasa de interés mensual
-      // A = valor financiado
-      
+      // Fórmula para número de meses con interés compuesto
       if (P <= valorFinanciado * r) {
         // La cuota es menor o igual al interés mensual, nunca terminará
         return { 
@@ -1082,64 +799,11 @@
         mesesRestantes: meses % 12,
         totalIntereses: totalIntereses,
         totalPagado: totalPagado,
-        valorFinanciado: valorFinanciado,
-        tasaMensual: r
+        valorFinanciado: valorFinanciado
       };
     }
 
-    // FUNCIÓN PARA CALCULAR TABLA DE AMORTIZACIÓN RESUMIDA
-    function calcularAmortizacionResumida(valorFinanciado, cuotaMensual, mesesTotales) {
-      let saldo = valorFinanciado;
-      const r = MONTHLY_INTEREST_RATE;
-      
-      let interesesPrimerAnio = 0;
-      let interesesUltimoAnio = 0;
-      let maxInteresesAnual = 0;
-      let anioMaxIntereses = 0;
-      let interesesAnioActual = 0;
-      let anioActual = 1;
-      let mesEnAnio = 0;
-      
-      for (let mes = 1; mes <= mesesTotales; mes++) {
-        const interesMes = saldo * r;
-        const capitalMes = cuotaMensual - interesMes;
-        saldo -= capitalMes;
-        
-        // Acumular intereses del año
-        interesesAnioActual += interesMes;
-        mesEnAnio++;
-        
-        // Primer año
-        if (mes <= 12) {
-          interesesPrimerAnio += interesMes;
-        }
-        
-        // Último año
-        if (mes > mesesTotales - 12) {
-          interesesUltimoAnio += interesMes;
-        }
-        
-        // Fin de año o fin del plazo
-        if (mesEnAnio === 12 || mes === mesesTotales) {
-          if (interesesAnioActual > maxInteresesAnual) {
-            maxInteresesAnual = interesesAnioActual;
-            anioMaxIntereses = anioActual;
-          }
-          anioActual++;
-          mesEnAnio = 0;
-          interesesAnioActual = 0;
-        }
-      }
-      
-      return {
-        interesesPrimerAnio: interesesPrimerAnio,
-        interesesUltimoAnio: interesesUltimoAnio,
-        maxInteresesAnual: maxInteresesAnual,
-        anioMaxIntereses: anioMaxIntereses
-      };
-    }
-
-    // FUNCIÓN PARA ACTUALIZAR LA INTERFAZ DE FINANCIACIÓN
+    // FUNCIÓN PARA ACTUALIZAR LA INTERFAZ DE FINANCIACIÓN (SIMPLIFICADA)
     function actualizarFinanciacion() {
       const slider = document.getElementById('downPaymentSlider');
       const percentage = parseInt(slider.value);
@@ -1148,13 +812,18 @@
       currentDownPayment = (currentSystemValue * percentage) / 100;
       financedAmount = currentSystemValue - currentDownPayment;
       
-      // Actualizar valores en pantalla
+      // Actualizar valores principales
       document.getElementById('downPaymentValue').textContent = formatoDineroCOP(currentDownPayment);
       document.getElementById('downPaymentPercentage').textContent = percentage + '%';
       document.getElementById('selectedDownPayment').textContent = formatoDineroCOP(currentDownPayment);
       document.getElementById('downPaymentPercent').textContent = percentage + '% del total';
       document.getElementById('monthlyPayment').textContent = formatoDineroCOP(currentMonthlyPayment);
       document.getElementById('financedAmount').textContent = formatoDineroCOP(financedAmount);
+      
+      // Líneas de financiamiento
+      document.getElementById('systemValueLine').textContent = formatoDineroCOP(currentSystemValue);
+      document.getElementById('downPaymentLine').textContent = formatoDineroCOP(currentDownPayment);
+      document.getElementById('balanceToFinance').textContent = formatoDineroCOP(financedAmount);
       
       // Calcular financiación
       const resultado = calcularFinanciacion(
@@ -1177,7 +846,7 @@
       }
       if (resultado.años === 0 && resultado.mesesRestantes === 0) {
         if (currentDownPayment >= currentSystemValue) {
-          tiempoTexto = 'Pago completo al contado';
+          tiempoTexto = 'Pago completo';
         } else {
           tiempoTexto = 'Menos de 1 mes';
         }
@@ -1185,8 +854,7 @@
       
       document.getElementById('financeTerm').textContent = tiempoTexto;
       document.getElementById('financeYears').textContent = resultado.años > 0 ? resultado.años + ' años' : '';
-      document.getElementById('totalInterest').textContent = formatoDineroCOP(resultado.totalIntereses);
-      document.getElementById('totalToPay').textContent = formatoDineroCOP(resultado.totalPagado);
+      document.getElementById('estimatedTime').textContent = tiempoTexto;
       
       // Actualizar gráfica de timeline
       const maxMeses = 25 * 12; // 25 años máximo
@@ -1199,8 +867,8 @@
         document.getElementById('midTerm').textContent = mitadAños + ' años';
         document.getElementById('endTerm').textContent = resultado.años + ' años';
       } else {
-        document.getElementById('midTerm').textContent = '50%';
-        document.getElementById('endTerm').textContent = 'Fin';
+        document.getElementById('midTerm').textContent = 'Mitad';
+        document.getElementById('endTerm').textContent = 'Final';
       }
       
       // Actualizar ahorro inmediato
@@ -1209,48 +877,6 @@
       document.getElementById('immediateSavings').textContent = formatoDineroCOP(ahorroInmediato) + '/mes';
       document.getElementById('originalBill').textContent = 'Factura actual: ' + formatoDineroCOP(currentMonthlyBill);
       document.getElementById('newBill').textContent = 'Nueva factura: ' + formatoDineroCOP(nuevaFactura);
-      
-      // Calcular y mostrar amortización resumida
-      if (financedAmount > 0 && resultado.meses < Infinity) {
-        const amortizacion = calcularAmortizacionResumida(
-          financedAmount,
-          currentMonthlyPayment,
-          resultado.meses
-        );
-        
-        document.getElementById('firstYearInterest').textContent = formatoDineroCOP(amortizacion.interesesPrimerAnio);
-        document.getElementById('lastYearInterest').textContent = formatoDineroCOP(amortizacion.interesesUltimoAnio);
-        document.getElementById('peakInterestYear').textContent = 
-          'Año ' + amortizacion.anioMaxIntereses + ' - ' + formatoDineroCOP(amortizacion.maxInteresesAnual);
-      } else {
-        document.getElementById('firstYearInterest').textContent = '$0 COP';
-        document.getElementById('lastYearInterest').textContent = '$0 COP';
-        document.getElementById('peakInterestYear').textContent = 'No aplica';
-      }
-      
-      // Actualizar timeline markers
-      actualizarTimelineMarkers(resultado.meses);
-    }
-
-    // FUNCIÓN PARA ACTUALIZAR MARCADORES EN TIMELINE
-    function actualizarTimelineMarkers(mesesTotales) {
-      const timelineLabels = document.getElementById('timelineLabels');
-      timelineLabels.innerHTML = '';
-      
-      if (mesesTotales === 0 || mesesTotales === Infinity) return;
-      
-      // Añadir marcador cada año
-      const años = Math.ceil(mesesTotales / 12);
-      for (let año = 1; año <= años; año++) {
-        const posicion = (año * 12 / mesesTotales) * 100;
-        if (posicion <= 100) {
-          const marker = document.createElement('div');
-          marker.className = 'timeline-marker-label';
-          marker.style.left = posicion + '%';
-          marker.textContent = año + 'a';
-          timelineLabels.appendChild(marker);
-        }
-      }
     }
 
     // FUNCIÓN PARA INICIALIZAR LA PANTALLA DE FINANCIACIÓN
@@ -1279,25 +905,27 @@
     function mostrarResumenFinal() {
       const nuevaFactura = currentMonthlyBill - currentMonthlyPayment;
       const ahorroInmediato = currentMonthlyBill - nuevaFactura;
+      const sliderValue = document.getElementById('downPaymentSlider').value;
       
       const resumenHTML = `
         <div style="text-align: left; line-height: 1.6;">
-          <p><strong>💰 Pago inicial seleccionado:</strong> ${formatoDineroCOP(currentDownPayment)}</p>
+          <p><strong>💰 Pago inicial:</strong> ${sliderValue}% (${formatoDineroCOP(currentDownPayment)})</p>
           <p><strong>📅 Cuota mensual:</strong> ${formatoDineroCOP(currentMonthlyPayment)}</p>
           <p><strong>⏱️ Tiempo de financiación:</strong> ${document.getElementById('financeTerm').textContent}</p>
-          <p><strong>🏠 Sistema solar:</strong> ${totalPanels} paneles (${formatoDineroCOP(currentSystemValue)})</p>
+          <p><strong>🏠 Sistema solar:</strong> ${totalPanels} paneles</p>
           <p><strong>💸 Ahorro mensual:</strong> ${formatoDineroCOP(ahorroInmediato)}/mes</p>
-          <p><strong>📊 Intereses totales:</strong> ${document.getElementById('totalInterest').textContent}</p>
-          <p><strong>💵 Total a pagar:</strong> ${document.getElementById('totalToPay').textContent}</p>
+          <p><strong>📊 Valor financiado:</strong> ${formatoDineroCOP(financedAmount)}</p>
         </div>
       `;
       
       document.getElementById('finalSummary').innerHTML = resumenHTML;
     }
 
-    // ========== FLUJO PRINCIPAL (igual que original pero adaptado) ==========
+    // ========== FUNCIONES DE MAPAS Y AUTOCOMPLETE ==========
     
-    // FUNCIONES DE MAPAS (se mantienen iguales)
+    // Variables para autocomplete de la primera pantalla
+    let splashAutocomplete;
+    
     function initMap(){
       const bogota = {lat:4.711, lng:-74.072};
       map = new google.maps.Map(document.getElementById('map'),{
@@ -1315,16 +943,29 @@
         title: 'Arrastra para ajustar'
       });
 
-      const input = document.getElementById('searchBox');
-      autocomplete = new google.maps.places.Autocomplete(input, {
+      // Configurar autocomplete para la primera pantalla
+      const splashInput = document.getElementById('searchBoxSplash');
+      splashAutocomplete = new google.maps.places.Autocomplete(splashInput, {
         fields: ['geometry', 'formatted_address'],
         types: ['address']
       });
-      autocomplete.bindTo('bounds', map);
-      autocomplete.addListener('place_changed', ()=>{
-        const place = autocomplete.getPlace();
-        if(!place.geometry){ return; }
-        muestraLugar(place.geometry.location);
+      
+      splashAutocomplete.addListener('place_changed', function() {
+        const place = splashAutocomplete.getPlace();
+        if (!place.geometry) {
+          console.log('No se encontró la ubicación');
+          return;
+        }
+        
+        // Actualizar coordenadas en la primera pantalla
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+        
+        document.getElementById('latTxtSplash').value = lat.toFixed(5);
+        document.getElementById('lonTxtSplash').value = lng.toFixed(5);
+        
+        console.log('Dirección seleccionada:', place.formatted_address);
+        console.log('Coordenadas actualizadas:', lat, lng);
       });
 
       marker.addListener('dragend', ()=>{
@@ -1335,6 +976,20 @@
       actualizaCoords(bogota.lat, bogota.lng);
       document.getElementById('latTxtSplash').value = bogota.lat.toFixed(5);
       document.getElementById('lonTxtSplash').value = bogota.lng.toFixed(5);
+      
+      // Event listeners para actualizar desde coordenadas manuales
+      document.getElementById('latTxtSplash').addEventListener('change', actualizarDesdeCoordenadasSplash);
+      document.getElementById('lonTxtSplash').addEventListener('change', actualizarDesdeCoordenadasSplash);
+    }
+
+    function actualizarDesdeCoordenadasSplash() {
+      const lat = document.getElementById('latTxtSplash').value;
+      const lon = document.getElementById('lonTxtSplash').value;
+      
+      if (sonCoordenadasValidas(lat, lon)) {
+        // Podríamos hacer reverse geocoding aquí si se desea
+        console.log('Coordenadas actualizadas manualmente:', lat, lon);
+      }
     }
 
     function initConfirmMap(lat, lng, address) {
@@ -1352,7 +1007,7 @@
         fields: ['geometry', 'formatted_address'],
         types: ['address']
       });
-      confirmAutocomplete.bindTo('bounds', confirmMap);
+      
       confirmAutocomplete.addListener('place_changed', ()=>{
         const place = confirmAutocomplete.getPlace();
         if(!place.geometry){ return; }
@@ -1377,6 +1032,29 @@
 
       document.getElementById('confirmAddress').value = address || '';
       updateConfirmCoords(lat, lng);
+      
+      // Event listeners para coordenadas editables en confirmación
+      document.getElementById('confirmLat').addEventListener('change', function() {
+        const lat = parseFloat(this.value);
+        const lon = parseFloat(document.getElementById('confirmLon').value);
+        if (sonCoordenadasValidas(lat, lon)) {
+          const newLocation = new google.maps.LatLng(lat, lon);
+          confirmMap.setCenter(newLocation);
+          confirmMarker.setPosition(newLocation);
+          reverseGeocode(lat, lon);
+        }
+      });
+
+      document.getElementById('confirmLon').addEventListener('change', function() {
+        const lat = parseFloat(document.getElementById('confirmLat').value);
+        const lon = parseFloat(this.value);
+        if (sonCoordenadasValidas(lat, lon)) {
+          const newLocation = new google.maps.LatLng(lat, lon);
+          confirmMap.setCenter(newLocation);
+          confirmMarker.setPosition(newLocation);
+          reverseGeocode(lat, lon);
+        }
+      });
     }
 
     function updateConfirmCoords(lat, lng) {
@@ -1400,8 +1078,10 @@
       document.getElementById('lonTxt').value = lng.toFixed(5);
     }
 
-    // FLUJO PRINCIPAL MEJORADO
+    // ========== FLUJO PRINCIPAL ==========
+    
     async function cotizarDesdeSplash() {
+      // Primero intentar con coordenadas
       let coordenadas = obtenerCoordenadasDeInputs();
       let address = document.getElementById('searchBoxSplash').value;
       
@@ -1413,10 +1093,14 @@
       let lat, lon;
       
       if (coordenadas) {
+        // Usar coordenadas si son válidas
         lat = coordenadas.lat;
         lon = coordenadas.lng;
+        console.log('✅ Usando coordenadas ingresadas:', lat, lon);
       } else {
-        // Por simplicidad, usamos Bogotá si no hay coordenadas
+        // Si hay dirección pero no coordenadas, intentar geocodificación
+        console.log('📍 Usando dirección, necesitamos geocodificar...');
+        // Por ahora usamos valores por defecto
         lat = 4.711;
         lon = -74.072;
       }
@@ -1432,6 +1116,7 @@
       document.getElementById('splashScreen').style.display = 'none';
       document.getElementById('confirmLocationScreen').style.display = 'flex';
       
+      // Inicializar mapa de confirmación
       initConfirmMap(lat, lon, address);
     }
 
@@ -1440,7 +1125,7 @@
       const lon = parseFloat(document.getElementById('confirmLon').value);
       const bill = parseFloat(document.getElementById('billSplash').value);
       
-      // Actualizar campos originales
+      // Actualizar los campos originales
       document.getElementById('latTxtSplash').value = lat.toFixed(5);
       document.getElementById('lonTxtSplash').value = lon.toFixed(5);
       document.getElementById('searchBoxSplash').value = document.getElementById('confirmAddress').value;
@@ -1462,7 +1147,7 @@
       }
     }
 
-    // FUNCIÓN PARA ENVIAR SOLICITUD (similar a la original)
+    // FUNCIÓN PARA ENVIAR SOLICITUD
     async function enviarSolicitudFinanciacion() {
       const userName = document.getElementById('userName').value;
       const userEmail = document.getElementById('userEmail').value;
@@ -1487,7 +1172,6 @@
         const exito = true;
         
         if (exito) {
-          // Mostrar resumen y pantalla final
           mostrarResumenFinal();
           document.getElementById('formScreen').style.display = 'none';
           document.getElementById('finalScreen').style.display = 'flex';
@@ -1527,18 +1211,15 @@
       document.getElementById('backToFinanceFromForm').addEventListener('click', function() {
         volverAlMenuAnterior('formScreen', 'financeScreen');
       });
-      document.getElementById('backToFormFromFinal').addEventListener('click', function() {
-        volverAlMenuAnterior('finalScreen', 'formScreen');
-      });
       
       // Botón nueva solicitud
-      document.getElementById('newRequestFromFinal').addEventListener('click', function() {
+      document.getElementById('newRequestBtn').addEventListener('click', function() {
         window.location.reload();
       });
     });
   </script>
 
-  <!-- Carga de Google Maps -->
+  <!-- Carga de Google Maps con callback a initMap -->
   <script async
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKNxSVeV-p40IVdXtU7Ghk7p-WdMnrZes&libraries=places&callback=initMap">
   </script>
