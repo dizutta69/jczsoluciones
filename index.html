@@ -449,7 +449,7 @@
         <img src="logo.png" alt="JZL Soluciones" class="logo-img" onerror="this.style.display='none'">
         <h2 class="splash-title">Diseña tu Financiación</h2>
         <p style="color: #666; margin-top: 0.5rem;">
-          Tu cuota mensual será equivalente a lo que tu sistema va a ahorrar, <strong style="color: #00704a;"> mínimo 70% de tu factura actual</strong>
+          Tu cuota mensual será equivalente a lo que tu sistema va a ahorrar, <strong style="color: #00704a;"> Aproximadamente el 70% de tu factura actual</strong>
         </p>
       </div>
       
@@ -688,12 +688,12 @@
     let sistemaConServicios = 0;
     
     // ========== CONSTANTES ==========
-    const ANNUAL_INTEREST_RATE = 0.24; // 24% anual
+    const ANNUAL_INTEREST_RATE = 0.22; // 22% anual
     const MONTHLY_INTEREST_RATE = Math.pow(1 + ANNUAL_INTEREST_RATE, 1/12) - 1;
     const TARGET_PERCENTAGE = 0.7; // 70% de la factura
     
     // PARÁMETROS DE LA FUNCIÓN EXPONENCIAL PARA DESCUENTO POR ESCALA
-    const A = 0.25;    // Máximo adicional posible (45%)
+    const A = 0.25;    // Máximo adicional posible (25%)
     const B = 0.15;    // Tasa de decrecimiento rápida
     const C = 0.12;    // Mínimo adicional asintótico (12%)
     
@@ -1355,4 +1355,5 @@
   </script>
 </body>
 </html>
+
 
