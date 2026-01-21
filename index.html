@@ -451,6 +451,9 @@
           <div class="step-text">
             <strong>💡 Ingresa tu factura mensual actual</strong>
             <input id="billSplash" type="number" placeholder="Ej: 200000 (COP)"/>
+            <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; background: #e3f2fd; padding: 0.5rem; border-radius: 6px;">
+              📊 Tu cuota de financiación será el <strong>70%</strong> de este valor
+            </p>
           </div>
         </div>
       </div>
@@ -502,7 +505,7 @@
         <img src="logo.png" alt="JZL Soluciones" class="logo-img" onerror="this.style.display='none'">
         <h2 class="splash-title">Diseña tu Financiación</h2>
         <p style="color: #666; margin-top: 0.5rem;">
-          Tu cuota mensual será equivalente <strong style="color: #00704a;"> a lo que ahorrarás en tu factura actual</strong>
+          Tu cuota mensual será el <strong style="color: #00704a;">70% de tu factura actual</strong>
         </p>
       </div>
       
@@ -512,20 +515,29 @@
           <div style="font-size: 1.1rem; color: #666; margin-bottom: 0.5rem;">Sistema solar estimado para tu consumo</div>
           <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
             <div style="text-align: center;">
-              <div style="font-size: 0.9rem; color: #888;">Páneles Solares</div>
+              <div style="font-size: 0.9rem; color: #888;">Paneles</div>
               <div style="font-size: 2rem; font-weight: bold; color: #00704a;" id="totalPanels">0</div>
             </div>
             <div style="text-align: center;">
-              <div style="font-size: 0.9rem; color: #888;">Potencia (KiloWatts) </div>
+              <div style="font-size: 0.9rem; color: #888;">Potencia</div>
               <div style="font-size: 2rem; font-weight: bold; color: #00704a;" id="totalKWp">0 kWp</div>
             </div>
             <div style="text-align: center;">
               <div style="font-size: 0.9rem; color: #888;">Valor base</div>
-              <div style="font-size: 1.8rem; font-weight: bold; color: #00704a;" id="systemWithServices">$0 COP</div>
+              <div style="font-size: 1.8rem; font-weight: bold; color: #00704a;" id="totalSystemValue">$0 COP</div>
             </div>
           </div>
         </div>
         
+        <!-- Descuento por Escala -->
+        <div id="scaleDiscountDisplay" style="text-align: center; margin-top: 1rem; display: none;">
+          <div class="scale-discount-badge">
+            🎯 Descuento por escala: <span id="discountPercentage">0%</span>
+          </div>
+          <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+            Sistemas más grandes obtienen mejor relación costo/beneficio
+          </p>
+        </div>
       </div>
       
       <!-- Control deslizante -->
@@ -594,7 +606,7 @@
         <!-- Líneas de financiamiento -->
         <div style="margin-top: 2rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: white; border-radius: 8px; margin: 0.5rem 0; border-left: 4px solid #00704a;">
-            <span>Sistema solar:</span>
+            <span>Sistema solar con servicios (5 años):</span>
             <strong style="font-size: 1.2rem; color: #00704a;" id="systemWithServices">$0 COP</strong>
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: white; border-radius: 8px; margin: 0.5rem 0; border-left: 4px solid #28a745;">
@@ -761,7 +773,7 @@
     const TARGET_PERCENTAGE = 0.7; // 70% de la factura
     
     // PARÁMETROS DE LA FUNCIÓN EXPONENCIAL PARA DESCUENTO POR ESCALA
-    const A = 0.30;    // Máximo adicional posible (45%)
+    const A = 0.45;    // Máximo adicional posible (45%)
     const B = 0.15;    // Tasa de decrecimiento rápida
     const C = 0.12;    // Mínimo adicional asintótico (12%)
     
@@ -1527,7 +1539,6 @@
   </script>
 </body>
 </html>
-
 
 
 
