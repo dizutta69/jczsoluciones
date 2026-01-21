@@ -397,9 +397,7 @@
           <div class="step-text">
             <strong>💡 Ingresa tu factura mensual actual</strong>
             <input id="billSplash" type="number" placeholder="Ej: 200000 (COP)"/>
-            <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; background: #e3f2fd; padding: 0.5rem; border-radius: 6px;">
-              📊 Tu cuota de financiación será el <strong>70%</strong> de este valor
-            </p>
+
           </div>
         </div>
       </div>
@@ -451,7 +449,7 @@
         <img src="logo.png" alt="JZL Soluciones" class="logo-img" onerror="this.style.display='none'">
         <h2 class="splash-title">Diseña tu Financiación</h2>
         <p style="color: #666; margin-top: 0.5rem;">
-          Tu cuota mensual será el <strong style="color: #00704a;">70% de tu factura actual</strong>
+          Tu cuota mensual será equivalente a lo que tu sistema va a ahorrar, <strong style="color: #00704a;"> mínimo 70% de tu factura actual</strong>
         </p>
       </div>
       
@@ -537,7 +535,7 @@
           </div>
           
           <div class="finance-card">
-            <div class="finance-label">Cuota mensual</div>
+            <div class="finance-label">Cuota mensual aproximada </div>
             <div class="finance-value" id="monthlyPayment">$0 COP</div>
             <div style="font-size: 0.8rem; color: #888;">70% de tu factura</div>
           </div>
@@ -695,7 +693,7 @@
     const TARGET_PERCENTAGE = 0.7; // 70% de la factura
     
     // PARÁMETROS DE LA FUNCIÓN EXPONENCIAL PARA DESCUENTO POR ESCALA
-    const A = 0.45;    // Máximo adicional posible (45%)
+    const A = 0.25;    // Máximo adicional posible (45%)
     const B = 0.15;    // Tasa de decrecimiento rápida
     const C = 0.12;    // Mínimo adicional asintótico (12%)
     
@@ -1357,3 +1355,4 @@
   </script>
 </body>
 </html>
+
