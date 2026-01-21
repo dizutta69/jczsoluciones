@@ -106,6 +106,7 @@
       border-radius: 8px;
       border: 2px solid #00704a;
       box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      z-index: 10000 !important;
     }
     
     .splash-coords {
@@ -137,7 +138,7 @@
       font-size: 0.9rem;
     }
 
-    /* ESTILOS PARA FINANCIACIÓN MEJORADOS */
+    /* ESTILOS PARA FINANCIACIÓN */
     .slider-container {
       margin: 2rem 0;
       padding: 1.5rem;
@@ -241,6 +242,68 @@
       margin: 0.5rem 0;
     }
     
+    /* NUEVAS MÉTRICAS DE ROI */
+    .roi-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    
+    .roi-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-top: 6px solid;
+      transition: all 0.3s;
+    }
+    
+    .roi-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .roi-card.positive {
+      border-top-color: #28a745;
+      background: linear-gradient(135deg, #f8fff9, #ffffff);
+    }
+    
+    .roi-card.neutral {
+      border-top-color: #ffc107;
+      background: linear-gradient(135deg, #fff9e6, #ffffff);
+    }
+    
+    .roi-card.info {
+      border-top-color: #17a2b8;
+      background: linear-gradient(135deg, #e6f7ff, #ffffff);
+    }
+    
+    .roi-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .roi-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+    
+    .roi-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin: 1rem 0;
+    }
+    
+    .roi-detail {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 0.5rem;
+    }
+    
     .scale-discount-badge {
       background: linear-gradient(135deg, #28a745, #20c997);
       color: white;
@@ -253,7 +316,7 @@
       box-shadow: 0 3px 10px rgba(40,167,69,0.3);
     }
     
-    /* TIMELINE MEJORADO */
+    /* TIMELINE */
     .timeline-container {
       background: white;
       padding: 1.5rem;
@@ -298,7 +361,7 @@
       margin-bottom: 1rem;
     }
     
-    /* BOTONES VOLVER MEJORADOS */
+    /* BOTONES VOLVER */
     .back-button {
       background: linear-gradient(135deg, #6c757d, #5a6268);
       color: white;
@@ -320,15 +383,6 @@
       box-shadow: 0 5px 15px rgba(108,117,125,0.3);
     }
     
-    /* PANTALLA DE CONFIRMACIÓN MEJORADA */
-    .location-controls {
-      background: #f8f9fa;
-      padding: 1.5rem;
-      border-radius: 12px;
-      margin-bottom: 1.5rem;
-      border: 2px solid #e0e0e0;
-    }
-    
     /* ANIMACIONES */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
@@ -346,7 +400,7 @@
         width: 95%;
       }
       
-      .finance-grid {
+      .finance-grid, .roi-metrics {
         grid-template-columns: 1fr;
       }
       
@@ -367,7 +421,7 @@
 </head>
 
 <body>
-  <!-- PANTALLA SPLASH INICIAL CON AUTOCOMPLETE CORREGIDO -->
+  <!-- PANTALLA SPLASH INICIAL CON AUTOCOMPLETE MEJORADO -->
   <div id="splashScreen" class="splash-overlay">
     <div class="splash-content">
       <div class="logo-header">
@@ -383,11 +437,11 @@
             <strong>📍 Ingresa tu dirección</strong>
             <input id="searchBoxSplash" type="text" placeholder="Ej: Cra 15 # 120-30, Bogotá" autocomplete="off"/>
             <div class="splash-coords">
-              <label>📐 Latitud: <input id="latTxtSplash" type="text" placeholder="4.711"/></label>
-              <label>📐 Longitud: <input id="lonTxtSplash" type="text" placeholder="-74.072"/></label>
+              <label>📐 Lat: <input id="latTxtSplash" type="text" placeholder="4.711"/></label>
+              <label>📐 Lon: <input id="lonTxtSplash" type="text" placeholder="-74.072"/></label>
             </div>
             <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; background: #e8f5e8; padding: 0.5rem; border-radius: 6px;">
-              💡 Escribe tu dirección y selecciona una sugerencia, o ingresa coordenadas manualmente
+              💡 <strong>Escribe tu dirección y selecciona una sugerencia</strong> o ingresa coordenadas manualmente
             </p>
           </div>
         </div>
@@ -397,7 +451,9 @@
           <div class="step-text">
             <strong>💡 Ingresa tu factura mensual actual</strong>
             <input id="billSplash" type="number" placeholder="Ej: 200000 (COP)"/>
-
+            <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; background: #e3f2fd; padding: 0.5rem; border-radius: 6px;">
+              📊 Tu cuota de financiación será el <strong>70%</strong> de este valor
+            </p>
           </div>
         </div>
       </div>
@@ -406,7 +462,7 @@
     </div>
   </div>
 
-  <!-- PANTALLA DE CONFIRMACIÓN DE UBICACIÓN -->
+  <!-- PANTALLA DE CONFIRMACIÓN -->
   <div id="confirmLocationScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
       <div class="logo-header">
@@ -415,7 +471,7 @@
         <p style="color: #666; margin-top: 0.5rem;">Ajusta el marcador si es necesario</p>
       </div>
       
-      <div class="location-controls">
+      <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 2px solid #e0e0e0;">
         <div style="margin-bottom: 1rem;">
           <label for="confirmAddress" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #00704a;">📍 Dirección:</label>
           <input id="confirmAddress" type="text" placeholder="Ingresa o ajusta la dirección" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;"/>
@@ -442,14 +498,14 @@
     </div>
   </div>
 
-  <!-- PANTALLA DE FINANCIACIÓN CON DESCUENTO POR ESCALA -->
+  <!-- PANTALLA DE FINANCIACIÓN CON MÉTRICAS ROI -->
   <div id="financeScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
       <div class="logo-header">
         <img src="logo.png" alt="JZL Soluciones" class="logo-img" onerror="this.style.display='none'">
         <h2 class="splash-title">Diseña tu Financiación</h2>
         <p style="color: #666; margin-top: 0.5rem;">
-          Tu cuota mensual será equivalente a lo que tu sistema va a ahorrar, <strong style="color: #00704a;"> Aproximadamente el 70% de tu factura actual</strong>
+          Tu cuota mensual será el <strong style="color: #00704a;">70% de tu factura actual</strong>
         </p>
       </div>
       
@@ -476,7 +532,7 @@
         <!-- Descuento por Escala -->
         <div id="scaleDiscountDisplay" style="text-align: center; margin-top: 1rem; display: none;">
           <div class="scale-discount-badge">
-            🎯 Descuento por escala aplicado: <span id="discountPercentage">0%</span>
+            🎯 Descuento por escala: <span id="discountPercentage">0%</span>
           </div>
           <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
             Sistemas más grandes obtienen mejor relación costo/beneficio
@@ -518,7 +574,7 @@
       <!-- Resultados de financiación -->
       <div class="finance-results">
         <h3 style="text-align: center; margin-bottom: 1.5rem; color: #00704a;">
-          📋 Resumen de tu financiación
+          📋 Resumen de financiación
         </h3>
         
         <div class="finance-grid">
@@ -535,7 +591,7 @@
           </div>
           
           <div class="finance-card">
-            <div class="finance-label">Cuota mensual aproximada </div>
+            <div class="finance-label">Cuota mensual</div>
             <div class="finance-value" id="monthlyPayment">$0 COP</div>
             <div style="font-size: 0.8rem; color: #888;">70% de tu factura</div>
           </div>
@@ -561,6 +617,30 @@
             <span>Saldo a financiar:</span>
             <strong style="font-size: 1.3rem; color: #00704a;" id="balanceToFinance">$0 COP</strong>
           </div>
+        </div>
+      </div>
+      
+      <!-- NUEVAS MÉTRICAS DE ROI -->
+      <div class="roi-metrics">
+        <div class="roi-card positive">
+          <div class="roi-icon">💰</div>
+          <div class="roi-title">Flujo mensual inmediato</div>
+          <div class="roi-value" id="roiFlujoMensual">$0 COP/mes</div>
+          <div class="roi-detail">Desde el primer mes</div>
+        </div>
+        
+        <div class="roi-card neutral">
+          <div class="roi-icon">🎯</div>
+          <div class="roi-title">Recuperación pago inicial</div>
+          <div class="roi-value" id="roiRecuperacion">0 años</div>
+          <div class="roi-detail" id="roiRecuperacionDetail">Tiempo para recuperar tu inversión</div>
+        </div>
+        
+        <div class="roi-card info">
+          <div class="roi-icon">📈</div>
+          <div class="roi-title">Equilibrio del proyecto</div>
+          <div class="roi-value" id="roiEquilibrio">0 años</div>
+          <div class="roi-detail" id="roiEquilibrioDetail">Cuando el proyecto se paga solo</div>
         </div>
       </div>
       
@@ -687,24 +767,20 @@
     let totalKWp = 0;
     let sistemaConServicios = 0;
     
-    // ========== CONSTANTES ==========
-    const ANNUAL_INTEREST_RATE = 0.22; // 22% anual
-    const MONTHLY_INTEREST_RATE = Math.pow(1 + ANNUAL_INTEREST_RATE, 1/12) - 1;
+    // ========== CONSTANTES ACTUALIZADAS ==========
+    const ANNUAL_INTEREST_RATE = 0.20; // 20% anual (reducido de 24%)
+    const MONTHLY_INTEREST_RATE = Math.pow(1 + ANNUAL_INTEREST_RATE, 1/12) - 1; // 1.53% mensual
     const TARGET_PERCENTAGE = 0.7; // 70% de la factura
     
     // PARÁMETROS DE LA FUNCIÓN EXPONENCIAL PARA DESCUENTO POR ESCALA
-    const A = 0.25;    // Máximo adicional posible (25%)
+    const A = 0.45;    // Máximo adicional posible (45%)
     const B = 0.15;    // Tasa de decrecimiento rápida
     const C = 0.12;    // Mínimo adicional asintótico (12%)
     
     // ========== FUNCIÓN EXPONENCIAL PARA DESCUENTO POR ESCALA ==========
     function calcularFactorAdicional(kWp) {
-      // Limitamos a 25kW para estabilización
       const kWpLimitado = Math.min(kWp, 25);
-      
-      // Fórmula: adicional = A × e^(-B × kWp) + C
       const adicional = A * Math.exp(-B * kWpLimitado) + C;
-      
       return adicional;
     }
     
@@ -749,7 +825,7 @@
       return null;
     }
     
-    // ========== CÁLCULO DEL SISTEMA SOLAR CON DESCUENTO POR ESCALA ==========
+    // ========== CÁLCULO DEL SISTEMA SOLAR ==========
     async function calcularCotizacion(lat, lon, bill) {
       const PRICE_KWH = 890;
       const USD_COP = 4000;
@@ -763,7 +839,7 @@
         const kwhMonth = bill / PRICE_KWH;
         const kwh70 = kwhMonth * TARGET;
     
-        let specific = 1350; // Valor por defecto
+        let specific = 1350;
     
         try {
           const response = await fetch(
@@ -856,6 +932,82 @@
       };
     }
     
+    // ========== CÁLCULO DE LAS 3 MÉTRICAS DE ROI ==========
+    function calcularMetricasROI(pagoInicial, ahorroMensual, sistemaConServicios, plazoMeses, saldoFinanciado) {
+      const resultados = {
+        // 1. Flujo mensual inmediato
+        flujoMensual: 0,
+        
+        // 2. Tiempo para recuperar pago inicial (ROI simple)
+        recuperacionPagoInicialAnios: 0,
+        
+        // 3. Tiempo para equilibrio del proyecto
+        equilibrioProyectoAnios: 0
+      };
+      
+      // 1. FLUJO MENSUAL INMEDIATO
+      // Ahorro mensual - Interés del primer mes
+      if (saldoFinanciado > 0) {
+        const interesPrimerMes = saldoFinanciado * MONTHLY_INTEREST_RATE;
+        resultados.flujoMensual = ahorroMensual - interesPrimerMes;
+      } else {
+        resultados.flujoMensual = ahorroMensual; // Si no hay financiación
+      }
+      
+      // 2. RECUPERACIÓN DEL PAGO INICIAL (ROI simple)
+      // Tiempo para que el ahorro acumulado iguale el pago inicial
+      if (resultados.flujoMensual > 0) {
+        resultados.recuperacionPagoInicialAnios = (pagoInicial / (resultados.flujoMensual * 12));
+      } else {
+        resultados.recuperacionPagoInicialAnios = Infinity; // Nunca se recupera
+      }
+      
+      // 3. EQUILIBRIO DEL PROYECTO (cuando se paga todo)
+      // Simulación mes a mes hasta encontrar el equilibrio
+      if (resultados.flujoMensual > 0) {
+        let saldo = saldoFinanciado;
+        let ahorroAcumulado = 0;
+        let interesesPagados = 0;
+        
+        for (let mes = 1; mes <= plazoMeses * 2; mes++) { // Buscar hasta el doble del plazo
+          // Interés del mes
+          if (saldo > 0) {
+            const interesMes = saldo * MONTHLY_INTEREST_RATE;
+            interesesPagados += interesMes;
+            
+            // Capital pagado este mes
+            const capitalMes = ahorroMensual - interesMes;
+            saldo = Math.max(0, saldo - capitalMes);
+          }
+          
+          // Ahorro acumulado
+          ahorroAcumulado += ahorroMensual;
+          
+          // Inversión total hasta ahora
+          const inversionTotal = pagoInicial + interesesPagados;
+          
+          // Verificar equilibrio
+          if (ahorroAcumulado >= inversionTotal) {
+            resultados.equilibrioProyectoAnios = mes / 12;
+            break;
+          }
+          
+          // Si ya no hay saldo pero aún no hay equilibrio
+          if (saldo <= 0 && ahorroAcumulado < (pagoInicial + interesesPagados)) {
+            // Calcular tiempo restante basado en flujo mensual
+            const deficit = (pagoInicial + interesesPagados) - ahorroAcumulado;
+            const mesesRestantes = deficit / resultados.flujoMensual;
+            resultados.equilibrioProyectoAnios = (mes + mesesRestantes) / 12;
+            break;
+          }
+        }
+      } else {
+        resultados.equilibrioProyectoAnios = Infinity;
+      }
+      
+      return resultados;
+    }
+    
     // ========== ACTUALIZAR INTERFAZ DE FINANCIACIÓN ==========
     function actualizarFinanciacion() {
       const slider = document.getElementById('downPaymentSlider');
@@ -879,25 +1031,25 @@
       document.getElementById('balanceToFinance').textContent = formatoDineroCOP(financedAmount);
       
       // Calcular financiación
-      const resultado = calcularFinanciacion(
+      const resultadoFinanciacion = calcularFinanciacion(
         sistemaConServicios,
         currentDownPayment,
         currentMonthlyPayment
       );
       
-      financeTermMonths = resultado.meses;
-      financedAmount = resultado.valorFinanciado;
+      financeTermMonths = resultadoFinanciacion.meses;
+      financedAmount = resultadoFinanciacion.valorFinanciado;
       
       // Formatear tiempo
       let tiempoTexto = '';
-      if (resultado.años > 0) {
-        tiempoTexto += resultado.años + ' año' + (resultado.años !== 1 ? 's' : '');
+      if (resultadoFinanciacion.años > 0) {
+        tiempoTexto += resultadoFinanciacion.años + ' año' + (resultadoFinanciacion.años !== 1 ? 's' : '');
       }
-      if (resultado.mesesRestantes > 0) {
-        if (resultado.años > 0) tiempoTexto += ' ';
-        tiempoTexto += resultado.mesesRestantes + ' mes' + (resultado.mesesRestantes !== 1 ? 'es' : '');
+      if (resultadoFinanciacion.mesesRestantes > 0) {
+        if (resultadoFinanciacion.años > 0) tiempoTexto += ' ';
+        tiempoTexto += resultadoFinanciacion.mesesRestantes + ' mes' + (resultadoFinanciacion.mesesRestantes !== 1 ? 'es' : '');
       }
-      if (resultado.años === 0 && resultado.mesesRestantes === 0) {
+      if (resultadoFinanciacion.años === 0 && resultadoFinanciacion.mesesRestantes === 0) {
         if (currentDownPayment >= sistemaConServicios) {
           tiempoTexto = 'Pago completo';
         } else {
@@ -905,27 +1057,76 @@
         }
       }
       
-      if (resultado.meses === Infinity) {
+      if (resultadoFinanciacion.meses === Infinity) {
         tiempoTexto = 'No aplicable';
       }
       
       document.getElementById('financeTerm').textContent = tiempoTexto;
-      document.getElementById('financeYears').textContent = resultado.años > 0 ? resultado.años + ' años' : '';
+      document.getElementById('financeYears').textContent = resultadoFinanciacion.años > 0 ? resultadoFinanciacion.años + ' años' : '';
       document.getElementById('estimatedTime').textContent = tiempoTexto;
       
       // Actualizar gráfica de timeline
       const maxMeses = 25 * 12;
-      const progressPercentage = resultado.meses === Infinity ? 100 : Math.min((financeTermMonths / maxMeses) * 100, 100);
+      const progressPercentage = resultadoFinanciacion.meses === Infinity ? 100 : Math.min((financeTermMonths / maxMeses) * 100, 100);
       document.getElementById('timelineProgress').style.width = progressPercentage + '%';
       
       // Actualizar marcadores de timeline
-      if (resultado.años > 0) {
-        const mitadAños = Math.floor(resultado.años / 2);
+      if (resultadoFinanciacion.años > 0) {
+        const mitadAños = Math.floor(resultadoFinanciacion.años / 2);
         document.getElementById('midTerm').textContent = mitadAños + ' años';
-        document.getElementById('endTerm').textContent = resultado.años + ' años';
+        document.getElementById('endTerm').textContent = resultadoFinanciacion.años + ' años';
       } else {
         document.getElementById('midTerm').textContent = 'Mitad';
         document.getElementById('endTerm').textContent = 'Final';
+      }
+      
+      // Calcular métricas ROI
+      const roiMetrics = calcularMetricasROI(
+        currentDownPayment,
+        currentMonthlyPayment,
+        sistemaConServicios,
+        financeTermMonths,
+        financedAmount
+      );
+      
+      // Actualizar métricas ROI en la interfaz
+      // 1. Flujo mensual inmediato
+      if (roiMetrics.flujoMensual > 0) {
+        document.getElementById('roiFlujoMensual').textContent = '+ ' + formatoDineroCOP(roiMetrics.flujoMensual) + '/mes';
+        document.getElementById('roiFlujoMensual').style.color = '#28a745';
+      } else {
+        document.getElementById('roiFlujoMensual').textContent = formatoDineroCOP(roiMetrics.flujoMensual) + '/mes';
+        document.getElementById('roiFlujoMensual').style.color = '#e74c3c';
+      }
+      
+      // 2. Recuperación pago inicial
+      if (roiMetrics.recuperacionPagoInicialAnios !== Infinity) {
+        if (roiMetrics.recuperacionPagoInicialAnios < 1) {
+          const meses = Math.round(roiMetrics.recuperacionPagoInicialAnios * 12);
+          document.getElementById('roiRecuperacion').textContent = meses + ' meses';
+          document.getElementById('roiRecuperacionDetail').textContent = 'Recuperas rápido tu inversión';
+        } else {
+          document.getElementById('roiRecuperacion').textContent = roiMetrics.recuperacionPagoInicialAnios.toFixed(1) + ' años';
+          document.getElementById('roiRecuperacionDetail').textContent = 'Tiempo para recuperar tu inversión';
+        }
+      } else {
+        document.getElementById('roiRecuperacion').textContent = 'No aplica';
+        document.getElementById('roiRecuperacionDetail').textContent = 'El flujo no es positivo';
+      }
+      
+      // 3. Equilibrio del proyecto
+      if (roiMetrics.equilibrioProyectoAnios !== Infinity) {
+        if (roiMetrics.equilibrioProyectoAnios < 1) {
+          const meses = Math.round(roiMetrics.equilibrioProyectoAnios * 12);
+          document.getElementById('roiEquilibrio').textContent = meses + ' meses';
+          document.getElementById('roiEquilibrioDetail').textContent = 'El proyecto se paga rápido';
+        } else {
+          document.getElementById('roiEquilibrio').textContent = roiMetrics.equilibrioProyectoAnios.toFixed(1) + ' años';
+          document.getElementById('roiEquilibrioDetail').textContent = 'Cuando el proyecto se paga solo';
+        }
+      } else {
+        document.getElementById('roiEquilibrio').textContent = 'No aplica';
+        document.getElementById('roiEquilibrioDetail').textContent = 'No se alcanza el equilibrio';
       }
       
       // Actualizar ahorro inmediato
@@ -938,7 +1139,6 @@
     
     // ========== INICIALIZAR PANTALLA DE FINANCIACIÓN ==========
     function inicializarPantallaFinanciacion(sistemaData) {
-      // Mostrar datos del sistema
       document.getElementById('totalPanels').textContent = sistemaData.panels;
       document.getElementById('totalKWp').textContent = sistemaData.kWp.toFixed(1);
       document.getElementById('totalSystemValue').textContent = formatoDineroCOP(sistemaData.valorBaseSistema);
@@ -967,68 +1167,56 @@
     }
     
     // ========== FUNCIONES DE MAPAS CORREGIDAS ==========
-    let splashAutocomplete;
-    
     function initMap() {
-      console.log('✅ initMap ejecutado');
+      console.log('✅ Google Maps API cargada');
       
-      // Configurar autocomplete para la primera pantalla - ¡ESTO ES CLAVE!
+      // INICIALIZAR AUTOCOMPLETE PARA LA PRIMERA PANTALLA
       const splashInput = document.getElementById('searchBoxSplash');
       
-      // Crear un elemento div temporal para el autocomplete
-      const pacContainer = document.createElement('div');
-      pacContainer.id = 'pac-container';
-      document.body.appendChild(pacContainer);
-      
-      splashAutocomplete = new google.maps.places.Autocomplete(splashInput, {
-        fields: ['geometry', 'formatted_address', 'name'],
+      // Crear autocomplete con configuración correcta
+      const autocomplete = new google.maps.places.Autocomplete(splashInput, {
+        fields: ['geometry', 'formatted_address'],
         types: ['address'],
         componentRestrictions: { country: 'co' }
       });
       
-      // Vincular el autocomplete al contenedor
-      splashAutocomplete.bindTo('bounds', new google.maps.LatLngBounds(
-        new google.maps.LatLng(4.0, -75.0),
-        new google.maps.LatLng(5.0, -73.0)
-      ));
-      
-      // Escuchar cambios en el autocomplete
-      splashAutocomplete.addListener('place_changed', function() {
-        const place = splashAutocomplete.getPlace();
-        console.log('📍 Lugar seleccionado:', place);
+      // Manejar selección de lugar
+      autocomplete.addListener('place_changed', function() {
+        const place = autocomplete.getPlace();
         
         if (!place.geometry) {
-          console.log('❌ No se encontró geometría');
+          console.log('❌ No se encontró la ubicación');
           return;
         }
         
-        // Actualizar coordenadas en los campos
         const lat = place.geometry.location.lat();
         const lng = place.geometry.location.lng();
         
-        document.getElementById('latTxtSplash').value = lat.toFixed(5);
-        document.getElementById('lonTxtSplash').value = lng.toFixed(5);
+        // Actualizar campos de coordenadas
+        document.getElementById('latTxtSplash').value = lat.toFixed(6);
+        document.getElementById('lonTxtSplash').value = lng.toFixed(6);
         
+        console.log('✅ Dirección seleccionada:', place.formatted_address);
         console.log('✅ Coordenadas actualizadas:', lat, lng);
         
-        // También actualizar el campo de búsqueda con la dirección completa
+        // Actualizar el campo de búsqueda con la dirección formateada
         if (place.formatted_address) {
           splashInput.value = place.formatted_address;
         }
       });
       
-      // Valores iniciales para Bogotá
-      document.getElementById('latTxtSplash').value = "4.711";
-      document.getElementById('lonTxtSplash').value = "-74.072";
-      
-      // Event listeners para coordenadas manuales
-      document.getElementById('latTxtSplash').addEventListener('change', function() {
-        console.log('Latitud cambiada manualmente:', this.value);
+      // Prevenir el envío del formulario al presionar Enter en el autocomplete
+      splashInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+        }
       });
       
-      document.getElementById('lonTxtSplash').addEventListener('change', function() {
-        console.log('Longitud cambiada manualmente:', this.value);
-      });
+      // Valores por defecto para Bogotá
+      document.getElementById('latTxtSplash').value = "4.7110";
+      document.getElementById('lonTxtSplash').value = "-74.0721";
+      
+      console.log('✅ Autocomplete configurado correctamente para la primera pantalla');
     }
     
     function initConfirmMap(lat, lng, address) {
@@ -1053,7 +1241,7 @@
     
       // Configurar autocomplete para dirección en confirmación
       const confirmAddressInput = document.getElementById('confirmAddress');
-      confirmAutocomplete = new google.maps.places.Autocomplete(confirmAddressInput, {
+      const confirmAutocomplete = new google.maps.places.Autocomplete(confirmAddressInput, {
         fields: ['geometry', 'formatted_address'],
         types: ['address'],
         componentRestrictions: { country: 'co' }
@@ -1070,7 +1258,6 @@
         confirmMarker.setPosition(newLocation);
         updateConfirmCoords(newLocation.lat(), newLocation.lng());
         
-        // Actualizar el campo de dirección
         if (place.formatted_address) {
           confirmAddressInput.value = place.formatted_address;
         }
@@ -1090,17 +1277,14 @@
         reverseGeocode(newPosition.lat(), newPosition.lng());
       });
     
-      // Inicializar campos
       document.getElementById('confirmAddress').value = address || '';
       updateConfirmCoords(lat, lng);
       
-      // Centrar el mapa correctamente
       setTimeout(() => {
         confirmMap.setCenter(location);
         confirmMap.setZoom(16);
       }, 100);
       
-      // Event listeners para coordenadas editables
       document.getElementById('confirmLat').addEventListener('change', function() {
         const lat = parseFloat(this.value);
         const lon = parseFloat(document.getElementById('confirmLon').value);
@@ -1144,7 +1328,6 @@
     async function cotizarDesdeSplash() {
       console.log('🚀 Iniciando cálculo desde splash...');
       
-      // Primero intentar con coordenadas
       let coordenadas = obtenerCoordenadasDeInputs();
       let address = document.getElementById('searchBoxSplash').value;
       
@@ -1159,12 +1342,10 @@
       let lat, lon;
       
       if (coordenadas) {
-        // Usar coordenadas si son válidas
         lat = coordenadas.lat;
         lon = coordenadas.lng;
         console.log('✅ Usando coordenadas ingresadas:', lat, lon);
       } else {
-        // Si hay dirección pero no coordenadas válidas
         alert('Por favor ingresa coordenadas válidas o selecciona una dirección de las sugerencias');
         return;
       }
@@ -1176,11 +1357,9 @@
         return; 
       }
     
-      // Mostrar pantalla de confirmación
       document.getElementById('splashScreen').style.display = 'none';
       document.getElementById('confirmLocationScreen').style.display = 'flex';
       
-      // Inicializar mapa de confirmación
       initConfirmMap(lat, lon, address);
     }
     
@@ -1189,21 +1368,17 @@
       const lon = parseFloat(document.getElementById('confirmLon').value);
       const bill = parseFloat(document.getElementById('billSplash').value);
       
-      // Actualizar los campos originales
       document.getElementById('latTxtSplash').value = lat.toFixed(5);
       document.getElementById('lonTxtSplash').value = lon.toFixed(5);
       document.getElementById('searchBoxSplash').value = document.getElementById('confirmAddress').value;
     
       try {
-        // Calcular sistema solar con descuento por escala
         const sistemaData = await calcularCotizacion(lat, lon, bill);
         console.log('📊 Sistema calculado:', sistemaData);
         
-        // Mostrar pantalla de financiación
         document.getElementById('confirmLocationScreen').style.display = 'none';
         document.getElementById('financeScreen').style.display = 'flex';
         
-        // Inicializar pantalla de financiación
         inicializarPantallaFinanciacion(sistemaData);
         
       } catch (error) {
@@ -1229,6 +1404,29 @@
         tiempoTexto += mesesFinanciacion + ' mes' + (mesesFinanciacion !== 1 ? 'es' : '');
       }
       
+      // Calcular métricas ROI para el resumen
+      const roiMetrics = calcularMetricasROI(
+        currentDownPayment,
+        currentMonthlyPayment,
+        sistemaConServicios,
+        financeTermMonths,
+        financedAmount
+      );
+      
+      let flujoTexto = 'No aplica';
+      if (roiMetrics.flujoMensual > 0) {
+        flujoTexto = '+ ' + formatoDineroCOP(roiMetrics.flujoMensual) + '/mes';
+      }
+      
+      let recuperacionTexto = 'No aplica';
+      if (roiMetrics.recuperacionPagoInicialAnios !== Infinity) {
+        if (roiMetrics.recuperacionPagoInicialAnios < 1) {
+          recuperacionTexto = Math.round(roiMetrics.recuperacionPagoInicialAnios * 12) + ' meses';
+        } else {
+          recuperacionTexto = roiMetrics.recuperacionPagoInicialAnios.toFixed(1) + ' años';
+        }
+      }
+      
       const resumenHTML = `
         <div style="display: grid; grid-template-columns: 1fr; gap: 0.75rem;">
           <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #d4edda;">
@@ -1244,12 +1442,12 @@
             <strong>${tiempoTexto}</strong>
           </div>
           <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #d4edda;">
-            <span>🏠 Sistema solar:</span>
-            <strong>${totalPanels} paneles (${totalKWp.toFixed(1)} kWp)</strong>
+            <span>💸 Flujo mensual:</span>
+            <strong style="color: ${roiMetrics.flujoMensual > 0 ? '#28a745' : '#e74c3c'};">${flujoTexto}</strong>
           </div>
           <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #d4edda;">
-            <span>💸 Ahorro mensual:</span>
-            <strong style="color: #28a745;">${formatoDineroCompleto(ahorroInmediato)}/mes</strong>
+            <span>🎯 Recuperación inversión:</span>
+            <strong>${recuperacionTexto}</strong>
           </div>
           <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: #d4edda; border-radius: 6px; margin-top: 0.5rem;">
             <span>📊 Valor financiado:</span>
@@ -1279,7 +1477,6 @@
       botonOriginal.disabled = true;
     
       try {
-        // Simular envío (aquí integrarías con Google Sheets)
         await new Promise(resolve => setTimeout(resolve, 1500));
         
         mostrarResumenFinal();
@@ -1327,19 +1524,6 @@
         window.location.reload();
       });
       
-      // Mejorar UX del formulario
-      document.querySelectorAll('input').forEach(input => {
-        input.addEventListener('focus', function() {
-          this.style.borderColor = '#00704a';
-          this.style.boxShadow = '0 0 0 3px rgba(0,112,74,0.1)';
-        });
-        
-        input.addEventListener('blur', function() {
-          this.style.borderColor = '#ddd';
-          this.style.boxShadow = 'none';
-        });
-      });
-      
       // Enter para enviar en el splash
       document.getElementById('billSplash').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
@@ -1350,10 +1534,12 @@
   </script>
 
   <!-- Carga de Google Maps -->
-  <script async defer
+  <script async
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKNxSVeV-p40IVdXtU7Ghk7p-WdMnrZes&libraries=places&callback=initMap">
   </script>
 </body>
 </html>
+
+
 
 
