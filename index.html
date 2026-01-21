@@ -383,6 +383,81 @@
       box-shadow: 0 5px 15px rgba(108,117,125,0.3);
     }
     
+    /* ESTILOS PARA MÉTRICAS 25 AÑOS */
+    .metrics-25-container {
+      background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin: 2rem 0;
+      border: 2px solid #ff9800;
+      box-shadow: 0 8px 25px rgba(255,152,0,0.1);
+    }
+    
+    .metrics-25-title {
+      text-align: center;
+      color: #e65100;
+      margin-bottom: 1.5rem;
+      font-size: 1.4rem;
+      font-weight: bold;
+    }
+    
+    .metrics-25-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    
+    .metric-25-card {
+      background: white;
+      padding: 1.2rem;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      border-top: 5px solid;
+      transition: transform 0.3s;
+    }
+    
+    .metric-25-card.orange {
+      border-top-color: #ff9800;
+    }
+    
+    .metric-25-card.green {
+      border-top-color: #4caf50;
+    }
+    
+    .metric-25-card.blue {
+      border-top-color: #2196f3;
+    }
+    
+    .metric-25-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    
+    .metric-25-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin: 0.5rem 0;
+      color: #333;
+    }
+    
+    .metric-25-detail {
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 0.5rem;
+    }
+    
+    .motivational-message {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin: 1.5rem 0;
+      border-left: 5px solid #1976d2;
+      font-size: 1rem;
+      color: #0d47a1;
+    }
+    
     /* ANIMACIONES */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
@@ -400,7 +475,7 @@
         width: 95%;
       }
       
-      .finance-grid, .roi-metrics {
+      .finance-grid, .roi-metrics, .metrics-25-grid {
         grid-template-columns: 1fr;
       }
       
@@ -644,6 +719,53 @@
         </div>
       </div>
       
+      <!-- SECCIÓN 25 AÑOS - NUEVA -->
+      <div class="metrics-25-container">
+        <div class="metrics-25-title">
+          📊 Proyección a 25 años (Vida útil del sistema)
+        </div>
+        
+        <div class="metrics-25-grid">
+          <div class="metric-25-card orange">
+            <div class="roi-icon">💰</div>
+            <div class="roi-title">Valor total producido</div>
+            <div class="metric-25-value" id="valorProduccion25">$0 COP</div>
+            <div class="metric-25-detail" id="produccionAño25">Con inflación del 5% anual</div>
+          </div>
+          
+          <div class="metric-25-card green">
+            <div class="roi-icon">📈</div>
+            <div class="roi-title">ROI sobre inversión</div>
+            <div class="metric-25-value" id="roi25Anios">0%</div>
+            <div class="metric-25-detail" id="gananciaPorMillon">Retorno en 25 años</div>
+          </div>
+          
+          <div class="metric-25-card blue">
+            <div class="roi-icon">💵</div>
+            <div class="roi-title">Beneficio neto</div>
+            <div class="metric-25-value" id="beneficioNeto25">$0 COP</div>
+            <div class="metric-25-detail" id="multiplicadorInversion">Ganancia después de costos</div>
+          </div>
+        </div>
+        
+        <!-- Detalles adicionales -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
+          <div style="background: white; padding: 1rem; border-radius: 8px; border-left: 4px solid #4caf50;">
+            <div style="font-size: 0.9rem; color: #666;">🏭 Producción anual</div>
+            <div style="font-size: 1.2rem; font-weight: bold; color: #333;" id="produccionAnualKWh">0 kWh</div>
+          </div>
+          <div style="background: white; padding: 1rem; border-radius: 8px; border-left: 4px solid #ff9800;">
+            <div style="font-size: 0.9rem; color: #666;">⚡ Eficiencia año 25</div>
+            <div style="font-size: 1.2rem; font-weight: bold; color: #333;" id="eficienciaAño25">80%</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- MENSAJE MOTIVACIONAL -->
+      <div class="motivational-message" id="mensajeMotivacional">
+        💡 <strong>Aumentar tu pago inicial mejora significativamente tu retorno a largo plazo.</strong>
+      </div>
+      
       <!-- Timeline -->
       <div class="timeline-container">
         <h3 style="text-align: center; margin-bottom: 1rem; color: #00704a;">
@@ -766,11 +888,18 @@
     let totalPanels = 0;
     let totalKWp = 0;
     let sistemaConServicios = 0;
+    let horasPicoAnualesActuales = 1350; // Se actualizará con datos de NASA
     
     // ========== CONSTANTES ACTUALIZADAS ==========
     const ANNUAL_INTEREST_RATE = 0.20; // 20% anual (reducido de 24%)
     const MONTHLY_INTEREST_RATE = Math.pow(1 + ANNUAL_INTEREST_RATE, 1/12) - 1; // 1.53% mensual
     const TARGET_PERCENTAGE = 0.7; // 70% de la factura
+    
+    // ========== CONSTANTES PARA CÁLCULO 25 AÑOS ==========
+    const VIDA_UTIL_SISTEMA = 25; // años
+    const DEGRADACION_ANUAL = 0.005; // 0.5% anual (garantía típica: 80% a 25 años)
+    const INFLACION_ENERGETICA_ANUAL = 0.05; // 5% anual de aumento en precio de energía
+    const PRECIO_KWH_ACTUAL = 890; // COP/kWh actual
     
     // PARÁMETROS DE LA FUNCIÓN EXPONENCIAL PARA DESCUENTO POR ESCALA
     const A = 0.45;    // Máximo adicional posible (45%)
@@ -790,7 +919,9 @@
     
     // ========== FUNCIONES DE FORMATEO ==========
     function formatoDineroCOP(valor) {
-      if (valor >= 1000000) {
+      if (valor >= 1000000000) {
+        return '$' + (valor/1000000000).toFixed(2).replace('.', ',') + 'B';
+      } else if (valor >= 1000000) {
         return '$' + (valor/1000000).toFixed(1).replace('.', ',') + 'M';
       } else if (valor >= 1000) {
         return '$' + Math.round(valor/1000) + 'K';
@@ -800,6 +931,15 @@
     
     function formatoDineroCompleto(valor) {
       return '$' + Math.round(valor).toLocaleString('es-CO');
+    }
+    
+    function formatoNumeroGrande(numero) {
+      if (numero >= 1000000) {
+        return (numero/1000000).toFixed(1).replace('.', ',') + 'M';
+      } else if (numero >= 1000) {
+        return (numero/1000).toFixed(0) + 'K';
+      }
+      return numero.toLocaleString('es-CO');
     }
     
     // ========== FUNCIONES PARA VALIDACIÓN DE COORDENADAS ==========
@@ -839,7 +979,7 @@
         const kwhMonth = bill / PRICE_KWH;
         const kwh70 = kwhMonth * TARGET;
     
-        let specific = 1350;
+        let specific = 1350; // Valor por defecto (horas pico anuales)
     
         try {
           const response = await fetch(
@@ -849,7 +989,7 @@
           if (response.ok) {
             const pvw = await response.json();
             if(pvw && pvw.outputs && pvw.outputs.ac_annual) {
-              specific = pvw.outputs.ac_annual;
+              specific = pvw.outputs.ac_annual; // Horas pico anuales de NASA
             }
           }
         } catch(error) {
@@ -872,6 +1012,9 @@
         // Calcular pago mensual (70% de la factura)
         currentMonthlyPayment = bill * TARGET_PERCENTAGE;
         currentMonthlyBill = bill;
+        
+        // Guardar horas pico para cálculos de 25 años
+        horasPicoAnualesActuales = specific;
     
         return {
           systemValue: currentSystemValue,
@@ -880,7 +1023,9 @@
           panels: totalPanels,
           monthlyBill: currentMonthlyBill,
           kWp: totalKWp,
-          factorDescuento: factorDescuento
+          factorDescuento: factorDescuento,
+          horasPicoAnuales: specific, // Horas pico de NASA
+          kwhAnuales: specific
         };
         
       } catch (error) {
@@ -930,6 +1075,86 @@
         totalPagado: totalPagado,
         valorFinanciado: valorFinanciado
       };
+    }
+    
+    // ========== CÁLCULO PRODUCCIÓN 25 AÑOS CON INFLACIÓN ==========
+    function calcularProduccion25Anios(kWp, horasPicoAnuales) {
+      let valorTotalProduccion = 0;
+      let produccionTotalKWh = 0;
+      let produccionAnualInicial = 0;
+      
+      for (let año = 1; año <= VIDA_UTIL_SISTEMA; año++) {
+        // 1. Calcular degradación del sistema (0.5% anual)
+        const factorDegradacion = Math.pow(1 - DEGRADACION_ANUAL, año - 1);
+        
+        // 2. Producción anual este año (kWh)
+        const produccionAnualKWh = kWp * horasPicoAnuales * factorDegradacion;
+        produccionTotalKWh += produccionAnualKWh;
+        
+        // Guardar producción del primer año
+        if (año === 1) {
+          produccionAnualInicial = produccionAnualKWh;
+        }
+        
+        // 3. Aplicar inflación al precio de energía (5% anual)
+        const precioKWhEsteAño = PRECIO_KWH_ACTUAL * Math.pow(1 + INFLACION_ENERGETICA_ANUAL, año - 1);
+        
+        // 4. Valor monetario de la producción este año
+        const valorProduccionAnual = produccionAnualKWh * precioKWhEsteAño;
+        valorTotalProduccion += valorProduccionAnual;
+      }
+      
+      // 5. Producción en el año 25 (para mostrar el 80% mínimo)
+      const produccionAño25 = kWp * horasPicoAnuales * Math.pow(1 - DEGRADACION_ANUAL, 24);
+      const porcentajeAño25 = (produccionAño25 / (kWp * horasPicoAnuales)) * 100;
+      
+      return {
+        valorTotalProduccion: valorTotalProduccion,
+        produccionTotalKWh: produccionTotalKWh,
+        produccionAnualInicial: produccionAnualInicial,
+        valorAnualPromedio: valorTotalProduccion / VIDA_UTIL_SISTEMA,
+        produccionAño25: produccionAño25,
+        porcentajeAño25: porcentajeAño25,
+        horasPicoAnuales: horasPicoAnuales
+      };
+    }
+    
+    // ========== CÁLCULO ROI SOBRE INVERSIÓN ==========
+    function calcularROI25Anios(inversionTotal, valorProduccion25Anios) {
+      // Beneficio neto
+      const beneficioNeto = valorProduccion25Anios - inversionTotal;
+      
+      // ROI porcentual
+      const roiPorcentual = (beneficioNeto / inversionTotal) * 100;
+      
+      // Retorno por cada peso invertido
+      const retornoPorPeso = valorProduccion25Anios / inversionTotal;
+      
+      // Tasa de retorno anualizada compuesta
+      const tasaAnualizada = (Math.pow(1 + roiPorcentual/100, 1/VIDA_UTIL_SISTEMA) - 1) * 100;
+      
+      // Ganancia por cada millón invertido
+      const gananciaPorMillon = inversionTotal > 0 ? (beneficioNeto / (inversionTotal / 1000000)) : 0;
+      
+      return {
+        beneficioNeto: beneficioNeto,
+        roiPorcentual: roiPorcentual,
+        retornoPorPeso: retornoPorPeso,
+        tasaAnualizada: tasaAnualizada,
+        inversionTotal: inversionTotal,
+        valorProduccion: valorProduccion25Anios,
+        gananciaPorMillon: gananciaPorMillon,
+        // Para mostrar de manera entendible:
+        multiplicadorInversion: retornoPorPeso.toFixed(1) + "X",
+        textoGananciaPorMillon: formatoDineroCOP(gananciaPorMillon) + " por cada $1M COP invertido"
+      };
+    }
+    
+    // ========== CÁLCULO INVERSIÓN TOTAL ==========
+    function calcularInversionTotal(pagoInicial, cuotaMensual, plazoMeses) {
+      // Sumar todas las cuotas durante el período de financiación
+      const totalCuotas = cuotaMensual * Math.min(plazoMeses, VIDA_UTIL_SISTEMA * 12);
+      return pagoInicial + totalCuotas;
     }
     
     // ========== CÁLCULO DE LAS 3 MÉTRICAS DE ROI ==========
@@ -1008,6 +1233,71 @@
       return resultados;
     }
     
+    // ========== ACTUALIZAR MÉTRICAS 25 AÑOS EN INTERFAZ ==========
+    function actualizarMetricas25Anios(produccionData, roiData) {
+      // 1. Valor total producido en 25 años
+      document.getElementById('valorProduccion25').textContent = 
+          formatoDineroCOP(produccionData.valorTotalProduccion);
+      
+      // 2. ROI porcentual
+      const roiElement = document.getElementById('roi25Anios');
+      roiElement.textContent = roiData.roiPorcentual.toFixed(1) + '%';
+      
+      // Color según ROI
+      if (roiData.roiPorcentual > 100) {
+          roiElement.style.color = '#28a745'; // Verde para ROI > 100%
+      } else if (roiData.roiPorcentual > 0) {
+          roiElement.style.color = '#ffc107'; // Amarillo para ROI positivo
+      } else {
+          roiElement.style.color = '#e74c3c'; // Rojo para ROI negativo
+      }
+      
+      // 3. Beneficio neto
+      document.getElementById('beneficioNeto25').textContent = 
+          formatoDineroCOP(roiData.beneficioNeto);
+      
+      // 4. Multiplicador de inversión
+      document.getElementById('multiplicadorInversion').textContent = 
+          roiData.multiplicadorInversion;
+      
+      // 5. Ganancia por millón
+      document.getElementById('gananciaPorMillon').textContent = 
+          roiData.textoGananciaPorMillon;
+      
+      // 6. Producción anual
+      document.getElementById('produccionAnualKWh').textContent = 
+          formatoNumeroGrande(produccionData.produccionAnualInicial) + ' kWh';
+      
+      // 7. Eficiencia año 25
+      document.getElementById('eficienciaAño25').textContent = 
+          produccionData.porcentajeAño25.toFixed(1) + '%';
+      
+      // 8. Detalle del año 25
+      document.getElementById('produccionAño25').textContent = 
+          'Año 25: ' + produccionData.porcentajeAño25.toFixed(1) + '% de producción inicial';
+      
+      // 9. Mensaje motivacional basado en pago inicial
+      actualizarMensajeMotivacional(roiData, currentDownPayment, sistemaConServicios);
+    }
+    
+    // ========== MENSAJE MOTIVACIONAL DINÁMICO ==========
+    function actualizarMensajeMotivacional(roiData, pagoInicial, valorSistema) {
+      const porcentajePagoInicial = (pagoInicial / valorSistema) * 100;
+      const mensajeElement = document.getElementById('mensajeMotivacional');
+      
+      let mensaje = '';
+      
+      if (porcentajePagoInicial < 20) {
+        mensaje = `💰 <strong>Aumenta tu pago inicial:</strong> Cada 10% adicional reduce tu tiempo de financiación y aumenta tu ROI en aproximadamente ${(roiData.roiPorcentual * 0.15).toFixed(1)}%. Con tu pago actual del ${porcentajePagoInicial.toFixed(0)}%, tu inversión se multiplica ${roiData.multiplicadorInversion} veces en 25 años.`;
+      } else if (porcentajePagoInicial < 50) {
+        mensaje = `🎯 <strong>Buen equilibrio:</strong> Con ${porcentajePagoInicial.toFixed(0)}% de pago inicial, cada $1M COP invertido te genera ${formatoDineroCOP(roiData.gananciaPorMillon)} en 25 años. Tu inversión se multiplica ${roiData.multiplicadorInversion} veces.`;
+      } else {
+        mensaje = `🚀 <strong>¡Excelente decisión!</strong> Con ${porcentajePagoInicial.toFixed(0)}% de pago inicial, tu inversión se multiplica ${roiData.multiplicadorInversion} veces en 25 años. Generarás ${formatoDineroCOP(roiData.beneficioNeto)} de beneficio neto.`;
+      }
+      
+      mensajeElement.innerHTML = mensaje;
+    }
+    
     // ========== ACTUALIZAR INTERFAZ DE FINANCIACIÓN ==========
     function actualizarFinanciacion() {
       const slider = document.getElementById('downPaymentSlider');
@@ -1080,7 +1370,7 @@
         document.getElementById('endTerm').textContent = 'Final';
       }
       
-      // Calcular métricas ROI
+      // Calcular métricas ROI iniciales
       const roiMetrics = calcularMetricasROI(
         currentDownPayment,
         currentMonthlyPayment,
@@ -1129,6 +1419,26 @@
         document.getElementById('roiEquilibrioDetail').textContent = 'No se alcanza el equilibrio';
       }
       
+      // ========== CÁLCULOS 25 AÑOS ==========
+      // Calcular producción y valor a 25 años
+      const produccion25Anios = calcularProduccion25Anios(
+          totalKWp,
+          horasPicoAnualesActuales
+      );
+      
+      // Calcular inversión total (pago inicial + todas las cuotas)
+      const inversionTotal = calcularInversionTotal(
+          currentDownPayment,
+          currentMonthlyPayment,
+          financeTermMonths
+      );
+      
+      // Calcular ROI
+      const roi25Anios = calcularROI25Anios(inversionTotal, produccion25Anios.valorTotalProduccion);
+      
+      // Actualizar interfaz con nuevos datos de 25 años
+      actualizarMetricas25Anios(produccion25Anios, roi25Anios);
+      
       // Actualizar ahorro inmediato
       const nuevaFactura = currentMonthlyBill - currentMonthlyPayment;
       const ahorroInmediato = currentMonthlyBill - nuevaFactura;
@@ -1150,6 +1460,9 @@
         document.getElementById('scaleDiscountDisplay').style.display = 'block';
         document.getElementById('discountPercentage').textContent = descuentoAdicional.toFixed(1) + '%';
       }
+      
+      // Guardar horas pico para cálculos posteriores
+      horasPicoAnualesActuales = sistemaData.horasPicoAnuales;
       
       // Configurar slider
       const slider = document.getElementById('downPaymentSlider');
@@ -1413,18 +1726,23 @@
         financedAmount
       );
       
+      // Calcular métricas 25 años para el resumen
+      const produccion25Anios = calcularProduccion25Anios(
+        totalKWp,
+        horasPicoAnualesActuales
+      );
+      
+      const inversionTotal = calcularInversionTotal(
+        currentDownPayment,
+        currentMonthlyPayment,
+        financeTermMonths
+      );
+      
+      const roi25Anios = calcularROI25Anios(inversionTotal, produccion25Anios.valorTotalProduccion);
+      
       let flujoTexto = 'No aplica';
       if (roiMetrics.flujoMensual > 0) {
         flujoTexto = '+ ' + formatoDineroCOP(roiMetrics.flujoMensual) + '/mes';
-      }
-      
-      let recuperacionTexto = 'No aplica';
-      if (roiMetrics.recuperacionPagoInicialAnios !== Infinity) {
-        if (roiMetrics.recuperacionPagoInicialAnios < 1) {
-          recuperacionTexto = Math.round(roiMetrics.recuperacionPagoInicialAnios * 12) + ' meses';
-        } else {
-          recuperacionTexto = roiMetrics.recuperacionPagoInicialAnios.toFixed(1) + ' años';
-        }
       }
       
       const resumenHTML = `
@@ -1445,9 +1763,13 @@
             <span>💸 Flujo mensual:</span>
             <strong style="color: ${roiMetrics.flujoMensual > 0 ? '#28a745' : '#e74c3c'};">${flujoTexto}</strong>
           </div>
-          <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #d4edda;">
-            <span>🎯 Recuperación inversión:</span>
-            <strong>${recuperacionTexto}</strong>
+          <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #d4edda; background: #fff3e0;">
+            <span>📊 ROI 25 años:</span>
+            <strong style="color: ${roi25Anios.roiPorcentual > 100 ? '#28a745' : roi25Anios.roiPorcentual > 0 ? '#ffc107' : '#e74c3c'};">${roi25Anios.roiPorcentual.toFixed(1)}%</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #d4edda; background: #fff3e0;">
+            <span>💰 Beneficio 25 años:</span>
+            <strong style="color: #e65100;">${formatoDineroCOP(roi25Anios.beneficioNeto)}</strong>
           </div>
           <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: #d4edda; border-radius: 6px; margin-top: 0.5rem;">
             <span>📊 Valor financiado:</span>
@@ -1539,6 +1861,3 @@
   </script>
 </body>
 </html>
-
-
-
