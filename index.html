@@ -2,21 +2,18 @@
 <html lang="es">
 <head>
   <meta charset="utf-8"/>
-  <title>Financiación Solar – Colombia (Google Maps)</title>
+  <title>Financiación Solar Inteligente – Colombia</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <style>
-    /* ESTILOS BASE (iguales) */
-    body{font-family:system-ui;margin:0;padding:1rem;background:#f7f7f7}
-    #map, #confirmMap{height:55vh;border-radius:8px;margin:.5rem 0}
-    label,input,button{font-size:1rem;padding:.4rem .6rem;margin:.2rem 0}
-    button{cursor:pointer;background:#00704a;color:#fff;border:none;border-radius:4px}
+    /* ESTILOS BASE OPTIMIZADOS */
+    body{font-family:system-ui;margin:0;padding:0;background:#f7f7f7}
     .splash-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.8);
+      background: linear-gradient(135deg, rgba(0,112,74,0.9) 0%, rgba(0,80,53,0.9) 100%);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -25,38 +22,46 @@
     .splash-content {
       background: white;
       padding: 2rem;
-      border-radius: 12px;
-      max-width: 600px;
+      border-radius: 16px;
+      max-width: 700px;
       width: 90%;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      border: 1px solid rgba(0,112,74,0.1);
     }
     .splash-title {
       color: #00704a;
       text-align: center;
       margin-bottom: 1.5rem;
       font-size: 1.8rem;
+      font-weight: 700;
     }
     .splash-instructions {
       margin-bottom: 2rem;
     }
     .splash-step {
       display: flex;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
       align-items: flex-start;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 10px;
+      border-left: 4px solid #00704a;
     }
     .step-number {
       background: #00704a;
       color: white;
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
       margin-right: 1rem;
       flex-shrink: 0;
+      font-weight: bold;
+      font-size: 1.1rem;
     }
     .step-text {
       flex: 1;
@@ -64,326 +69,325 @@
     .splash-button {
       display: block;
       width: 100%;
-      padding: 12px;
-      background: #00704a;
+      padding: 14px;
+      background: linear-gradient(135deg, #00704a, #005a3c);
       color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 1.1rem;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: all 0.3s;
+      font-weight: 600;
+      margin-top: 1rem;
     }
     .splash-button:hover {
-      background: #005a3c;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,112,74,0.3);
     }
 
-    /* MEJORAS PARA INPUTS */
+    /* INPUTS MEJORADOS */
     .splash-step input {
       width: 100%;
       margin-top: 0.5rem;
-      padding: 0.75rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
       font-size: 1rem;
       box-sizing: border-box;
+      transition: all 0.3s;
+    }
+    .splash-step input:focus {
+      border-color: #00704a;
+      box-shadow: 0 0 0 3px rgba(0,112,74,0.1);
+      outline: none;
+    }
+    
+    .pac-container {
+      border-radius: 8px;
+      border: 2px solid #00704a;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
     
     .splash-coords {
-      margin-top: 0.5rem;
+      margin-top: 0.75rem;
       font-size: 0.9rem;
       color: #666;
       display: flex;
       gap: 1rem;
       align-items: center;
+      flex-wrap: wrap;
     }
     
     .splash-coords label {
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      background: white;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
     }
     
     .splash-coords input {
-      width: 120px;
+      width: 100px;
       padding: 0.5rem;
-      border: 1px solid #eee;
+      border: 1px solid #e0e0e0;
       background: #f9f9f9;
       border-radius: 4px;
+      font-size: 0.9rem;
     }
 
-    /* NUEVOS ESTILOS PARA FINANCIACIÓN */
+    /* ESTILOS PARA FINANCIACIÓN MEJORADOS */
     .slider-container {
       margin: 2rem 0;
-      padding: 1rem;
-      background: #f8f9fa;
-      border-radius: 8px;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #f8f9fa, #ffffff);
+      border-radius: 12px;
+      border: 2px solid #e8f5e8;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
+    
     .slider-value {
       text-align: center;
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: bold;
       color: #00704a;
       margin-bottom: 1rem;
-      padding: 0.5rem;
+      padding: 1rem;
       background: white;
-      border-radius: 8px;
-      border: 2px solid #00704a;
-    }
-    
-    /* Estilos para el slider */
-    .slider-wrapper {
-      position: relative;
-      height: 40px;
-      margin: 1rem 0;
+      border-radius: 10px;
+      border: 3px solid #00704a;
+      box-shadow: 0 4px 6px rgba(0,112,74,0.1);
     }
     
     input[type="range"] {
       -webkit-appearance: none;
       width: 100%;
-      height: 10px;
-      border-radius: 5px;
+      height: 12px;
+      border-radius: 6px;
       background: linear-gradient(to right, #2ecc71, #f39c12, #e74c3c);
       outline: none;
-      margin: 15px 0;
+      margin: 20px 0;
     }
     
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       background: #00704a;
       cursor: pointer;
-      border: 3px solid white;
+      border: 4px solid white;
       box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      transition: all 0.2s;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 15px rgba(0,112,74,0.4);
     }
     
     .slider-labels {
       display: flex;
       justify-content: space-between;
-      margin-top: 5px;
+      margin-top: 10px;
       font-size: 0.9rem;
       color: #666;
+      font-weight: 600;
     }
     
-    .slider-percentage {
-      text-align: center;
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #00704a;
-      margin-top: 0.5rem;
-    }
-    
-    /* Resultados de financiación simplificados */
     .finance-results {
-      background: #f8f9fa;
+      background: linear-gradient(135deg, #ffffff, #f8f9fa);
       padding: 1.5rem;
-      border-radius: 8px;
-      margin: 1.5rem 0;
+      border-radius: 12px;
+      margin: 2rem 0;
       border: 2px solid #00704a;
+      box-shadow: 0 8px 25px rgba(0,112,74,0.1);
     }
     
     .finance-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 1rem;
-      margin: 1rem 0;
+      margin: 1.5rem 0;
     }
     
     .finance-card {
       background: white;
-      padding: 1rem;
-      border-radius: 8px;
+      padding: 1.2rem;
+      border-radius: 10px;
       text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      border-top: 4px solid #00704a;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      border-top: 5px solid #00704a;
+      transition: transform 0.3s;
+    }
+    
+    .finance-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,112,74,0.15);
     }
     
     .finance-label {
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       color: #666;
-      margin-bottom: 0.5rem;
-    }
-    
-    .finance-value {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #00704a;
-    }
-    
-    .finance-detail {
-      font-size: 0.8rem;
-      color: #888;
-      margin-top: 0.25rem;
-    }
-    
-    /* Línea de financiamiento */
-    .finance-line {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem;
-      background: white;
-      border-radius: 8px;
-      margin: 0.5rem 0;
-      border-left: 4px solid #00704a;
-    }
-    
-    /* Timeline simplificado */
-    .timeline-container {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 8px;
-      margin: 1.5rem 0;
-      border: 1px solid #ddd;
-    }
-    
-    .timeline-bar {
-      height: 30px;
-      background: #e9ecef;
-      border-radius: 15px;
-      margin: 1rem 0;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .timeline-progress {
-      position: absolute;
-      left: 0;
-      top: 0;
-      height: 100%;
-      background: linear-gradient(90deg, #2ecc71, #f39c12);
-      border-radius: 15px;
-      transition: width 0.5s ease;
-    }
-    
-    .timeline-ticks {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-      font-size: 0.8rem;
-      color: #666;
-    }
-    
-    /* Mensaje de inversión */
-    .investment-message {
-      background: linear-gradient(135deg, #e8f5e8, #d4edda);
-      padding: 1.5rem;
-      border-radius: 8px;
-      margin: 1.5rem 0;
-      text-align: center;
-      border-left: 4px solid #28a745;
-    }
-    
-    .investment-title {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #28a745;
-      margin-bottom: 0.5rem;
-    }
-    
-    .investment-value {
-      font-size: 2rem;
-      font-weight: bold;
-      color: #00704a;
-    }
-    
-    /* Estilos existentes que se mantienen */
-    .investment-details {
-      background: #f8f9fa;
-      padding: 1.5rem;
-      border-radius: 8px;
-      margin: 1.5rem 0;
-      text-align: center;
-    }
-    
-    .back-button {
-      background: #6c757d;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 10px 15px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      margin-top: 1rem;
-      transition: background 0.3s;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-    
-    .back-button:hover {
-      background: #5a6268;
-    }
-    
-    .back-button-container {
-      text-align: center;
-      margin-top: 1rem;
-    }
-    
-    .logo-header {
-      text-align: center;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 2px solid #00704a;
-    }
-    
-    .logo-img {
-      max-height: 60px;
-      width: auto;
-    }
-    
-    /* FORMULARIO */
-    .email-form {
-      background: #f8f9fa;
-      padding: 1.5rem;
-      border-radius: 8px;
-      margin-top: 2rem;
-    }
-    
-    .form-group {
-      margin-bottom: 1rem;
-    }
-    
-    .form-group label {
-      display: block;
       margin-bottom: 0.5rem;
       font-weight: 600;
     }
     
-    .form-group input {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 1rem;
+    .finance-value {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #00704a;
+      margin: 0.5rem 0;
+    }
+    
+    .scale-discount-badge {
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      display: inline-block;
+      margin-top: 1rem;
+      box-shadow: 0 3px 10px rgba(40,167,69,0.3);
+    }
+    
+    /* TIMELINE MEJORADO */
+    .timeline-container {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin: 2rem 0;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .investment-message {
+      background: linear-gradient(135deg, #e8f5e8, #d4edda);
+      padding: 2rem;
+      border-radius: 12px;
+      margin: 2rem 0;
+      text-align: center;
+      border-left: 5px solid #28a745;
+      box-shadow: 0 5px 15px rgba(40,167,69,0.1);
+    }
+    
+    .investment-title {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #28a745;
+      margin-bottom: 1rem;
+    }
+    
+    /* LOGO Y HEADER */
+    .logo-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 3px solid #00704a;
+      background: linear-gradient(135deg, #f8fff9, #ffffff);
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,112,74,0.1);
+    }
+    
+    .logo-img {
+      max-height: 70px;
+      width: auto;
+      margin-bottom: 1rem;
+    }
+    
+    /* BOTONES VOLVER MEJORADOS */
+    .back-button {
+      background: linear-gradient(135deg, #6c757d, #5a6268);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+    
+    .back-button:hover {
+      transform: translateX(-5px);
+      box-shadow: 0 5px 15px rgba(108,117,125,0.3);
+    }
+    
+    /* PANTALLA DE CONFIRMACIÓN MEJORADA */
+    .location-controls {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      border: 2px solid #e0e0e0;
+    }
+    
+    /* ANIMACIONES */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .splash-content {
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .splash-content {
+        padding: 1.5rem;
+        width: 95%;
+      }
+      
+      .finance-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .splash-coords {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .splash-coords label {
+        justify-content: space-between;
+      }
+      
+      .splash-coords input {
+        width: 100%;
+      }
     }
   </style>
 </head>
 
 <body>
-  <!-- PANTALLA SPLASH INICIAL CON AUTOCOMPLETE FUNCIONAL -->
+  <!-- PANTALLA SPLASH INICIAL CON AUTOCOMPLETE CORREGIDO -->
   <div id="splashScreen" class="splash-overlay">
     <div class="splash-content">
       <div class="logo-header">
-        <img src="logo.png" alt="Energialt SAS" class="logo-img" onerror="this.style.display='none'">
-        <h2 class="splash-title">Financiación Solar Flexible</h2>
+        <img src="logo.png" alt="JZL Soluciones" class="logo-img" onerror="this.style.display='none'">
+        <h2 class="splash-title">Financiación Solar Inteligente</h2>
+        <p style="color: #666; margin-top: 0.5rem;">Convierte tu factura de luz en una inversión</p>
       </div>
       
       <div class="splash-instructions">
-        <p style="text-align: center; margin-bottom: 1.5rem;">Diseña tu financiamiento ideal para energía solar:</p>
-        
         <div class="splash-step">
           <div class="step-number">1</div>
           <div class="step-text">
-            <strong>Ingresa tu dirección O coordenadas</strong>
-            <input id="searchBoxSplash" type="text" placeholder="Cra 15 # 120-30, Bogotá" autocomplete="off"/>
+            <strong>📍 Ingresa tu dirección</strong>
+            <input id="searchBoxSplash" type="text" placeholder="Ej: Cra 15 # 120-30, Bogotá" autocomplete="off"/>
             <div class="splash-coords">
-              <label>Lat: <input id="latTxtSplash" type="text" placeholder="4.711"/></label>
-              <label>Lon: <input id="lonTxtSplash" type="text" placeholder="-74.072"/></label>
+              <label>📐 Latitud: <input id="latTxtSplash" type="text" placeholder="4.711"/></label>
+              <label>📐 Longitud: <input id="lonTxtSplash" type="text" placeholder="-74.072"/></label>
             </div>
-            <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">
-              💡 Escribe tu dirección o ingresa coordenadas manualmente
+            <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; background: #e8f5e8; padding: 0.5rem; border-radius: 6px;">
+              💡 Escribe tu dirección y selecciona una sugerencia, o ingresa coordenadas manualmente
             </p>
           </div>
         </div>
@@ -391,16 +395,16 @@
         <div class="splash-step">
           <div class="step-number">2</div>
           <div class="step-text">
-            <strong>Ingresa el valor de tu factura mensual (COP)</strong>
-            <input id="billSplash" type="number" placeholder="200000"/>
-            <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;">
-              Tu cuota mensual será el 70% de este valor
+            <strong>💡 Ingresa tu factura mensual actual</strong>
+            <input id="billSplash" type="number" placeholder="Ej: 200000 (COP)"/>
+            <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; background: #e3f2fd; padding: 0.5rem; border-radius: 6px;">
+              📊 Tu cuota de financiación será el <strong>70%</strong> de este valor
             </p>
           </div>
         </div>
       </div>
       
-      <button id="cotizarSplash" class="splash-button">Calcular Financiación</button>
+      <button id="cotizarSplash" class="splash-button">✨ Calcular Mi Financiación</button>
     </div>
   </div>
 
@@ -408,30 +412,31 @@
   <div id="confirmLocationScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
       <div class="logo-header">
-        <img src="logo.png" alt="Energialt SAS" class="logo-img" onerror="this.style.display='none'">
+        <img src="logo.png" alt="JZL Soluciones" class="logo-img" onerror="this.style.display='none'">
         <h2 class="splash-title">Confirma tu ubicación</h2>
+        <p style="color: #666; margin-top: 0.5rem;">Ajusta el marcador si es necesario</p>
       </div>
       
-      <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-        <div style="margin-bottom: 0.5rem;">
-          <label for="confirmAddress" style="display: block; margin-bottom: 0.25rem; font-weight: 600;">Dirección:</label>
-          <input id="confirmAddress" type="text" placeholder="Ingresa o ajusta la dirección" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;"/>
+      <div class="location-controls">
+        <div style="margin-bottom: 1rem;">
+          <label for="confirmAddress" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #00704a;">📍 Dirección:</label>
+          <input id="confirmAddress" type="text" placeholder="Ingresa o ajusta la dirección" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;"/>
         </div>
         
         <div>
-          <label style="display: block; margin-bottom: 0.25rem; font-weight: 600;">Coordenadas:</label>
-          <div style="display: flex; gap: 1rem;">
-            <input id="confirmLat" type="text" placeholder="Latitud" style="flex: 1; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;"/>
-            <input id="confirmLon" type="text" placeholder="Longitud" style="flex: 1; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;"/>
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #00704a;">🌐 Coordenadas:</label>
+          <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <input id="confirmLat" type="text" placeholder="Latitud" style="flex: 1; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;"/>
+            <input id="confirmLon" type="text" placeholder="Longitud" style="flex: 1; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;"/>
           </div>
         </div>
       </div>
       
-      <div id="confirmMap" style="height: 300px; border-radius: 8px; margin-bottom: 1rem;"></div>
+      <div id="confirmMap" style="height: 300px; border-radius: 10px; margin-bottom: 1.5rem; border: 2px solid #ddd;"></div>
       
-      <button id="confirmLocationBtn" class="splash-button">Confirmar Ubicación</button>
+      <button id="confirmLocationBtn" class="splash-button">✅ Confirmar Ubicación</button>
       
-      <div class="back-button-container">
+      <div style="text-align: center; margin-top: 1.5rem;">
         <button id="backToSplashFromConfirm" class="back-button">
           ← Volver a editar datos
         </button>
@@ -439,30 +444,49 @@
     </div>
   </div>
 
-  <!-- PANTALLA DE FINANCIACIÓN SIMPLIFICADA -->
+  <!-- PANTALLA DE FINANCIACIÓN CON DESCUENTO POR ESCALA -->
   <div id="financeScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
       <div class="logo-header">
-        <img src="logo.png" alt="Energialt SAS" class="logo-img" onerror="this.style.display='none'">
+        <img src="logo.png" alt="JZL Soluciones" class="logo-img" onerror="this.style.display='none'">
         <h2 class="splash-title">Diseña tu Financiación</h2>
-        <p style="text-align: center; color: #666; margin-top: 0.5rem;">
-          Tu cuota mensual será el <strong>70% de tu factura actual</strong>
+        <p style="color: #666; margin-top: 0.5rem;">
+          Tu cuota mensual será el <strong style="color: #00704a;">70% de tu factura actual</strong>
         </p>
       </div>
       
-      <div class="investment-details">
-        <div style="font-size: 1.2rem; margin-bottom: 1rem; color: #666;">
-          Sistema solar estimado para tu consumo:
+      <!-- Sistema Calculado -->
+      <div style="background: linear-gradient(135deg, #f8f9fa, #ffffff); padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0; border: 2px solid #e0e0e0;">
+        <div style="text-align: center; margin-bottom: 1rem;">
+          <div style="font-size: 1.1rem; color: #666; margin-bottom: 0.5rem;">Sistema solar estimado para tu consumo</div>
+          <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+            <div style="text-align: center;">
+              <div style="font-size: 0.9rem; color: #888;">Paneles</div>
+              <div style="font-size: 2rem; font-weight: bold; color: #00704a;" id="totalPanels">0</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 0.9rem; color: #888;">Potencia</div>
+              <div style="font-size: 2rem; font-weight: bold; color: #00704a;" id="totalKWp">0 kWp</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 0.9rem; color: #888;">Valor base</div>
+              <div style="font-size: 1.8rem; font-weight: bold; color: #00704a;" id="totalSystemValue">$0 COP</div>
+            </div>
+          </div>
         </div>
-        <div style="font-size: 2rem; font-weight: bold; color: #00704a; margin-bottom: 0.5rem;">
-          <span id="totalPanels">0</span> paneles
-        </div>
-        <div style="font-size: 1.5rem; color: #666;">
-          Valor total: <span id="totalSystemValue" style="font-weight: bold; color: #00704a;">$0 COP</span>
+        
+        <!-- Descuento por Escala -->
+        <div id="scaleDiscountDisplay" style="text-align: center; margin-top: 1rem; display: none;">
+          <div class="scale-discount-badge">
+            🎯 Descuento por escala aplicado: <span id="discountPercentage">0%</span>
+          </div>
+          <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+            Sistemas más grandes obtienen mejor relación costo/beneficio
+          </p>
         </div>
       </div>
       
-      <!-- Control deslizante para pago inicial -->
+      <!-- Control deslizante -->
       <div class="slider-container">
         <h3 style="text-align: center; margin-bottom: 1rem; color: #00704a;">
           💰 Ajusta tu pago inicial
@@ -472,27 +496,28 @@
           $0 COP
         </div>
         
-        <div class="slider-wrapper">
+        <div style="position: relative;">
           <input type="range" id="downPaymentSlider" min="0" max="100" value="20" step="1">
         </div>
         
-        <div class="slider-percentage">
-          <span id="downPaymentPercentage">20%</span> del valor total
+        <div style="text-align: center; margin-top: 0.5rem;">
+          <div style="font-size: 1.2rem; font-weight: bold; color: #00704a;" id="downPaymentPercentage">20%</div>
+          <div style="font-size: 0.9rem; color: #888;">del valor total</div>
         </div>
         
         <div class="slider-labels">
           <span>$0 COP</span>
-          <span>Pago inicial</span>
+          <span style="color: #00704a; font-weight: bold;">Pago inicial</span>
           <span id="maxDownPaymentLabel">$0 COP</span>
         </div>
         
-        <p style="text-align: center; font-size: 0.9rem; color: #666; margin-top: 1rem;">
-          💡 Desliza para ajustar cuánto quieres pagar inicialmente.<br>
-          <strong>A mayor cuota inicial, reduces tu cuenta de energía más rápido.</strong>
+        <p style="text-align: center; font-size: 0.9rem; color: #666; margin-top: 1.5rem; padding: 1rem; background: #e8f5e8; border-radius: 8px;">
+          💡 <strong>Desliza para ajustar cuánto quieres pagar inicialmente.</strong><br>
+          A mayor cuota inicial, reduces tu tiempo de financiación más rápido.
         </p>
       </div>
       
-      <!-- Resultados de financiación SIMPLIFICADOS -->
+      <!-- Resultados de financiación -->
       <div class="finance-results">
         <h3 style="text-align: center; margin-bottom: 1.5rem; color: #00704a;">
           📋 Resumen de tu financiación
@@ -502,79 +527,83 @@
           <div class="finance-card">
             <div class="finance-label">Pago inicial</div>
             <div class="finance-value" id="selectedDownPayment">$0 COP</div>
-            <div class="finance-detail" id="downPaymentPercent">0% del total</div>
+            <div style="font-size: 0.8rem; color: #888;" id="downPaymentPercent">0% del total</div>
           </div>
           
           <div class="finance-card">
             <div class="finance-label">Valor financiado</div>
             <div class="finance-value" id="financedAmount">$0 COP</div>
-            <div class="finance-detail">Saldo a pagar</div>
+            <div style="font-size: 0.8rem; color: #888;">Saldo a pagar</div>
           </div>
           
           <div class="finance-card">
             <div class="finance-label">Cuota mensual</div>
             <div class="finance-value" id="monthlyPayment">$0 COP</div>
-            <div class="finance-detail">70% de tu factura</div>
+            <div style="font-size: 0.8rem; color: #888;">70% de tu factura</div>
           </div>
           
           <div class="finance-card">
             <div class="finance-label">Plazo total</div>
             <div class="finance-value" id="financeTerm">0 meses</div>
-            <div class="finance-detail" id="financeYears">0 años</div>
+            <div style="font-size: 0.8rem; color: #888;" id="financeYears">0 años</div>
           </div>
         </div>
         
-        <!-- Líneas de financiamiento simplificadas -->
-        <div style="margin-top: 1.5rem;">
-          <div class="finance-line">
-            <span>Valor del sistema solar:</span>
-            <strong id="systemValueLine">$0 COP</strong>
+        <!-- Líneas de financiamiento -->
+        <div style="margin-top: 2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: white; border-radius: 8px; margin: 0.5rem 0; border-left: 4px solid #00704a;">
+            <span>Sistema solar con servicios (5 años):</span>
+            <strong style="font-size: 1.2rem; color: #00704a;" id="systemWithServices">$0 COP</strong>
           </div>
-          <div class="finance-line">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: white; border-radius: 8px; margin: 0.5rem 0; border-left: 4px solid #28a745;">
             <span>Pago inicial seleccionado:</span>
-            <strong id="downPaymentLine">$0 COP</strong>
+            <strong style="font-size: 1.2rem; color: #28a745;" id="downPaymentLine">$0 COP</strong>
           </div>
-          <div class="finance-line" style="background: #e8f5e8; font-weight: bold;">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #e8f5e8; border-radius: 8px; margin: 0.5rem 0; border-left: 4px solid #00704a; font-weight: bold;">
             <span>Saldo a financiar:</span>
-            <strong id="balanceToFinance">$0 COP</strong>
+            <strong style="font-size: 1.3rem; color: #00704a;" id="balanceToFinance">$0 COP</strong>
           </div>
         </div>
       </div>
       
-      <!-- Timeline de pagos simplificado -->
+      <!-- Timeline -->
       <div class="timeline-container">
         <h3 style="text-align: center; margin-bottom: 1rem; color: #00704a;">
-          ⏱️ Línea de tiempo de pagos
+          ⏱️ Proyección de pagos
         </h3>
         
-        <div class="timeline-bar">
-          <div class="timeline-progress" id="timelineProgress"></div>
+        <div style="height: 30px; background: #e9ecef; border-radius: 15px; margin: 1.5rem 0; position: relative; overflow: hidden;">
+          <div id="timelineProgress" style="position: absolute; left: 0; top: 0; height: 100%; background: linear-gradient(90deg, #2ecc71, #f39c12); border-radius: 15px; transition: width 0.5s ease; width: 0%;"></div>
         </div>
         
-        <div class="timeline-ticks">
-          <span>Hoy</span>
+        <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.9rem; color: #666; font-weight: 600;">
+          <span>🏁 Inicio</span>
           <span id="midTerm">Mitad</span>
-          <span id="endTerm">Final</span>
+          <span id="endTerm">Finalización</span>
         </div>
         
-        <p style="text-align: center; font-size: 0.9rem; color: #666; margin-top: 1rem;">
-          Tiempo estimado para completar el pago: <strong id="estimatedTime">0 meses</strong>
+        <p style="text-align: center; font-size: 0.9rem; color: #666; margin-top: 1.5rem;">
+          Tiempo estimado para completar el pago: <strong id="estimatedTime" style="color: #00704a;">0 meses</strong>
         </p>
       </div>
       
-      <!-- Mensaje de inversión (modificado) -->
+      <!-- Mensaje de inversión -->
       <div class="investment-message">
         <div class="investment-title">¡Convierte tu pago de energía en inversión desde el primer mes!</div>
-        <div class="investment-value" id="immediateSavings">$0 COP/mes</div>
+        <div style="font-size: 2.2rem; font-weight: bold; color: #00704a; margin: 1rem 0;" id="immediateSavings">$0 COP/mes</div>
         <p style="margin-top: 0.5rem; color: #666; font-size: 0.9rem;">
           Mientras pagas el sistema, tu factura baja inmediatamente<br>
-          <strong id="originalBill">Factura actual: $0 COP</strong> → <strong id="newBill">Nueva factura: $0 COP</strong>
+          <span style="font-weight: bold; color: #ff6b6b;" id="originalBill">Factura actual: $0 COP</span> → 
+          <span style="font-weight: bold; color: #2ea642;" id="newBill">Nueva factura: $0 COP</span>
         </p>
+        <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.8); border-radius: 8px;">
+          <div style="font-size: 0.9rem; color: #666;">🎯 <strong>Incluye todo por 5 años:</strong> Mantenimiento + Atención prioritaria + Plataforma de monitoreo</div>
+        </div>
       </div>
       
-      <button id="nextToFormBtn" class="splash-button">Continuar con mis datos</button>
+      <button id="nextToFormBtn" class="splash-button">📝 Continuar con mis datos</button>
       
-      <div class="back-button-container">
+      <div style="text-align: center; margin-top: 1.5rem;">
         <button id="backToConfirmFromFinance" class="back-button">
           ← Volver a ajustar ubicación
         </button>
@@ -586,36 +615,36 @@
   <div id="formScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
       <div class="logo-header">
-        <img src="logo.png" alt="Energialt SAS" class="logo-img" onerror="this.style.display='none'">
+        <img src="logo.png" alt="JZL Soluciones" class="logo-img" onerror="this.style.display='none'">
         <h2 class="splash-title">Completa tus datos</h2>
       </div>
       
-      <div class="email-form">
-        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
-          <p style="text-align: center; margin: 0; color: #00704a; font-weight: bold;">
+      <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 12px; margin-top: 1rem;">
+        <div style="background: #e8f5e8; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center;">
+          <p style="margin: 0; color: #00704a; font-weight: bold; font-size: 1.1rem;">
             ¡Estás a un paso de convertir tu factura de luz en una inversión!
           </p>
         </div>
 
-        <div class="form-group">
-          <label for="userName">Nombre completo</label>
-          <input type="text" id="userName" placeholder="Ingresa tu nombre">
+        <div style="margin-bottom: 1.5rem;">
+          <label for="userName" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">👤 Nombre completo</label>
+          <input type="text" id="userName" placeholder="Ingresa tu nombre completo" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;"/>
         </div>
         
-        <div class="form-group">
-          <label for="userEmail">Correo electrónico</label>
-          <input type="email" id="userEmail" placeholder="Ingresa tu email">
+        <div style="margin-bottom: 1.5rem;">
+          <label for="userEmail" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">📧 Correo electrónico</label>
+          <input type="email" id="userEmail" placeholder="ejemplo@email.com" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;"/>
         </div>
         
-        <div class="form-group">
-          <label for="userPhone">Teléfono</label>
-          <input type="tel" id="userPhone" placeholder="Ingresa tu teléfono">
+        <div style="margin-bottom: 2rem;">
+          <label for="userPhone" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333;">📱 Teléfono</label>
+          <input type="tel" id="userPhone" placeholder="Ingresa tu número de teléfono" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem;"/>
         </div>
         
-        <button id="sendFinanceBtn" class="splash-button">Solicitar financiación</button>
+        <button id="sendFinanceBtn" class="splash-button">✅ Solicitar financiación</button>
       </div>
 
-      <div class="back-button-container">
+      <div style="text-align: center; margin-top: 1.5rem;">
         <button id="backToFinanceFromForm" class="back-button">
           ← Volver a ajustar financiación
         </button>
@@ -627,27 +656,28 @@
   <div id="finalScreen" class="splash-overlay" style="display: none;">
     <div class="splash-content">
       <div class="logo-header" style="text-align: center; margin-bottom: 2rem;">
-        <img src="logo.png" alt="Energialt SAS" class="logo-img" onerror="this.style.display='none'">
+        <img src="logo.png" alt="JZL Soluciones" class="logo-img" onerror="this.style.display='none'">
       </div>
       
       <div style="text-align: center; margin-bottom: 2rem;">
-        <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+        <div style="font-size: 4rem; margin-bottom: 1rem; color: #28a745;">✅</div>
         <h2 class="splash-title">¡Solicitud Enviada!</h2>
+        <p style="color: #666; margin-top: 0.5rem;">Hemos procesado tu solicitud de financiación</p>
       </div>
       
-      <div style="background: #e8f5e8; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
-        <h3 style="color: #00704a; margin-bottom: 1rem;">Resumen de tu solicitud</h3>
-        <div id="finalSummary"></div>
+      <div style="background: #e8f5e8; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border: 2px solid #28a745;">
+        <h3 style="color: #00704a; margin-bottom: 1rem; text-align: center;">📋 Resumen de tu solicitud</h3>
+        <div id="finalSummary" style="text-align: left; line-height: 1.6;"></div>
       </div>
       
-      <button id="newRequestBtn" class="splash-button" style="background: #28a745;">
+      <button id="newRequestBtn" class="splash-button" style="background: linear-gradient(135deg, #28a745, #20c997);">
         🔄 Nueva Solicitud
       </button>
     </div>
   </div>
 
   <script>
-    // Variables globales
+    // ========== VARIABLES GLOBALES ==========
     let map, marker, autocomplete, confirmMap, confirmMarker, confirmAutocomplete;
     let currentSystemValue = 0;
     let currentMonthlyBill = 0;
@@ -656,30 +686,49 @@
     let financedAmount = 0;
     let financeTermMonths = 0;
     let totalPanels = 0;
+    let totalKWp = 0;
+    let sistemaConServicios = 0;
     
-    // Constantes
+    // ========== CONSTANTES ==========
     const ANNUAL_INTEREST_RATE = 0.24; // 24% anual
-    const MONTHLY_INTEREST_RATE = Math.pow(1 + ANNUAL_INTEREST_RATE, 1/12) - 1; // Interés compuesto
+    const MONTHLY_INTEREST_RATE = Math.pow(1 + ANNUAL_INTEREST_RATE, 1/12) - 1;
     const TARGET_PERCENTAGE = 0.7; // 70% de la factura
     
-    // URL de Google Apps Script
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzidMv2QUfpI-ZnbhWPP8p3AHBGyANszR13WkDEv4J1lg6HgMZ3GplF5XiMIGnsYZGzjQ/exec';
-
-    // FUNCIONES DE FORMATEO
-    function formatoDineroCOP(valor) {
-      const numeroFormateado = valor.toLocaleString('es-CO', {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      });
+    // PARÁMETROS DE LA FUNCIÓN EXPONENCIAL PARA DESCUENTO POR ESCALA
+    const A = 0.45;    // Máximo adicional posible (45%)
+    const B = 0.15;    // Tasa de decrecimiento rápida
+    const C = 0.12;    // Mínimo adicional asintótico (12%)
+    
+    // ========== FUNCIÓN EXPONENCIAL PARA DESCUENTO POR ESCALA ==========
+    function calcularFactorAdicional(kWp) {
+      // Limitamos a 25kW para estabilización
+      const kWpLimitado = Math.min(kWp, 25);
       
-      if (valor >= 1000000) {
-        return '$' + numeroFormateado.replace('.', "'");
-      } else {
-        return '$' + numeroFormateado;
-      }
+      // Fórmula: adicional = A × e^(-B × kWp) + C
+      const adicional = A * Math.exp(-B * kWpLimitado) + C;
+      
+      return adicional;
     }
-
-    // FUNCIONES PARA VALIDACIÓN DE COORDENADAS
+    
+    function calcularFactorTotal(kWp) {
+      return 1 + calcularFactorAdicional(kWp);
+    }
+    
+    // ========== FUNCIONES DE FORMATEO ==========
+    function formatoDineroCOP(valor) {
+      if (valor >= 1000000) {
+        return '$' + (valor/1000000).toFixed(1).replace('.', ',') + 'M';
+      } else if (valor >= 1000) {
+        return '$' + Math.round(valor/1000) + 'K';
+      }
+      return '$' + Math.round(valor).toLocaleString('es-CO');
+    }
+    
+    function formatoDineroCompleto(valor) {
+      return '$' + Math.round(valor).toLocaleString('es-CO');
+    }
+    
+    // ========== FUNCIONES PARA VALIDACIÓN DE COORDENADAS ==========
     function sonCoordenadasValidas(lat, lon) {
       const numLat = parseFloat(lat);
       const numLon = parseFloat(lon);
@@ -687,7 +736,7 @@
              numLat >= -90 && numLat <= 90 && 
              numLon >= -180 && numLon <= 180;
     }
-
+    
     function obtenerCoordenadasDeInputs() {
       const lat = document.getElementById('latTxtSplash').value;
       const lon = document.getElementById('lonTxtSplash').value;
@@ -701,8 +750,8 @@
       }
       return null;
     }
-
-    // FUNCIÓN PARA CALCULAR LA COTIZACIÓN DEL SISTEMA
+    
+    // ========== CÁLCULO DEL SISTEMA SOLAR CON DESCUENTO POR ESCALA ==========
     async function calcularCotizacion(lat, lon, bill) {
       const PRICE_KWH = 890;
       const USD_COP = 4000;
@@ -711,13 +760,13 @@
       const TARGET = 0.7;
       const AREA_POR_PANEL = 2.2;
       const COSTO_FIJO_COP = 3000000;
-
+    
       try {
         const kwhMonth = bill / PRICE_KWH;
         const kwh70 = kwhMonth * TARGET;
-
+    
         let specific = 1350; // Valor por defecto
-
+    
         try {
           const response = await fetch(
             `https://developer.nrel.gov/api/pvwatts/v8.json?api_key=ECmQDDWbYsWgQ4pFg2zFUZdlbTirJhA1pnfQRRC4&lat=${lat}&lon=${lon}&system_capacity=1&azimuth=180&tilt=${Math.abs(lat)}&array_type=1&module_type=0&losses=14&timeframe=monthly`
@@ -732,23 +781,32 @@
         } catch(error) {
           console.warn('Error PVWatts, usando valor por defecto:', error);
         }
-
+    
         const kwp = (kwh70 * 12) / specific;
         totalPanels = Math.ceil(kwp / (PANEL_W/1000));
+        totalKWp = totalPanels * (PANEL_W/1000);
         const kwpReal = totalPanels * (PANEL_W/1000);
-
+    
         const priceUsd = kwpReal * 1000 * USD_W_INSTALLED;
-        currentSystemValue = priceUsd * USD_COP + COSTO_FIJO_COP;
+        const valorBaseSistema = priceUsd * USD_COP + COSTO_FIJO_COP;
+        
+        // APLICAR DESCUENTO POR ESCALA
+        const factorDescuento = calcularFactorTotal(totalKWp);
+        currentSystemValue = valorBaseSistema * factorDescuento;
+        sistemaConServicios = currentSystemValue;
         
         // Calcular pago mensual (70% de la factura)
         currentMonthlyPayment = bill * TARGET_PERCENTAGE;
         currentMonthlyBill = bill;
-
+    
         return {
           systemValue: currentSystemValue,
+          valorBaseSistema: valorBaseSistema,
           monthlyPayment: currentMonthlyPayment,
           panels: totalPanels,
-          monthlyBill: currentMonthlyBill
+          monthlyBill: currentMonthlyBill,
+          kWp: totalKWp,
+          factorDescuento: factorDescuento
         };
         
       } catch (error) {
@@ -756,8 +814,8 @@
         throw error;
       }
     }
-
-    // FUNCIÓN PARA CALCULAR FINANCIACIÓN CON INTERÉS COMPUESTO
+    
+    // ========== CÁLCULO DE FINANCIACIÓN ==========
     function calcularFinanciacion(valorTotal, pagoInicial, cuotaMensual) {
       const valorFinanciado = valorTotal - pagoInicial;
       const r = MONTHLY_INTEREST_RATE;
@@ -768,7 +826,6 @@
       }
       
       if (valorFinanciado <= 0) {
-        // Si no hay saldo por financiar
         return { 
           meses: 0, 
           totalIntereses: 0, 
@@ -777,9 +834,7 @@
         };
       }
       
-      // Fórmula para número de meses con interés compuesto
       if (P <= valorFinanciado * r) {
-        // La cuota es menor o igual al interés mensual, nunca terminará
         return { 
           meses: Infinity, 
           totalIntereses: Infinity, 
@@ -802,17 +857,17 @@
         valorFinanciado: valorFinanciado
       };
     }
-
-    // FUNCIÓN PARA ACTUALIZAR LA INTERFAZ DE FINANCIACIÓN (SIMPLIFICADA)
+    
+    // ========== ACTUALIZAR INTERFAZ DE FINANCIACIÓN ==========
     function actualizarFinanciacion() {
       const slider = document.getElementById('downPaymentSlider');
       const percentage = parseInt(slider.value);
       
-      // Calcular pago inicial en pesos
-      currentDownPayment = (currentSystemValue * percentage) / 100;
-      financedAmount = currentSystemValue - currentDownPayment;
+      // Calcular pago inicial
+      currentDownPayment = (sistemaConServicios * percentage) / 100;
+      financedAmount = sistemaConServicios - currentDownPayment;
       
-      // Actualizar valores principales
+      // Actualizar valores en pantalla
       document.getElementById('downPaymentValue').textContent = formatoDineroCOP(currentDownPayment);
       document.getElementById('downPaymentPercentage').textContent = percentage + '%';
       document.getElementById('selectedDownPayment').textContent = formatoDineroCOP(currentDownPayment);
@@ -821,13 +876,13 @@
       document.getElementById('financedAmount').textContent = formatoDineroCOP(financedAmount);
       
       // Líneas de financiamiento
-      document.getElementById('systemValueLine').textContent = formatoDineroCOP(currentSystemValue);
+      document.getElementById('systemWithServices').textContent = formatoDineroCOP(sistemaConServicios);
       document.getElementById('downPaymentLine').textContent = formatoDineroCOP(currentDownPayment);
       document.getElementById('balanceToFinance').textContent = formatoDineroCOP(financedAmount);
       
       // Calcular financiación
       const resultado = calcularFinanciacion(
-        currentSystemValue,
+        sistemaConServicios,
         currentDownPayment,
         currentMonthlyPayment
       );
@@ -845,11 +900,15 @@
         tiempoTexto += resultado.mesesRestantes + ' mes' + (resultado.mesesRestantes !== 1 ? 'es' : '');
       }
       if (resultado.años === 0 && resultado.mesesRestantes === 0) {
-        if (currentDownPayment >= currentSystemValue) {
+        if (currentDownPayment >= sistemaConServicios) {
           tiempoTexto = 'Pago completo';
         } else {
           tiempoTexto = 'Menos de 1 mes';
         }
+      }
+      
+      if (resultado.meses === Infinity) {
+        tiempoTexto = 'No aplicable';
       }
       
       document.getElementById('financeTerm').textContent = tiempoTexto;
@@ -857,8 +916,8 @@
       document.getElementById('estimatedTime').textContent = tiempoTexto;
       
       // Actualizar gráfica de timeline
-      const maxMeses = 25 * 12; // 25 años máximo
-      const progressPercentage = Math.min((financeTermMonths / maxMeses) * 100, 100);
+      const maxMeses = 25 * 12;
+      const progressPercentage = resultado.meses === Infinity ? 100 : Math.min((financeTermMonths / maxMeses) * 100, 100);
       document.getElementById('timelineProgress').style.width = progressPercentage + '%';
       
       // Actualizar marcadores de timeline
@@ -878,18 +937,26 @@
       document.getElementById('originalBill').textContent = 'Factura actual: ' + formatoDineroCOP(currentMonthlyBill);
       document.getElementById('newBill').textContent = 'Nueva factura: ' + formatoDineroCOP(nuevaFactura);
     }
-
-    // FUNCIÓN PARA INICIALIZAR LA PANTALLA DE FINANCIACIÓN
-    function inicializarPantallaFinanciacion() {
-      // Establecer valores máximos
-      document.getElementById('totalSystemValue').textContent = formatoDineroCOP(currentSystemValue);
-      document.getElementById('maxDownPaymentLabel').textContent = formatoDineroCOP(currentSystemValue);
-      document.getElementById('totalPanels').textContent = totalPanels;
+    
+    // ========== INICIALIZAR PANTALLA DE FINANCIACIÓN ==========
+    function inicializarPantallaFinanciacion(sistemaData) {
+      // Mostrar datos del sistema
+      document.getElementById('totalPanels').textContent = sistemaData.panels;
+      document.getElementById('totalKWp').textContent = sistemaData.kWp.toFixed(1);
+      document.getElementById('totalSystemValue').textContent = formatoDineroCOP(sistemaData.valorBaseSistema);
+      document.getElementById('maxDownPaymentLabel').textContent = formatoDineroCOP(sistemaConServicios);
+      
+      // Mostrar descuento por escala
+      const descuentoAdicional = (sistemaData.factorDescuento - 1) * 100;
+      if (descuentoAdicional > 0) {
+        document.getElementById('scaleDiscountDisplay').style.display = 'block';
+        document.getElementById('discountPercentage').textContent = descuentoAdicional.toFixed(1) + '%';
+      }
       
       // Configurar slider
       const slider = document.getElementById('downPaymentSlider');
       slider.max = 100;
-      slider.value = 20; // 20% por defecto
+      slider.value = 20;
       
       // Event listener para slider
       slider.addEventListener('input', function() {
@@ -900,140 +967,142 @@
       // Calcular primera vez
       actualizarFinanciacion();
     }
-
-    // FUNCIÓN PARA MOSTRAR RESUMEN FINAL
-    function mostrarResumenFinal() {
-      const nuevaFactura = currentMonthlyBill - currentMonthlyPayment;
-      const ahorroInmediato = currentMonthlyBill - nuevaFactura;
-      const sliderValue = document.getElementById('downPaymentSlider').value;
-      
-      const resumenHTML = `
-        <div style="text-align: left; line-height: 1.6;">
-          <p><strong>💰 Pago inicial:</strong> ${sliderValue}% (${formatoDineroCOP(currentDownPayment)})</p>
-          <p><strong>📅 Cuota mensual:</strong> ${formatoDineroCOP(currentMonthlyPayment)}</p>
-          <p><strong>⏱️ Tiempo de financiación:</strong> ${document.getElementById('financeTerm').textContent}</p>
-          <p><strong>🏠 Sistema solar:</strong> ${totalPanels} paneles</p>
-          <p><strong>💸 Ahorro mensual:</strong> ${formatoDineroCOP(ahorroInmediato)}/mes</p>
-          <p><strong>📊 Valor financiado:</strong> ${formatoDineroCOP(financedAmount)}</p>
-        </div>
-      `;
-      
-      document.getElementById('finalSummary').innerHTML = resumenHTML;
-    }
-
-    // ========== FUNCIONES DE MAPAS Y AUTOCOMPLETE ==========
     
-    // Variables para autocomplete de la primera pantalla
+    // ========== FUNCIONES DE MAPAS CORREGIDAS ==========
     let splashAutocomplete;
     
-    function initMap(){
-      const bogota = {lat:4.711, lng:-74.072};
-      map = new google.maps.Map(document.getElementById('map'),{
-        zoom: 12,
-        center: bogota,
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: false
-      });
-
-      marker = new google.maps.Marker({
-        position: bogota,
-        map: map,
-        draggable: true,
-        title: 'Arrastra para ajustar'
-      });
-
-      // Configurar autocomplete para la primera pantalla
+    function initMap() {
+      console.log('✅ initMap ejecutado');
+      
+      // Configurar autocomplete para la primera pantalla - ¡ESTO ES CLAVE!
       const splashInput = document.getElementById('searchBoxSplash');
+      
+      // Crear un elemento div temporal para el autocomplete
+      const pacContainer = document.createElement('div');
+      pacContainer.id = 'pac-container';
+      document.body.appendChild(pacContainer);
+      
       splashAutocomplete = new google.maps.places.Autocomplete(splashInput, {
-        fields: ['geometry', 'formatted_address'],
-        types: ['address']
+        fields: ['geometry', 'formatted_address', 'name'],
+        types: ['address'],
+        componentRestrictions: { country: 'co' }
       });
       
+      // Vincular el autocomplete al contenedor
+      splashAutocomplete.bindTo('bounds', new google.maps.LatLngBounds(
+        new google.maps.LatLng(4.0, -75.0),
+        new google.maps.LatLng(5.0, -73.0)
+      ));
+      
+      // Escuchar cambios en el autocomplete
       splashAutocomplete.addListener('place_changed', function() {
         const place = splashAutocomplete.getPlace();
+        console.log('📍 Lugar seleccionado:', place);
+        
         if (!place.geometry) {
-          console.log('No se encontró la ubicación');
+          console.log('❌ No se encontró geometría');
           return;
         }
         
-        // Actualizar coordenadas en la primera pantalla
+        // Actualizar coordenadas en los campos
         const lat = place.geometry.location.lat();
         const lng = place.geometry.location.lng();
         
         document.getElementById('latTxtSplash').value = lat.toFixed(5);
         document.getElementById('lonTxtSplash').value = lng.toFixed(5);
         
-        console.log('Dirección seleccionada:', place.formatted_address);
-        console.log('Coordenadas actualizadas:', lat, lng);
+        console.log('✅ Coordenadas actualizadas:', lat, lng);
+        
+        // También actualizar el campo de búsqueda con la dirección completa
+        if (place.formatted_address) {
+          splashInput.value = place.formatted_address;
+        }
       });
-
-      marker.addListener('dragend', ()=>{
-        const pos = marker.getPosition();
-        actualizaCoords(pos.lat(), pos.lng());
+      
+      // Valores iniciales para Bogotá
+      document.getElementById('latTxtSplash').value = "4.711";
+      document.getElementById('lonTxtSplash').value = "-74.072";
+      
+      // Event listeners para coordenadas manuales
+      document.getElementById('latTxtSplash').addEventListener('change', function() {
+        console.log('Latitud cambiada manualmente:', this.value);
       });
-
-      actualizaCoords(bogota.lat, bogota.lng);
-      document.getElementById('latTxtSplash').value = bogota.lat.toFixed(5);
-      document.getElementById('lonTxtSplash').value = bogota.lng.toFixed(5);
       
-      // Event listeners para actualizar desde coordenadas manuales
-      document.getElementById('latTxtSplash').addEventListener('change', actualizarDesdeCoordenadasSplash);
-      document.getElementById('lonTxtSplash').addEventListener('change', actualizarDesdeCoordenadasSplash);
+      document.getElementById('lonTxtSplash').addEventListener('change', function() {
+        console.log('Longitud cambiada manualmente:', this.value);
+      });
     }
-
-    function actualizarDesdeCoordenadasSplash() {
-      const lat = document.getElementById('latTxtSplash').value;
-      const lon = document.getElementById('lonTxtSplash').value;
-      
-      if (sonCoordenadasValidas(lat, lon)) {
-        // Podríamos hacer reverse geocoding aquí si se desea
-        console.log('Coordenadas actualizadas manualmente:', lat, lon);
-      }
-    }
-
+    
     function initConfirmMap(lat, lng, address) {
-      const location = {lat: lat, lng: lng};
-      confirmMap = new google.maps.Map(document.getElementById('confirmMap'),{
+      console.log('📍 Inicializando mapa de confirmación con:', lat, lng);
+      
+      const location = { lat: lat, lng: lng };
+      
+      confirmMap = new google.maps.Map(document.getElementById('confirmMap'), {
         zoom: 16,
         center: location,
         mapTypeControl: false,
         streetViewControl: false,
-        fullscreenControl: false
+        fullscreenControl: false,
+        styles: [
+          {
+            featureType: "poi",
+            elementType: "labels",
+            stylers: [{ visibility: "off" }]
+          }
+        ]
       });
-
+    
+      // Configurar autocomplete para dirección en confirmación
       const confirmAddressInput = document.getElementById('confirmAddress');
       confirmAutocomplete = new google.maps.places.Autocomplete(confirmAddressInput, {
         fields: ['geometry', 'formatted_address'],
-        types: ['address']
+        types: ['address'],
+        componentRestrictions: { country: 'co' }
       });
       
-      confirmAutocomplete.addListener('place_changed', ()=>{
+      confirmAutocomplete.bindTo('bounds', confirmMap);
+      
+      confirmAutocomplete.addListener('place_changed', function() {
         const place = confirmAutocomplete.getPlace();
-        if(!place.geometry){ return; }
+        if (!place.geometry) return;
+        
         const newLocation = place.geometry.location;
         confirmMap.setCenter(newLocation);
         confirmMarker.setPosition(newLocation);
         updateConfirmCoords(newLocation.lat(), newLocation.lng());
+        
+        // Actualizar el campo de dirección
+        if (place.formatted_address) {
+          confirmAddressInput.value = place.formatted_address;
+        }
       });
-
+    
       confirmMarker = new google.maps.Marker({
         position: location,
         map: confirmMap,
         draggable: true,
-        title: 'Arrastra para ajustar la ubicación'
+        title: 'Arrastra para ajustar la ubicación',
+        animation: google.maps.Animation.DROP
       });
-
-      confirmMarker.addListener('dragend', ()=>{
+    
+      confirmMarker.addListener('dragend', function() {
         const newPosition = confirmMarker.getPosition();
         updateConfirmCoords(newPosition.lat(), newPosition.lng());
         reverseGeocode(newPosition.lat(), newPosition.lng());
       });
-
+    
+      // Inicializar campos
       document.getElementById('confirmAddress').value = address || '';
       updateConfirmCoords(lat, lng);
       
-      // Event listeners para coordenadas editables en confirmación
+      // Centrar el mapa correctamente
+      setTimeout(() => {
+        confirmMap.setCenter(location);
+        confirmMap.setZoom(16);
+      }, 100);
+      
+      // Event listeners para coordenadas editables
       document.getElementById('confirmLat').addEventListener('change', function() {
         const lat = parseFloat(this.value);
         const lon = parseFloat(document.getElementById('confirmLon').value);
@@ -1044,7 +1113,7 @@
           reverseGeocode(lat, lon);
         }
       });
-
+    
       document.getElementById('confirmLon').addEventListener('change', function() {
         const lat = parseFloat(document.getElementById('confirmLat').value);
         const lon = parseFloat(this.value);
@@ -1056,12 +1125,12 @@
         }
       });
     }
-
+    
     function updateConfirmCoords(lat, lng) {
       document.getElementById('confirmLat').value = lat.toFixed(5);
       document.getElementById('confirmLon').value = lng.toFixed(5);
     }
-
+    
     function reverseGeocode(lat, lng) {
       const geocoder = new google.maps.Geocoder();
       const latLng = { lat: lat, lng: lng };
@@ -1072,24 +1141,23 @@
         }
       });
     }
-
-    function actualizaCoords(lat, lng){
-      document.getElementById('latTxt').value = lat.toFixed(5);
-      document.getElementById('lonTxt').value = lng.toFixed(5);
-    }
-
-    // ========== FLUJO PRINCIPAL ==========
     
+    // ========== FLUJO PRINCIPAL ==========
     async function cotizarDesdeSplash() {
+      console.log('🚀 Iniciando cálculo desde splash...');
+      
       // Primero intentar con coordenadas
       let coordenadas = obtenerCoordenadasDeInputs();
       let address = document.getElementById('searchBoxSplash').value;
+      
+      console.log('📌 Dirección ingresada:', address);
+      console.log('📌 Coordenadas obtenidas:', coordenadas);
       
       if (!coordenadas && !address.trim()) {
         alert('Por favor ingresa una dirección o coordenadas válidas');
         return;
       }
-
+    
       let lat, lon;
       
       if (coordenadas) {
@@ -1098,20 +1166,18 @@
         lon = coordenadas.lng;
         console.log('✅ Usando coordenadas ingresadas:', lat, lon);
       } else {
-        // Si hay dirección pero no coordenadas, intentar geocodificación
-        console.log('📍 Usando dirección, necesitamos geocodificar...');
-        // Por ahora usamos valores por defecto
-        lat = 4.711;
-        lon = -74.072;
+        // Si hay dirección pero no coordenadas válidas
+        alert('Por favor ingresa coordenadas válidas o selecciona una dirección de las sugerencias');
+        return;
       }
-
+    
       const bill = parseFloat(document.getElementById('billSplash').value);
       
       if(isNaN(bill) || bill <= 0){ 
         alert('Define una factura mayor a 0'); 
         return; 
       }
-
+    
       // Mostrar pantalla de confirmación
       document.getElementById('splashScreen').style.display = 'none';
       document.getElementById('confirmLocationScreen').style.display = 'flex';
@@ -1119,7 +1185,7 @@
       // Inicializar mapa de confirmación
       initConfirmMap(lat, lon, address);
     }
-
+    
     async function confirmarUbicacion() {
       const lat = parseFloat(document.getElementById('confirmLat').value);
       const lon = parseFloat(document.getElementById('confirmLon').value);
@@ -1129,70 +1195,116 @@
       document.getElementById('latTxtSplash').value = lat.toFixed(5);
       document.getElementById('lonTxtSplash').value = lon.toFixed(5);
       document.getElementById('searchBoxSplash').value = document.getElementById('confirmAddress').value;
-
+    
       try {
-        // Calcular sistema solar
-        await calcularCotizacion(lat, lon, bill);
+        // Calcular sistema solar con descuento por escala
+        const sistemaData = await calcularCotizacion(lat, lon, bill);
+        console.log('📊 Sistema calculado:', sistemaData);
         
         // Mostrar pantalla de financiación
         document.getElementById('confirmLocationScreen').style.display = 'none';
         document.getElementById('financeScreen').style.display = 'flex';
         
         // Inicializar pantalla de financiación
-        inicializarPantallaFinanciacion();
+        inicializarPantallaFinanciacion(sistemaData);
         
       } catch (error) {
         alert('Error en el cálculo. Verifica los datos.');
-        console.error(error);
+        console.error('❌ Error:', error);
       }
     }
-
-    // FUNCIÓN PARA ENVIAR SOLICITUD
+    
+    // ========== FUNCIÓN PARA MOSTRAR RESUMEN FINAL ==========
+    function mostrarResumenFinal() {
+      const nuevaFactura = currentMonthlyBill - currentMonthlyPayment;
+      const ahorroInmediato = currentMonthlyBill - nuevaFactura;
+      const sliderValue = document.getElementById('downPaymentSlider').value;
+      const añosFinanciacion = Math.floor(financeTermMonths / 12);
+      const mesesFinanciacion = financeTermMonths % 12;
+      
+      let tiempoTexto = '';
+      if (añosFinanciacion > 0) {
+        tiempoTexto += añosFinanciacion + ' año' + (añosFinanciacion !== 1 ? 's' : '');
+      }
+      if (mesesFinanciacion > 0) {
+        if (añosFinanciacion > 0) tiempoTexto += ' ';
+        tiempoTexto += mesesFinanciacion + ' mes' + (mesesFinanciacion !== 1 ? 'es' : '');
+      }
+      
+      const resumenHTML = `
+        <div style="display: grid; grid-template-columns: 1fr; gap: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #d4edda;">
+            <span>💰 Pago inicial:</span>
+            <strong>${sliderValue}% (${formatoDineroCompleto(currentDownPayment)})</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #d4edda;">
+            <span>📅 Cuota mensual:</span>
+            <strong>${formatoDineroCompleto(currentMonthlyPayment)}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #d4edda;">
+            <span>⏱️ Tiempo financiación:</span>
+            <strong>${tiempoTexto}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #d4edda;">
+            <span>🏠 Sistema solar:</span>
+            <strong>${totalPanels} paneles (${totalKWp.toFixed(1)} kWp)</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #d4edda;">
+            <span>💸 Ahorro mensual:</span>
+            <strong style="color: #28a745;">${formatoDineroCompleto(ahorroInmediato)}/mes</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 0.5rem; background: #d4edda; border-radius: 6px; margin-top: 0.5rem;">
+            <span>📊 Valor financiado:</span>
+            <strong>${formatoDineroCompleto(financedAmount)}</strong>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('finalSummary').innerHTML = resumenHTML;
+    }
+    
+    // ========== FUNCIÓN PARA ENVIAR SOLICITUD ==========
     async function enviarSolicitudFinanciacion() {
       const userName = document.getElementById('userName').value;
       const userEmail = document.getElementById('userEmail').value;
       const userPhone = document.getElementById('userPhone').value;
-
+    
       if (!userName || !userEmail || !userPhone) {
         alert('Por favor completa todos los campos');
         return;
       }
-
+    
       const botonOriginal = document.getElementById('sendFinanceBtn');
       const textoOriginal = botonOriginal.textContent;
       
       botonOriginal.textContent = 'Enviando...';
       botonOriginal.disabled = true;
-
+    
       try {
-        // Aquí iría la llamada a Google Sheets
-        // const exito = await guardarSolicitudGoogleSheets(userName, userEmail, userPhone);
+        // Simular envío (aquí integrarías con Google Sheets)
+        await new Promise(resolve => setTimeout(resolve, 1500));
         
-        // Por ahora simulamos éxito
-        const exito = true;
+        mostrarResumenFinal();
+        document.getElementById('formScreen').style.display = 'none';
+        document.getElementById('finalScreen').style.display = 'flex';
         
-        if (exito) {
-          mostrarResumenFinal();
-          document.getElementById('formScreen').style.display = 'none';
-          document.getElementById('finalScreen').style.display = 'flex';
-        } else {
-          throw new Error('Error al guardar datos');
-        }
       } catch (error) {
         alert('Error al enviar la solicitud. Por favor intenta nuevamente.');
         botonOriginal.textContent = textoOriginal;
         botonOriginal.disabled = false;
       }
     }
-
-    // FUNCIÓN PARA VOLVER AL MENÚ ANTERIOR
+    
+    // ========== FUNCIÓN PARA VOLVER AL MENÚ ANTERIOR ==========
     function volverAlMenuAnterior(pantallaActual, pantallaAnterior) {
       document.getElementById(pantallaActual).style.display = 'none';
       document.getElementById(pantallaAnterior).style.display = 'flex';
     }
-
-    // EVENT LISTENERS
+    
+    // ========== EVENT LISTENERS ==========
     document.addEventListener('DOMContentLoaded', function() {
+      console.log('✅ DOM cargado');
+      
       // Botones principales
       document.getElementById('cotizarSplash').addEventListener('click', cotizarDesdeSplash);
       document.getElementById('confirmLocationBtn').addEventListener('click', confirmarUbicacion);
@@ -1216,11 +1328,31 @@
       document.getElementById('newRequestBtn').addEventListener('click', function() {
         window.location.reload();
       });
+      
+      // Mejorar UX del formulario
+      document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('focus', function() {
+          this.style.borderColor = '#00704a';
+          this.style.boxShadow = '0 0 0 3px rgba(0,112,74,0.1)';
+        });
+        
+        input.addEventListener('blur', function() {
+          this.style.borderColor = '#ddd';
+          this.style.boxShadow = 'none';
+        });
+      });
+      
+      // Enter para enviar en el splash
+      document.getElementById('billSplash').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          document.getElementById('cotizarSplash').click();
+        }
+      });
     });
   </script>
 
-  <!-- Carga de Google Maps con callback a initMap -->
-  <script async
+  <!-- Carga de Google Maps -->
+  <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKNxSVeV-p40IVdXtU7Ghk7p-WdMnrZes&libraries=places&callback=initMap">
   </script>
 </body>
