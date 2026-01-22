@@ -534,7 +534,6 @@
           <div class="step-text">
             <strong>💡 Ingresa tu factura mensual actual</strong>
             <input id="billSplash" type="number" placeholder="Ej: 200000 (COP)"/>
-            <!-- FRASE QUITADA: 📊 Tu cuota de financiación será el 70% de este valor -->
           </div>
         </div>
       </div>
@@ -963,7 +962,7 @@
         currentSystemValue = valorBaseSistema * factorDescuento;
         sistemaConServicios = currentSystemValue;
         
-        // Calcular pago mensual (70% de la factura)
+        // Calcular pago mensual (75% de la factura)
         currentMonthlyPayment = bill * TARGET_PERCENTAGE;
         currentMonthlyBill = bill;
         
@@ -1691,4 +1690,5 @@
   </script>
 </body>
 </html>
+
 
