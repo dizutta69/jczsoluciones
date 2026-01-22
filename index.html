@@ -593,7 +593,7 @@
         </div>
         
         <div style="position: relative;">
-          <input type="range" id="downPaymentSlider" min="0" max="100" value="20" step="1">
+          <input type="range" id="downPaymentSlider" min="20" max="100" value="40" step="1">
         </div>
         
         <div style="text-align: center; margin-top: 0.5rem;">
@@ -1251,8 +1251,9 @@ function actualizarMetricas25Anios(produccionData, roiData, flujoMensual) {
       
       // Configurar slider
       const slider = document.getElementById('downPaymentSlider');
+      slider.min = 20;  // Mínimo 20%
       slider.max = 100;
-      slider.value = 20;
+      slider.value = 40; // Valor inicial 40%
       
       // Event listener para slider
       slider.addEventListener('input', function() {
@@ -1644,6 +1645,7 @@ function actualizarMetricas25Anios(produccionData, roiData, flujoMensual) {
   </script>
 </body>
 </html>
+
 
 
 
