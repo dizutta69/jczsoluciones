@@ -378,33 +378,7 @@
       font-size: 1rem;
       color: #0d47a1;
     }
-    
-    /* FLUJO MENSUAL JUNTO CON PRODUCCIÓN */
-    .flujo-combined-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin: 1.5rem 0;
-    }
-    
-    .flujo-mensual-card {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      border-top: 5px solid #28a745;
-    }
-    
-    .flujo-total-card {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      border-top: 5px solid #ff9800;
-    }
-    
+        
     /* LOGO Y HEADER */
     .logo-header {
       text-align: center;
@@ -482,11 +456,7 @@
       .finance-grid, .roi-metrics, .metrics-25-grid {
         grid-template-columns: 1fr;
       }
-      
-      .flujo-combined-container {
-        grid-template-columns: 1fr;
-      }
-      
+            
       .splash-coords {
         flex-direction: column;
         align-items: stretch;
@@ -678,63 +648,57 @@
         <!-- LÍNEAS DE FINANCIAMIENTO QUITADAS -->
       </div>
       
-      <!-- Flujo mensual junto con flujo total del proyecto -->
-      <div class="flujo-combined-container">
-        <div class="flujo-mensual-card">
-          <div style="font-size: 1.1rem; font-weight: bold; color: #333; margin-bottom: 1rem;">💸 Flujo mensual inmediato</div>
-          <div style="font-size: 2rem; font-weight: bold; color: #28a745; margin: 1rem 0;" id="roiFlujoMensual">$0 COP/mes</div>
-          <div style="font-size: 0.9rem; color: #666;">Desde el primer mes</div>
-        </div>
-        
-        <div class="flujo-total-card">
-          <div style="font-size: 1.1rem; font-weight: bold; color: #333; margin-bottom: 1rem;">📈 Flujo total del proyecto</div>
-          <div style="font-size: 2rem; font-weight: bold; color: #ff9800; margin: 1rem 0;" id="flujoTotalProyecto">$0 COP</div>
-          <div style="font-size: 0.9rem; color: #666;" id="flujoTotalDetail">En 25 años</div>
-        </div>
-      </div>
       
-      <!-- SECCIÓN 25 AÑOS -->
-      <div class="metrics-25-container">
-        <div class="metrics-25-title">
-          📊 Proyección a 25 años (Vida útil del sistema)
-        </div>
-        
-        <div class="metrics-25-grid">
-          <div class="metric-25-card orange">
-            <div class="roi-icon">💰</div>
-            <div class="roi-title">Valor total producido</div>
-            <div class="metric-25-value" id="valorProduccion25">$0 COP</div>
-            <div class="metric-25-detail" id="produccionAño25">Con inflación del 5% anual</div>
-          </div>
-          
-          <div class="metric-25-card green">
-            <div class="roi-icon">📈</div>
-            <div class="roi-title">ROI sobre inversión</div>
-            <div class="metric-25-value" id="roi25Anios">0%</div>
-            <div class="metric-25-detail" id="gananciaPorMillon">Retorno en 25 años</div>
-          </div>
-          
-          <div class="metric-25-card blue">
-            <div class="roi-icon">💵</div>
-            <div class="roi-title">Beneficio neto</div>
-            <div class="metric-25-value" id="beneficioNeto25">$0 COP</div>
-            <div class="metric-25-detail" id="multiplicadorInversion">Ganancia después de costos</div>
-          </div>
-        </div>
-        
-        <!-- Detalles adicionales -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
-          <div style="background: white; padding: 1rem; border-radius: 8px; border-left: 4px solid #4caf50;">
-            <div style="font-size: 0.9rem; color: #666;">🏭 Producción anual</div>
-            <div style="font-size: 1.2rem; font-weight: bold; color: #333;" id="produccionAnualKWh">0 kWh</div>
-          </div>
-          <div style="background: white; padding: 1rem; border-radius: 8px; border-left: 4px solid #ff9800;">
-            <div style="font-size: 0.9rem; color: #666;">⚡ Eficiencia año 25</div>
-            <div style="font-size: 1.2rem; font-weight: bold; color: #333;" id="eficienciaAño25">80%</div>
-          </div>
-        </div>
-      </div>
-      
+<!-- SECCIÓN 25 AÑOS - REORGANIZADA -->
+<div class="metrics-25-container">
+  <div class="metrics-25-title">
+    📊 Proyección a 25 años (Vida útil del sistema)
+  </div>
+  
+  <div class="metrics-25-grid">
+    <!-- Fila superior: 2 indicadores -->
+    <div class="metric-25-card green">
+      <div class="roi-icon">💰</div>
+      <div class="roi-title">Flujo mensual inmediato</div>
+      <div class="metric-25-value" id="roiFlujoMensual">$0 COP/mes</div>
+      <div class="metric-25-detail">Desde el primer mes</div>
+    </div>
+    
+    <div class="metric-25-card orange">
+      <div class="roi-icon">📈</div>
+      <div class="roi-title">Flujo total del proyecto</div>
+      <div class="metric-25-value" id="flujoTotalProyecto">$0 COP</div>
+      <div class="metric-25-detail">Beneficio neto en 25 años</div>
+    </div>
+    
+    <!-- Fila inferior: 2 indicadores -->
+    <div class="metric-25-card blue">
+      <div class="roi-icon">💵</div>
+      <div class="roi-title">Valor total producido</div>
+      <div class="metric-25-value" id="valorProduccion25">$0 COP</div>
+      <div class="metric-25-detail" id="produccionAño25">Con inflación del 5% anual</div>
+    </div>
+    
+    <div class="metric-25-card green">
+      <div class="roi-icon">📊</div>
+      <div class="roi-title">ROI sobre inversión</div>
+      <div class="metric-25-value" id="roi25Anios">0%</div>
+      <div class="metric-25-detail" id="gananciaPorMillon">Retorno en 25 años</div>
+    </div>
+  </div>
+  
+  <!-- Detalles adicionales -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
+    <div style="background: white; padding: 1rem; border-radius: 8px; border-left: 4px solid #4caf50;">
+      <div style="font-size: 0.9rem; color: #666;">🏭 Producción anual</div>
+      <div style="font-size: 1.2rem; font-weight: bold; color: #333;" id="produccionAnualKWh">0 kWh</div>
+    </div>
+    <div style="background: white; padding: 1rem; border-radius: 8px; border-left: 4px solid #ff9800;">
+      <div style="font-size: 0.9rem; color: #666;">⚡ Eficiencia año 25</div>
+      <div style="font-size: 1.2rem; font-weight: bold; color: #333;" id="eficienciaAño25">80%</div>
+    </div>
+  </div>
+</div>      
       <!-- MENSAJE MOTIVACIONAL -->
       <div class="motivational-message" id="mensajeMotivacional">
         💡 <strong>Aumentar tu pago inicial mejora significativamente tu retorno a largo plazo.</strong>
@@ -1122,63 +1086,53 @@
       return flujoMensual;
     }
     
-    // ========== ACTUALIZAR MÉTRICAS 25 AÑOS EN INTERFAZ ==========
-    function actualizarMetricas25Anios(produccionData, roiData, flujoMensual) {
-      // 1. Valor total producido en 25 años
-      document.getElementById('valorProduccion25').textContent = 
-          formatoDineroCOP(produccionData.valorTotalProduccion);
-      
-      // 2. ROI porcentual
-      const roiElement = document.getElementById('roi25Anios');
-      roiElement.textContent = roiData.roiPorcentual.toFixed(1) + '%';
-      
-      // Color según ROI
-      if (roiData.roiPorcentual > 100) {
-          roiElement.style.color = '#28a745'; // Verde para ROI > 100%
-      } else if (roiData.roiPorcentual > 0) {
-          roiElement.style.color = '#ffc107'; // Amarillo para ROI positivo
-      } else {
-          roiElement.style.color = '#e74c3c'; // Rojo para ROI negativo
-      }
-      
-      // 3. Beneficio neto
-      document.getElementById('beneficioNeto25').textContent = 
-          formatoDineroCOP(roiData.beneficioNeto);
-      
-      // 4. Multiplicador de inversión
-      document.getElementById('multiplicadorInversion').textContent = 
-          roiData.multiplicadorInversion;
-      
-      // 5. Ganancia por millón
-      document.getElementById('gananciaPorMillon').textContent = 
-          roiData.textoGananciaPorMillon;
-      
-      // 6. Producción anual
-      document.getElementById('produccionAnualKWh').textContent = 
-          formatoNumeroGrande(produccionData.produccionAnualInicial) + ' kWh';
-      
-      // 7. Eficiencia año 25
-      document.getElementById('eficienciaAño25').textContent = 
-          produccionData.porcentajeAño25.toFixed(1) + '%';
-      
-      // 8. Flujo mensual
-      const flujoMensualElement = document.getElementById('roiFlujoMensual');
-      if (flujoMensual > 0) {
-        flujoMensualElement.textContent = '+ ' + formatoDineroCOP(flujoMensual) + '/mes';
-        flujoMensualElement.style.color = '#28a745';
-      } else {
-        flujoMensualElement.textContent = formatoDineroCOP(flujoMensual) + '/mes';
-        flujoMensualElement.style.color = '#e74c3c';
-      }
-      
-      // 9. Flujo total del proyecto (beneficio neto)
-      const flujoTotalElement = document.getElementById('flujoTotalProyecto');
-      flujoTotalElement.textContent = formatoDineroCOP(roiData.beneficioNeto);
-      document.getElementById('flujoTotalDetail').textContent = 'Beneficio neto en 25 años';
-      
-      // 10. Mensaje motivacional basado en pago inicial
-      actualizarMensajeMotivacional(roiData, currentDownPayment, sistemaConServicios);
-    }
+function actualizarMetricas25Anios(produccionData, roiData, flujoMensual) {
+  // 1. Flujo mensual inmediato
+  const flujoMensualElement = document.getElementById('roiFlujoMensual');
+  if (flujoMensual > 0) {
+    flujoMensualElement.textContent = '+ ' + formatoDineroCOP(flujoMensual) + '/mes';
+    flujoMensualElement.style.color = '#28a745';
+  } else {
+    flujoMensualElement.textContent = formatoDineroCOP(flujoMensual) + '/mes';
+    flujoMensualElement.style.color = '#e74c3c';
+  }
+  
+  // 2. Flujo total del proyecto (beneficio neto)
+  const flujoTotalElement = document.getElementById('flujoTotalProyecto');
+  flujoTotalElement.textContent = formatoDineroCOP(roiData.beneficioNeto);
+  
+  // 3. Valor total producido en 25 años
+  document.getElementById('valorProduccion25').textContent = 
+      formatoDineroCOP(produccionData.valorTotalProduccion);
+  
+  // 4. ROI porcentual
+  const roiElement = document.getElementById('roi25Anios');
+  roiElement.textContent = roiData.roiPorcentual.toFixed(1) + '%';
+  
+  // Color según ROI
+  if (roiData.roiPorcentual > 100) {
+      roiElement.style.color = '#28a745'; // Verde para ROI > 100%
+  } else if (roiData.roiPorcentual > 0) {
+      roiElement.style.color = '#ffc107'; // Amarillo para ROI positivo
+  } else {
+      roiElement.style.color = '#e74c3c'; // Rojo para ROI negativo
+  }
+  
+  // 5. Ganancia por millón
+  document.getElementById('gananciaPorMillon').textContent = 
+      roiData.textoGananciaPorMillon;
+  
+  // 6. Producción anual
+  document.getElementById('produccionAnualKWh').textContent = 
+      formatoNumeroGrande(produccionData.produccionAnualInicial) + ' kWh';
+  
+  // 7. Eficiencia año 25
+  document.getElementById('eficienciaAño25').textContent = 
+      produccionData.porcentajeAño25.toFixed(1) + '%';
+  
+  // 8. Mensaje motivacional basado en pago inicial
+  actualizarMensajeMotivacional(roiData, currentDownPayment, sistemaConServicios);
+}
     
     // ========== MENSAJE MOTIVACIONAL DINÁMICO ==========
     function actualizarMensajeMotivacional(roiData, pagoInicial, valorSistema) {
@@ -1690,6 +1644,7 @@
   </script>
 </body>
 </html>
+
 
 
 
