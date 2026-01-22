@@ -844,9 +844,9 @@
     let horasPicoAnualesActuales = 1350; // Se actualizará con datos de NASA
     
     // ========== CONSTANTES ACTUALIZADAS ==========
-    const ANNUAL_INTEREST_RATE = 0.20; // 20% anual (reducido de 24%)
-    const MONTHLY_INTEREST_RATE = Math.pow(1 + ANNUAL_INTEREST_RATE, 1/12) - 1; // 1.53% mensual
-    const TARGET_PERCENTAGE = 0.75; // 75% de la factura
+    const ANNUAL_INTEREST_RATE = 0.16; // 16% anual (reducido de 24%)
+    const MONTHLY_INTEREST_RATE = Math.pow(1 + ANNUAL_INTEREST_RATE, 1/12) - 1;
+    const TARGET_PERCENTAGE = 0.70; // 70% de la factura
     
     // ========== CONSTANTES PARA CÁLCULO 25 AÑOS ==========
     const VIDA_UTIL_SISTEMA = 25; // años
@@ -924,7 +924,7 @@
       const USD_COP = 4000;
       const USD_W_INSTALLED = 0.9;
       const PANEL_W = 450;
-      const TARGET = 0.75;
+      const TARGET = 0.70;
       const AREA_POR_PANEL = 2.2;
       const COSTO_FIJO_COP = 3000000;
     
@@ -1690,5 +1690,6 @@
   </script>
 </body>
 </html>
+
 
 
