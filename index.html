@@ -304,85 +304,6 @@
       margin-top: 0.5rem;
     }
     
-    .scale-discount-badge {
-      background: linear-gradient(135deg, #28a745, #20c997);
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      font-weight: bold;
-      display: inline-block;
-      margin-top: 1rem;
-      box-shadow: 0 3px 10px rgba(40,167,69,0.3);
-    }
-    
-    /* TIMELINE */
-    .timeline-container {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      margin: 2rem 0;
-      border: 1px solid #e0e0e0;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    }
-    
-    .investment-message {
-      background: linear-gradient(135deg, #e8f5e8, #d4edda);
-      padding: 2rem;
-      border-radius: 12px;
-      margin: 2rem 0;
-      text-align: center;
-      border-left: 5px solid #28a745;
-      box-shadow: 0 5px 15px rgba(40,167,69,0.1);
-    }
-    
-    .investment-title {
-      font-size: 1.6rem;
-      font-weight: bold;
-      color: #28a745;
-      margin-bottom: 1rem;
-    }
-    
-    /* LOGO Y HEADER */
-    .logo-header {
-      text-align: center;
-      margin-bottom: 2rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 3px solid #00704a;
-      background: linear-gradient(135deg, #f8fff9, #ffffff);
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0,112,74,0.1);
-    }
-    
-    .logo-img {
-      max-height: 70px;
-      width: auto;
-      margin-bottom: 1rem;
-    }
-    
-    /* BOTONES VOLVER */
-    .back-button {
-      background: linear-gradient(135deg, #6c757d, #5a6268);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 20px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      margin-top: 1rem;
-      transition: all 0.3s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 600;
-    }
-    
-    .back-button:hover {
-      transform: translateX(-5px);
-      box-shadow: 0 5px 15px rgba(108,117,125,0.3);
-    }
-    
     /* ESTILOS PARA MÉTRICAS 25 AÑOS */
     .metrics-25-container {
       background: linear-gradient(135deg, #fff3e0, #ffe0b2);
@@ -458,6 +379,89 @@
       color: #0d47a1;
     }
     
+    /* FLUJO MENSUAL JUNTO CON PRODUCCIÓN */
+    .flujo-combined-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    
+    .flujo-mensual-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-top: 5px solid #28a745;
+    }
+    
+    .flujo-total-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-top: 5px solid #ff9800;
+    }
+    
+    /* LOGO Y HEADER */
+    .logo-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 3px solid #00704a;
+      background: linear-gradient(135deg, #f8fff9, #ffffff);
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,112,74,0.1);
+    }
+    
+    .logo-img {
+      max-height: 70px;
+      width: auto;
+      margin-bottom: 1rem;
+    }
+    
+    /* BOTONES VOLVER */
+    .back-button {
+      background: linear-gradient(135deg, #6c757d, #5a6268);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+    
+    .back-button:hover {
+      transform: translateX(-5px);
+      box-shadow: 0 5px 15px rgba(108,117,125,0.3);
+    }
+    
+    .investment-message {
+      background: linear-gradient(135deg, #e8f5e8, #d4edda);
+      padding: 2rem;
+      border-radius: 12px;
+      margin: 2rem 0;
+      text-align: center;
+      border-left: 5px solid #28a745;
+      box-shadow: 0 5px 15px rgba(40,167,69,0.1);
+    }
+    
+    .investment-title {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #28a745;
+      margin-bottom: 1rem;
+    }
+    
     /* ANIMACIONES */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
@@ -476,6 +480,10 @@
       }
       
       .finance-grid, .roi-metrics, .metrics-25-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .flujo-combined-container {
         grid-template-columns: 1fr;
       }
       
@@ -526,9 +534,7 @@
           <div class="step-text">
             <strong>💡 Ingresa tu factura mensual actual</strong>
             <input id="billSplash" type="number" placeholder="Ej: 200000 (COP)"/>
-            <p style="font-size: 0.85rem; color: #666; margin-top: 0.5rem; background: #e3f2fd; padding: 0.5rem; border-radius: 6px;">
-              📊 Tu cuota de financiación será el <strong>70%</strong> de este valor
-            </p>
+            <!-- FRASE QUITADA: 📊 Tu cuota de financiación será el 70% de este valor -->
           </div>
         </div>
       </div>
@@ -580,7 +586,7 @@
         <img src="logo.png" alt="JZL Soluciones" class="logo-img" onerror="this.style.display='none'">
         <h2 class="splash-title">Diseña tu Financiación</h2>
         <p style="color: #666; margin-top: 0.5rem;">
-          Tu cuota mensual será el <strong style="color: #00704a;">70% de tu factura actual</strong>
+          Tu cuota mensual será equivalente a tu ahorro en la factura de energía
         </p>
       </div>
       
@@ -598,21 +604,13 @@
               <div style="font-size: 2rem; font-weight: bold; color: #00704a;" id="totalKWp">0 kWp</div>
             </div>
             <div style="text-align: center;">
-              <div style="font-size: 0.9rem; color: #888;">Valor base</div>
+              <div style="font-size: 0.9rem; color: #888;">Valor total</div>
               <div style="font-size: 1.8rem; font-weight: bold; color: #00704a;" id="totalSystemValue">$0 COP</div>
             </div>
           </div>
         </div>
         
-        <!-- Descuento por Escala -->
-        <div id="scaleDiscountDisplay" style="text-align: center; margin-top: 1rem; display: none;">
-          <div class="scale-discount-badge">
-            🎯 Descuento por escala: <span id="discountPercentage">0%</span>
-          </div>
-          <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
-            Sistemas más grandes obtienen mejor relación costo/beneficio
-          </p>
-        </div>
+        <!-- DESCUENTO POR ESCALA QUITADO -->
       </div>
       
       <!-- Control deslizante -->
@@ -668,7 +666,7 @@
           <div class="finance-card">
             <div class="finance-label">Cuota mensual</div>
             <div class="finance-value" id="monthlyPayment">$0 COP</div>
-            <div style="font-size: 0.8rem; color: #888;">70% de tu factura</div>
+            <div style="font-size: 0.8rem; color: #888;">Equivalente al ahorro</div>
           </div>
           
           <div class="finance-card">
@@ -678,48 +676,25 @@
           </div>
         </div>
         
-        <!-- Líneas de financiamiento -->
-        <div style="margin-top: 2rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: white; border-radius: 8px; margin: 0.5rem 0; border-left: 4px solid #00704a;">
-            <span>Sistema solar con servicios (5 años):</span>
-            <strong style="font-size: 1.2rem; color: #00704a;" id="systemWithServices">$0 COP</strong>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: white; border-radius: 8px; margin: 0.5rem 0; border-left: 4px solid #28a745;">
-            <span>Pago inicial seleccionado:</span>
-            <strong style="font-size: 1.2rem; color: #28a745;" id="downPaymentLine">$0 COP</strong>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #e8f5e8; border-radius: 8px; margin: 0.5rem 0; border-left: 4px solid #00704a; font-weight: bold;">
-            <span>Saldo a financiar:</span>
-            <strong style="font-size: 1.3rem; color: #00704a;" id="balanceToFinance">$0 COP</strong>
-          </div>
+        <!-- LÍNEAS DE FINANCIAMIENTO QUITADAS -->
+      </div>
+      
+      <!-- Flujo mensual junto con flujo total del proyecto -->
+      <div class="flujo-combined-container">
+        <div class="flujo-mensual-card">
+          <div style="font-size: 1.1rem; font-weight: bold; color: #333; margin-bottom: 1rem;">💸 Flujo mensual inmediato</div>
+          <div style="font-size: 2rem; font-weight: bold; color: #28a745; margin: 1rem 0;" id="roiFlujoMensual">$0 COP/mes</div>
+          <div style="font-size: 0.9rem; color: #666;">Desde el primer mes</div>
+        </div>
+        
+        <div class="flujo-total-card">
+          <div style="font-size: 1.1rem; font-weight: bold; color: #333; margin-bottom: 1rem;">📈 Flujo total del proyecto</div>
+          <div style="font-size: 2rem; font-weight: bold; color: #ff9800; margin: 1rem 0;" id="flujoTotalProyecto">$0 COP</div>
+          <div style="font-size: 0.9rem; color: #666;" id="flujoTotalDetail">En 25 años</div>
         </div>
       </div>
       
-      <!-- NUEVAS MÉTRICAS DE ROI -->
-      <div class="roi-metrics">
-        <div class="roi-card positive">
-          <div class="roi-icon">💰</div>
-          <div class="roi-title">Flujo mensual inmediato</div>
-          <div class="roi-value" id="roiFlujoMensual">$0 COP/mes</div>
-          <div class="roi-detail">Desde el primer mes</div>
-        </div>
-        
-        <div class="roi-card neutral">
-          <div class="roi-icon">🎯</div>
-          <div class="roi-title">Recuperación pago inicial</div>
-          <div class="roi-value" id="roiRecuperacion">0 años</div>
-          <div class="roi-detail" id="roiRecuperacionDetail">Tiempo para recuperar tu inversión</div>
-        </div>
-        
-        <div class="roi-card info">
-          <div class="roi-icon">📈</div>
-          <div class="roi-title">Equilibrio del proyecto</div>
-          <div class="roi-value" id="roiEquilibrio">0 años</div>
-          <div class="roi-detail" id="roiEquilibrioDetail">Cuando el proyecto se paga solo</div>
-        </div>
-      </div>
-      
-      <!-- SECCIÓN 25 AÑOS - NUEVA -->
+      <!-- SECCIÓN 25 AÑOS -->
       <div class="metrics-25-container">
         <div class="metrics-25-title">
           📊 Proyección a 25 años (Vida útil del sistema)
@@ -764,27 +739,6 @@
       <!-- MENSAJE MOTIVACIONAL -->
       <div class="motivational-message" id="mensajeMotivacional">
         💡 <strong>Aumentar tu pago inicial mejora significativamente tu retorno a largo plazo.</strong>
-      </div>
-      
-      <!-- Timeline -->
-      <div class="timeline-container">
-        <h3 style="text-align: center; margin-bottom: 1rem; color: #00704a;">
-          ⏱️ Proyección de pagos
-        </h3>
-        
-        <div style="height: 30px; background: #e9ecef; border-radius: 15px; margin: 1.5rem 0; position: relative; overflow: hidden;">
-          <div id="timelineProgress" style="position: absolute; left: 0; top: 0; height: 100%; background: linear-gradient(90deg, #2ecc71, #f39c12); border-radius: 15px; transition: width 0.5s ease; width: 0%;"></div>
-        </div>
-        
-        <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.9rem; color: #666; font-weight: 600;">
-          <span>🏁 Inicio</span>
-          <span id="midTerm">Mitad</span>
-          <span id="endTerm">Finalización</span>
-        </div>
-        
-        <p style="text-align: center; font-size: 0.9rem; color: #666; margin-top: 1.5rem;">
-          Tiempo estimado para completar el pago: <strong id="estimatedTime" style="color: #00704a;">0 meses</strong>
-        </p>
       </div>
       
       <!-- Mensaje de inversión -->
@@ -1157,84 +1111,20 @@
       return pagoInicial + totalCuotas;
     }
     
-    // ========== CÁLCULO DE LAS 3 MÉTRICAS DE ROI ==========
-    function calcularMetricasROI(pagoInicial, ahorroMensual, sistemaConServicios, plazoMeses, saldoFinanciado) {
-      const resultados = {
-        // 1. Flujo mensual inmediato
-        flujoMensual: 0,
-        
-        // 2. Tiempo para recuperar pago inicial (ROI simple)
-        recuperacionPagoInicialAnios: 0,
-        
-        // 3. Tiempo para equilibrio del proyecto
-        equilibrioProyectoAnios: 0
-      };
+    // ========== CÁLCULO FLUJO MENSUAL ==========
+    function calcularFlujoMensual(pagoInicial, ahorroMensual, saldoFinanciado) {
+      let flujoMensual = ahorroMensual;
       
-      // 1. FLUJO MENSUAL INMEDIATO
-      // Ahorro mensual - Interés del primer mes
       if (saldoFinanciado > 0) {
         const interesPrimerMes = saldoFinanciado * MONTHLY_INTEREST_RATE;
-        resultados.flujoMensual = ahorroMensual - interesPrimerMes;
-      } else {
-        resultados.flujoMensual = ahorroMensual; // Si no hay financiación
+        flujoMensual = ahorroMensual - interesPrimerMes;
       }
       
-      // 2. RECUPERACIÓN DEL PAGO INICIAL (ROI simple)
-      // Tiempo para que el ahorro acumulado iguale el pago inicial
-      if (resultados.flujoMensual > 0) {
-        resultados.recuperacionPagoInicialAnios = (pagoInicial / (resultados.flujoMensual * 12));
-      } else {
-        resultados.recuperacionPagoInicialAnios = Infinity; // Nunca se recupera
-      }
-      
-      // 3. EQUILIBRIO DEL PROYECTO (cuando se paga todo)
-      // Simulación mes a mes hasta encontrar el equilibrio
-      if (resultados.flujoMensual > 0) {
-        let saldo = saldoFinanciado;
-        let ahorroAcumulado = 0;
-        let interesesPagados = 0;
-        
-        for (let mes = 1; mes <= plazoMeses * 2; mes++) { // Buscar hasta el doble del plazo
-          // Interés del mes
-          if (saldo > 0) {
-            const interesMes = saldo * MONTHLY_INTEREST_RATE;
-            interesesPagados += interesMes;
-            
-            // Capital pagado este mes
-            const capitalMes = ahorroMensual - interesMes;
-            saldo = Math.max(0, saldo - capitalMes);
-          }
-          
-          // Ahorro acumulado
-          ahorroAcumulado += ahorroMensual;
-          
-          // Inversión total hasta ahora
-          const inversionTotal = pagoInicial + interesesPagados;
-          
-          // Verificar equilibrio
-          if (ahorroAcumulado >= inversionTotal) {
-            resultados.equilibrioProyectoAnios = mes / 12;
-            break;
-          }
-          
-          // Si ya no hay saldo pero aún no hay equilibrio
-          if (saldo <= 0 && ahorroAcumulado < (pagoInicial + interesesPagados)) {
-            // Calcular tiempo restante basado en flujo mensual
-            const deficit = (pagoInicial + interesesPagados) - ahorroAcumulado;
-            const mesesRestantes = deficit / resultados.flujoMensual;
-            resultados.equilibrioProyectoAnios = (mes + mesesRestantes) / 12;
-            break;
-          }
-        }
-      } else {
-        resultados.equilibrioProyectoAnios = Infinity;
-      }
-      
-      return resultados;
+      return flujoMensual;
     }
     
     // ========== ACTUALIZAR MÉTRICAS 25 AÑOS EN INTERFAZ ==========
-    function actualizarMetricas25Anios(produccionData, roiData) {
+    function actualizarMetricas25Anios(produccionData, roiData, flujoMensual) {
       // 1. Valor total producido en 25 años
       document.getElementById('valorProduccion25').textContent = 
           formatoDineroCOP(produccionData.valorTotalProduccion);
@@ -1272,11 +1162,22 @@
       document.getElementById('eficienciaAño25').textContent = 
           produccionData.porcentajeAño25.toFixed(1) + '%';
       
-      // 8. Detalle del año 25
-      document.getElementById('produccionAño25').textContent = 
-          'Año 25: ' + produccionData.porcentajeAño25.toFixed(1) + '% de producción inicial';
+      // 8. Flujo mensual
+      const flujoMensualElement = document.getElementById('roiFlujoMensual');
+      if (flujoMensual > 0) {
+        flujoMensualElement.textContent = '+ ' + formatoDineroCOP(flujoMensual) + '/mes';
+        flujoMensualElement.style.color = '#28a745';
+      } else {
+        flujoMensualElement.textContent = formatoDineroCOP(flujoMensual) + '/mes';
+        flujoMensualElement.style.color = '#e74c3c';
+      }
       
-      // 9. Mensaje motivacional basado en pago inicial
+      // 9. Flujo total del proyecto (beneficio neto)
+      const flujoTotalElement = document.getElementById('flujoTotalProyecto');
+      flujoTotalElement.textContent = formatoDineroCOP(roiData.beneficioNeto);
+      document.getElementById('flujoTotalDetail').textContent = 'Beneficio neto en 25 años';
+      
+      // 10. Mensaje motivacional basado en pago inicial
       actualizarMensajeMotivacional(roiData, currentDownPayment, sistemaConServicios);
     }
     
@@ -1315,11 +1216,6 @@
       document.getElementById('monthlyPayment').textContent = formatoDineroCOP(currentMonthlyPayment);
       document.getElementById('financedAmount').textContent = formatoDineroCOP(financedAmount);
       
-      // Líneas de financiamiento
-      document.getElementById('systemWithServices').textContent = formatoDineroCOP(sistemaConServicios);
-      document.getElementById('downPaymentLine').textContent = formatoDineroCOP(currentDownPayment);
-      document.getElementById('balanceToFinance').textContent = formatoDineroCOP(financedAmount);
-      
       // Calcular financiación
       const resultadoFinanciacion = calcularFinanciacion(
         sistemaConServicios,
@@ -1353,71 +1249,13 @@
       
       document.getElementById('financeTerm').textContent = tiempoTexto;
       document.getElementById('financeYears').textContent = resultadoFinanciacion.años > 0 ? resultadoFinanciacion.años + ' años' : '';
-      document.getElementById('estimatedTime').textContent = tiempoTexto;
       
-      // Actualizar gráfica de timeline
-      const maxMeses = 25 * 12;
-      const progressPercentage = resultadoFinanciacion.meses === Infinity ? 100 : Math.min((financeTermMonths / maxMeses) * 100, 100);
-      document.getElementById('timelineProgress').style.width = progressPercentage + '%';
-      
-      // Actualizar marcadores de timeline
-      if (resultadoFinanciacion.años > 0) {
-        const mitadAños = Math.floor(resultadoFinanciacion.años / 2);
-        document.getElementById('midTerm').textContent = mitadAños + ' años';
-        document.getElementById('endTerm').textContent = resultadoFinanciacion.años + ' años';
-      } else {
-        document.getElementById('midTerm').textContent = 'Mitad';
-        document.getElementById('endTerm').textContent = 'Final';
-      }
-      
-      // Calcular métricas ROI iniciales
-      const roiMetrics = calcularMetricasROI(
+      // Calcular flujo mensual
+      const flujoMensual = calcularFlujoMensual(
         currentDownPayment,
         currentMonthlyPayment,
-        sistemaConServicios,
-        financeTermMonths,
         financedAmount
       );
-      
-      // Actualizar métricas ROI en la interfaz
-      // 1. Flujo mensual inmediato
-      if (roiMetrics.flujoMensual > 0) {
-        document.getElementById('roiFlujoMensual').textContent = '+ ' + formatoDineroCOP(roiMetrics.flujoMensual) + '/mes';
-        document.getElementById('roiFlujoMensual').style.color = '#28a745';
-      } else {
-        document.getElementById('roiFlujoMensual').textContent = formatoDineroCOP(roiMetrics.flujoMensual) + '/mes';
-        document.getElementById('roiFlujoMensual').style.color = '#e74c3c';
-      }
-      
-      // 2. Recuperación pago inicial
-      if (roiMetrics.recuperacionPagoInicialAnios !== Infinity) {
-        if (roiMetrics.recuperacionPagoInicialAnios < 1) {
-          const meses = Math.round(roiMetrics.recuperacionPagoInicialAnios * 12);
-          document.getElementById('roiRecuperacion').textContent = meses + ' meses';
-          document.getElementById('roiRecuperacionDetail').textContent = 'Recuperas rápido tu inversión';
-        } else {
-          document.getElementById('roiRecuperacion').textContent = roiMetrics.recuperacionPagoInicialAnios.toFixed(1) + ' años';
-          document.getElementById('roiRecuperacionDetail').textContent = 'Tiempo para recuperar tu inversión';
-        }
-      } else {
-        document.getElementById('roiRecuperacion').textContent = 'No aplica';
-        document.getElementById('roiRecuperacionDetail').textContent = 'El flujo no es positivo';
-      }
-      
-      // 3. Equilibrio del proyecto
-      if (roiMetrics.equilibrioProyectoAnios !== Infinity) {
-        if (roiMetrics.equilibrioProyectoAnios < 1) {
-          const meses = Math.round(roiMetrics.equilibrioProyectoAnios * 12);
-          document.getElementById('roiEquilibrio').textContent = meses + ' meses';
-          document.getElementById('roiEquilibrioDetail').textContent = 'El proyecto se paga rápido';
-        } else {
-          document.getElementById('roiEquilibrio').textContent = roiMetrics.equilibrioProyectoAnios.toFixed(1) + ' años';
-          document.getElementById('roiEquilibrioDetail').textContent = 'Cuando el proyecto se paga solo';
-        }
-      } else {
-        document.getElementById('roiEquilibrio').textContent = 'No aplica';
-        document.getElementById('roiEquilibrioDetail').textContent = 'No se alcanza el equilibrio';
-      }
       
       // ========== CÁLCULOS 25 AÑOS ==========
       // Calcular producción y valor a 25 años
@@ -1437,7 +1275,7 @@
       const roi25Anios = calcularROI25Anios(inversionTotal, produccion25Anios.valorTotalProduccion);
       
       // Actualizar interfaz con nuevos datos de 25 años
-      actualizarMetricas25Anios(produccion25Anios, roi25Anios);
+      actualizarMetricas25Anios(produccion25Anios, roi25Anios, flujoMensual);
       
       // Actualizar ahorro inmediato
       const nuevaFactura = currentMonthlyBill - currentMonthlyPayment;
@@ -1449,17 +1287,11 @@
     
     // ========== INICIALIZAR PANTALLA DE FINANCIACIÓN ==========
     function inicializarPantallaFinanciacion(sistemaData) {
+      // Mostrar valor total con mantenimientos incluidos
       document.getElementById('totalPanels').textContent = sistemaData.panels;
       document.getElementById('totalKWp').textContent = sistemaData.kWp.toFixed(1);
-      document.getElementById('totalSystemValue').textContent = formatoDineroCOP(sistemaData.valorBaseSistema);
+      document.getElementById('totalSystemValue').textContent = formatoDineroCOP(sistemaConServicios);
       document.getElementById('maxDownPaymentLabel').textContent = formatoDineroCOP(sistemaConServicios);
-      
-      // Mostrar descuento por escala
-      const descuentoAdicional = (sistemaData.factorDescuento - 1) * 100;
-      if (descuentoAdicional > 0) {
-        document.getElementById('scaleDiscountDisplay').style.display = 'block';
-        document.getElementById('discountPercentage').textContent = descuentoAdicional.toFixed(1) + '%';
-      }
       
       // Guardar horas pico para cálculos posteriores
       horasPicoAnualesActuales = sistemaData.horasPicoAnuales;
@@ -1717,12 +1549,10 @@
         tiempoTexto += mesesFinanciacion + ' mes' + (mesesFinanciacion !== 1 ? 'es' : '');
       }
       
-      // Calcular métricas ROI para el resumen
-      const roiMetrics = calcularMetricasROI(
+      // Calcular flujo mensual
+      const flujoMensual = calcularFlujoMensual(
         currentDownPayment,
         currentMonthlyPayment,
-        sistemaConServicios,
-        financeTermMonths,
         financedAmount
       );
       
@@ -1741,8 +1571,8 @@
       const roi25Anios = calcularROI25Anios(inversionTotal, produccion25Anios.valorTotalProduccion);
       
       let flujoTexto = 'No aplica';
-      if (roiMetrics.flujoMensual > 0) {
-        flujoTexto = '+ ' + formatoDineroCOP(roiMetrics.flujoMensual) + '/mes';
+      if (flujoMensual > 0) {
+        flujoTexto = '+ ' + formatoDineroCOP(flujoMensual) + '/mes';
       }
       
       const resumenHTML = `
@@ -1761,7 +1591,7 @@
           </div>
           <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #d4edda;">
             <span>💸 Flujo mensual:</span>
-            <strong style="color: ${roiMetrics.flujoMensual > 0 ? '#28a745' : '#e74c3c'};">${flujoTexto}</strong>
+            <strong style="color: ${flujoMensual > 0 ? '#28a745' : '#e74c3c'};">${flujoTexto}</strong>
           </div>
           <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #d4edda; background: #fff3e0;">
             <span>📊 ROI 25 años:</span>
